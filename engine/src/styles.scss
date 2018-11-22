@@ -1,0 +1,38 @@
+@import 'components/Tooltip/tooltip.scss';
+@import 'components/Controls/controls.scss';
+@import 'components/Count/count.scss';
+
+.el-grapho-wrapper {
+  display: inline-block;
+  position: relative;
+  background-color: white;
+  overflow: hidden;
+
+  &.el-grapho-select-interaction-mode {
+    cursor: default;
+
+    .el-grapho-controls {
+      .el-grapho-select-control {
+        border-color: #119fe0;
+
+        path {
+          fill: #119fe0;
+        }
+      }
+    }
+  }
+
+  &.el-grapho-pan-interaction-mode {
+    cursor: move;
+
+    .el-grapho-controls {
+      .el-grapho-pan-control {
+        border-color: #119fe0;
+
+        path {
+          fill: #119fe0;
+        }
+      }
+    }
+  }
+}

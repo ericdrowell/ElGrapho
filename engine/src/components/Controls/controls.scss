@@ -1,0 +1,15 @@
+.el-grapho-controls {
+  position: absolute;
+  right: 0;
+  top: 5px;
+
+  button {
+    background: white;
+    padding: 5px;
+    cursor: pointer;
+    outline: none;
+    border: 2px solid black;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+}
