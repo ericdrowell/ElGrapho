@@ -1,8 +1,8 @@
 module.exports = {
-  entry: './gallery/src/gallery.js',
+  entry: './engine/src/ElGrapho.js',
   output: {
-    filename: 'gallery.js',
-    path: __dirname + '/gallery/dist'
+    filename: 'ElGrapho.js',
+    path: __dirname + '/engine/dist'
   },
   devtool: 'source-map',
   mode: 'development' // development or production

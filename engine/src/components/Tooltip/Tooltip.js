@@ -19,7 +19,7 @@ const Tooltip = {
     Tooltip.wrapper.style.left = x + 'px';
     Tooltip.wrapper.style.bottom = (window.innerHeight - y + 10) + 'px';
 
-    template.call(Tooltip, index);
+    template(index, this.wrapper);
   },
   hide: function() {
     if (!Tooltip.initialized) {

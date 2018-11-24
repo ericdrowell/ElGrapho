@@ -171,7 +171,11 @@ ElGrapho.prototype = {
           Tooltip.hide();
         }
         else {
-          Tooltip.render(dataPointIndex, evt.clientX, evt.clientY, that.components.tooltip.template);
+          Tooltip.render(dataPointIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+
+          that.fire('node-mouseover', {
+            dataPointIndex: dataPointIndex
+          });
         }
       }
     }));
@@ -202,7 +206,10 @@ ElGrapho.prototype = {
       Tooltip.hide();
     }));
   },
-  setInteractionMode(mode) {
+  setTooltipTemplate: function(func) {
+    this.tooltipTemplate = func;
+  },
+  setInteractionMode: function(mode) {
     this.interactionMode = mode;
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
   },
@@ -288,8 +295,8 @@ ElGrapho.prototype = {
   on: function(name, func) {
     this.events.on(name, func);
   },
-  fire: function(name) {
-    this.events.fire(name);
+  fire: function(name, evt) {
+    this.events.fire(name, evt);
   }
 };
 

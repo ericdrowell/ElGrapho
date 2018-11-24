@@ -18,9 +18,9 @@
     "concretejs": "^3.0.2"
   },
   "scripts": {
-    "build": "npm run jshint && npm run prep-dists && node engine/scripts/build-icons.js && node engine/scripts/build-shaders.js && npm run sass && webpack --config webpack.config.js && cp gallery/src/index.html gallery/dist/index.html",
+    "build": "npm run jshint && npm run prep-dists && node engine/scripts/build-icons.js && node engine/scripts/build-shaders.js && npm run sass && webpack --config webpack.config.js",
     "jshint": "jshint engine/src/",
     "sass": "node-sass engine/src/styles.scss engine/dist/styles/ElGrapho.css && uglifycss engine/dist/styles/ElGrapho.css > engine/dist/styles/ElGrapho.min.css && node engine/scripts/build-styles.js",
-    "prep-dists": "rm -rf engine/dist && mkdir engine/dist && mkdir engine/dist/icons && mkdir engine/dist/shaders && mkdir engine/dist/styles && rm -rf gallery/dist && mkdir gallery/dist"
+    "prep-dists": "rm -rf engine/dist && mkdir engine/dist && mkdir engine/dist/icons && mkdir engine/dist/shaders && mkdir engine/dist/styles"
   }
 }

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Gallery</h1>
+    <div id="container"></div>
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+      const WIDTH = 500;
+      const HEIGHT = 500;
+
+      // let points = ElGrapho.VertexBridges.getRandomPoints({
+      //   numPoints: 100,
+      //   width: WIDTH,
+      //   height: HEIGHT,
+      //   pointSize: 10
+      // });
+
+      let points = {
+        positions: new Float32Array([0, 0    ]),
+        colors:    new Float32Array([255, 0, 0, 1]),
+        hitColors: new Float32Array([0,   0, 0, 1]),
+        sizes:     new Float32Array([10          ]),
+      };
+
+      var graph = new ElGrapho({
+        container: document.getElementById('container'),
+        vertices: {
+          points: points
+        },
+        width: WIDTH,
+        height: HEIGHT,
+        renderingMode: 'ux'
+      });
+
+      graph.setTooltipTemplate(function(index, el) {
+        el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
+      });
+
+      graph.on('node-mouseover', function(evt) {
+        let dataPointIndex = evt.dataPointIndex;
+        console.log(dataPointIndex)
+      });
+    </script>
+  </body>
+</html>

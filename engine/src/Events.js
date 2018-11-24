@@ -11,10 +11,10 @@ Events.prototype = {
 
     this.funcs[name].push(func);
   },
-  fire: function(name) {
+  fire: function(name, evt) {
     if (this.funcs[name]) {
       this.funcs[name].forEach(function(f) {
-        f();
+        f(evt);
       });
     }
   }
