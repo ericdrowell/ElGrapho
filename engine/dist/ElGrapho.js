@@ -615,8 +615,6 @@ Concrete.Hit.prototype = {
       }
     }
 
-    console.log(data)
-
     return this.rgbToInt(data);
   },
   /**
@@ -1743,6 +1741,14 @@ const VertexBridges = {
     return sizes;
   }),
 
+  getFocused: Profiler('VertexBridges.getFocused', function(num) {
+    let focused = new Float32Array(num);
+    for (let n=0; n<num; n++) {
+      focused[n] = 0;
+    }
+    return focused;
+  }),
+
   /**
    * generate line connections between random nodes
    * @param {Float32Array} points
@@ -1853,7 +1859,8 @@ const VertexBridges = {
       positions: VertexBridges.getRandomPointPositions(numPoints, width, height),
       colors: VertexBridges.getRandomColors(numPoints),
       hitColors: VertexBridges.getHitColors(numPoints),
-      sizes: VertexBridges.getConstantSizes(numPoints, pointSize)
+      sizes: VertexBridges.getConstantSizes(numPoints, pointSize),
+      focused: VertexBridges.getFocused(numPoints)
     };
   }),
 
@@ -1923,7 +1930,8 @@ const VertexBridges = {
       positions: positions,
       colors: colors,
       hitColors: VertexBridges.getHitColors(numPoints),
-      sizes: VertexBridges.getRandomSizes(numPoints, minPointSize, maxPointSize)
+      sizes: VertexBridges.getRandomSizes(numPoints, minPointSize, maxPointSize),
+      focused: VertexBridges.getFocused(numPoints)
     };
   })
 

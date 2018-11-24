@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Random Triangle</h1>
+    <div id="container"></div>
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+      const WIDTH = 500;
+      const HEIGHT = 500;
+
+
+      let points = ElGrapho.VertexBridges.getRandomClusteredGraphPoints({
+        numPoints: 100,
+        width: WIDTH,
+        height: HEIGHT,
+        minPointSize: 8,
+        maxPointSize: 16
+      });
+
+      let triangles = ElGrapho.VertexBridges.getGraphTriangles({
+        points: points, 
+        maxConnectionsPerNode: 1,
+        edgeSize: 0.4
+      });
+
+      let graph = new ElGrapho({
+        container: document.getElementById('container'),
+        vertices: {
+          points: points,
+          triangles: triangles
+        },
+        width: WIDTH,
+        height: HEIGHT,
+        renderingMode: 'ux'
+      });
+
+    </script>
+  </body>
+</html>
