@@ -9,6 +9,7 @@
 * SPIKE investigate using single integer as hit color and letting shader convert to components
 * SPIKE investigate using colorIndex for point color and letting shader convert to components
 * SPIKE try using normalized x,y positions and let shader convert
+* can I use ints in glsl where appropriate? Right now using all floats
 
 
 

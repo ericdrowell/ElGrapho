@@ -97,7 +97,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*
  * Concrete v3.0.2
  * A lightweight Html5 Canvas framework that enables hit detection, layering, multi buffering, 
  * pixel ratio management, exports, and image downloads
- * Release Date: 11-20-2018
+ * Release Date: 11-23-2018
  * https://github.com/ericdrowell/concrete
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -615,6 +615,8 @@ Concrete.Hit.prototype = {
       }
     }
 
+    console.log(data)
+
     return this.rgbToInt(data);
   },
   /**
@@ -918,6 +920,7 @@ void main(void) {
 module.exports = `attribute vec4 aVertexPosition;
 attribute vec4 aVertexColor;
 attribute float aVertexSize;
+attribute float aVertexFocused;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -928,7 +931,15 @@ void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
   // scale points with zoom.  Using scale of x component
   gl_PointSize = aVertexSize * length(uModelViewMatrix[0]);
-  vVertexColor = aVertexColor;
+
+  // normal color
+  if (aVertexFocused == 0.0) {
+    vVertexColor = aVertexColor;
+  }
+  // focused color
+  else {
+    vVertexColor = vec4(0.0, 0.0, 255.0, 1.0); 
+  }
 }`;
 
 /***/ }),
@@ -1114,6 +1125,11 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.PERFORMANCE : config.renderingMode;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
+  // default tooltip template
+  this.tooltipTemplate = function(index, el) {
+    el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
+  };
+  this.hoveredDataIndex = -1;
 
   let viewport = this.viewport = new Concrete.Viewport({
     container: this.wrapper,
@@ -1227,7 +1243,7 @@ ElGrapho.prototype = {
 
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
-      let dataPointIndex = viewport.getIntersection(mousePos.x, mousePos.y);
+      let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
       // if panning
       if (that.panStart) {
@@ -1241,15 +1257,24 @@ ElGrapho.prototype = {
       }
       else {
         // if pixel data is not white (empty)
-        if (dataPointIndex === -1) {
+        if (dataIndex === -1) {
           Tooltip.hide();
         }
         else {
-          Tooltip.render(dataPointIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+          Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+        }
 
-          that.fire('node-mouseover', {
-            dataPointIndex: dataPointIndex
-          });
+
+        // change point state
+        if (dataIndex !== that.hoveredDataIndex) {
+          if (that.hoveredDataIndex > -1) {
+            that.vertices.points.focused[that.hoveredDataIndex] = 0;
+          }
+
+          that.vertices.points.focused[dataIndex] = 1;
+          that.webgl.initBuffers(that.vertices);
+          that.dirty = true;
+          that.hoveredDataIndex = dataIndex;          
         }
       }
     }));
@@ -1279,9 +1304,6 @@ ElGrapho.prototype = {
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
-  },
-  setTooltipTemplate: function(func) {
-    this.tooltipTemplate = func;
   },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;
@@ -1986,6 +2008,9 @@ WebGL.prototype = {
     shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
     gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
 
+    shaderProgram.vertexFocusedAttribute = gl.getAttribLocation(shaderProgram, 'aVertexFocused');
+    gl.enableVertexAttribArray(shaderProgram.vertexFocusedAttribute);
+
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
@@ -2063,7 +2088,10 @@ WebGL.prototype = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.points.colors, 4, this.layer.scene.context),
         sizes: this.createBuffer(vertices.points.sizes, 1, this.layer.scene.context),
+        focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
+        // unfortunately, have to have dedicated hitPositions and hitSizes because these buffers need to be bound
+        // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
         hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context),
         hitColors: this.createBuffer(vertices.points.hitColors, 4, this.layer.hit.context),
         hitSizes: this.createBuffer(vertices.points.sizes, 1, this.layer.hit.context)
@@ -2101,6 +2129,7 @@ WebGL.prototype = {
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
     this.bindBuffer(buffers.sizes, shaderProgram.vertexSizeAttribute, gl);
+    this.bindBuffer(buffers.focused, shaderProgram.vertexFocusedAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },

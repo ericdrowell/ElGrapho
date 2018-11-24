@@ -40,6 +40,11 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.PERFORMANCE : config.renderingMode;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
+  // default tooltip template
+  this.tooltipTemplate = function(index, el) {
+    el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
+  };
+  this.hoveredDataIndex = -1;
 
   let viewport = this.viewport = new Concrete.Viewport({
     container: this.wrapper,
@@ -153,7 +158,7 @@ ElGrapho.prototype = {
 
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
-      let dataPointIndex = viewport.getIntersection(mousePos.x, mousePos.y);
+      let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
       // if panning
       if (that.panStart) {
@@ -167,15 +172,24 @@ ElGrapho.prototype = {
       }
       else {
         // if pixel data is not white (empty)
-        if (dataPointIndex === -1) {
+        if (dataIndex === -1) {
           Tooltip.hide();
         }
         else {
-          Tooltip.render(dataPointIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+          Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+        }
 
-          that.fire('node-mouseover', {
-            dataPointIndex: dataPointIndex
-          });
+
+        // change point state
+        if (dataIndex !== that.hoveredDataIndex) {
+          if (that.hoveredDataIndex > -1) {
+            that.vertices.points.focused[that.hoveredDataIndex] = 0;
+          }
+
+          that.vertices.points.focused[dataIndex] = 1;
+          that.webgl.initBuffers(that.vertices);
+          that.dirty = true;
+          that.hoveredDataIndex = dataIndex;          
         }
       }
     }));
@@ -205,9 +219,6 @@ ElGrapho.prototype = {
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
-  },
-  setTooltipTemplate: function(func) {
-    this.tooltipTemplate = func;
   },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;

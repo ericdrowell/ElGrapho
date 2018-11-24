@@ -59,6 +59,9 @@ WebGL.prototype = {
     shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
     gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
 
+    shaderProgram.vertexFocusedAttribute = gl.getAttribLocation(shaderProgram, 'aVertexFocused');
+    gl.enableVertexAttribArray(shaderProgram.vertexFocusedAttribute);
+
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
@@ -136,7 +139,10 @@ WebGL.prototype = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.points.colors, 4, this.layer.scene.context),
         sizes: this.createBuffer(vertices.points.sizes, 1, this.layer.scene.context),
+        focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
+        // unfortunately, have to have dedicated hitPositions and hitSizes because these buffers need to be bound
+        // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
         hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context),
         hitColors: this.createBuffer(vertices.points.hitColors, 4, this.layer.hit.context),
         hitSizes: this.createBuffer(vertices.points.sizes, 1, this.layer.hit.context)
@@ -174,6 +180,7 @@ WebGL.prototype = {
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
     this.bindBuffer(buffers.sizes, shaderProgram.vertexSizeAttribute, gl);
+    this.bindBuffer(buffers.focused, shaderProgram.vertexFocusedAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
