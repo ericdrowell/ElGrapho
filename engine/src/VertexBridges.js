@@ -80,13 +80,11 @@ const VertexBridges = {
     let trianglePositionsIndex = 0;
     let triangleColorsIndex = 0;
 
-    let edgeSize = Math.min.apply(Math, nodes.sizes)/2 * 0.3;
-    let normalDistance = edgeSize/2;
-
     for (let n=0; n<edges.length; n+=2) {
       let pointIndex0 = edges[n];
       let pointIndex1 = edges[n+1];
-      
+      let normalDistance0 = nodes.sizes[pointIndex0]*0.1;
+      let normalDistance1 = nodes.sizes[pointIndex1]*0.1;
 
       let x0 = nodes.xs[pointIndex0];
       let x1 = nodes.xs[pointIndex1];
@@ -97,35 +95,38 @@ const VertexBridges = {
       let vector = vec2.fromValues(vectorX, vectorY);
       let normalizedVector = vec2.normalize(vec2.create(), vector);
       let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
-      let offsetVector = vec2.scale(vec2.create(), perpVector, normalDistance);
-      let xOffset = -1 * offsetVector[0];
-      let yOffset = offsetVector[1];
+      let offsetVector0 = vec2.scale(vec2.create(), perpVector, normalDistance0);
+      let offsetVector1 = vec2.scale(vec2.create(), perpVector, normalDistance1);
+      let xOffset0 = -1 * offsetVector0[0];
+      let yOffset0 = offsetVector0[1];
+      let xOffset1 = -1 * offsetVector1[0];
+      let yOffset1 = offsetVector1[1];
 
       // first triangle
-      trianglePositions[trianglePositionsIndex++] = x0 - xOffset;
-      trianglePositions[trianglePositionsIndex++] = y0 + yOffset;
+      trianglePositions[trianglePositionsIndex++] = x0 - xOffset0;
+      trianglePositions[trianglePositionsIndex++] = y0 + yOffset0;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-      trianglePositions[trianglePositionsIndex++] = x1 - xOffset;
-      trianglePositions[trianglePositionsIndex++] = y1 + yOffset;
+      trianglePositions[trianglePositionsIndex++] = x1 - xOffset1;
+      trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x0 + xOffset;
-      trianglePositions[trianglePositionsIndex++] = y0 - yOffset;
+      trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
+      trianglePositions[trianglePositionsIndex++] = y0 - yOffset0;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
 
       // second triangle
-      trianglePositions[trianglePositionsIndex++] = x1 + xOffset;
-      trianglePositions[trianglePositionsIndex++] = y1 - yOffset;
+      trianglePositions[trianglePositionsIndex++] = x1 + xOffset1;
+      trianglePositions[trianglePositionsIndex++] = y1 - yOffset1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x0 + xOffset;
-      trianglePositions[trianglePositionsIndex++] = y0 - yOffset;
+      trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
+      trianglePositions[trianglePositionsIndex++] = y0 - yOffset0;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-      trianglePositions[trianglePositionsIndex++] = x1 - xOffset;
-      trianglePositions[trianglePositionsIndex++] = y1 + yOffset;
+      trianglePositions[trianglePositionsIndex++] = x1 - xOffset1;
+      trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
     }
 

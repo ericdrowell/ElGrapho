@@ -18,3 +18,4 @@ El Grapho is a high performance graph visualization library leveraging WebGL and
 * max number of WebGL contexts = 12 on my Mac.  that is 400M interactive data points.  800M non interactive data points
 * can render 16M at a time, and then rasterize the result, and then render the next 16M
 * Ultimately the bottleneck is how much memory the array buffers take up.  Can support over 100M
+* having a dedicated layer per shader program does not help with performance
