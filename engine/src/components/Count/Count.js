@@ -7,7 +7,7 @@ const Count = function(config) {
   let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
   let triangleCount = vertices.triangles ? vertices.triangles.positions.length/6 : 0;
 
-  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' points + ' + NumberFormatter.addCommas(triangleCount) + ' triangles';
+  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' nodes + ' + NumberFormatter.addCommas(triangleCount) + ' edges';
   wrapper.className = 'el-grapho-count';
 
   container.appendChild(wrapper);

@@ -1,5 +1,6 @@
 module.exports = `attribute vec4 aVertexPosition;
-attribute vec4 aVertexColor;
+
+attribute float aVertexColor;
 attribute float aVertexSize;
 attribute float aVertexFocused;
 
@@ -15,10 +16,19 @@ void main() {
 
   // normal color
   if (aVertexFocused == 0.0) {
-    vVertexColor = aVertexColor;
+    //vVertexColor = aVertexColor;
+    if (aVertexColor == 0.0) {
+      vVertexColor = vec4(1.0, 0.0, 0.0, 1.0); 
+    }
+    else if (aVertexColor == 1.0) {
+      vVertexColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+    else {
+      vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
+    }
   }
   // focused color
   else {
-    vVertexColor = vec4(0.0, 0.0, 255.0, 1.0); 
+    vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
   }
 }`;

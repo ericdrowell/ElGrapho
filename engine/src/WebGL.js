@@ -2,8 +2,10 @@ const glMatrix = require('gl-matrix');
 const mat4 = glMatrix.mat4;
 const Concrete = require('../../../../concrete/build/concrete.js');
 const pointVert = require('../dist/shaders/point.vert');
-const genericFrag = require('../dist/shaders/generic.frag');
+const hitPointVert = require('../dist/shaders/hitPoint.vert');
 const triangleVert = require('../dist/shaders/triangle.vert');
+
+const genericFrag = require('../dist/shaders/generic.frag');
 const Profiler = require('./Profiler');
 
 let WebGL = function(config) {
@@ -70,7 +72,7 @@ WebGL.prototype = {
   },
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
-    let vertexShader = this.getShader('vertex', pointVert, gl);
+    let vertexShader = this.getShader('vertex', hitPointVert, gl);
     let fragmentShader = this.getShader('fragment', genericFrag, gl);
     let shaderProgram = gl.createProgram();
 
@@ -85,11 +87,11 @@ WebGL.prototype = {
     gl.useProgram(shaderProgram);
 
     // attribute variables per data point
+    shaderProgram.vertexIndexAttribute = gl.getAttribLocation(shaderProgram, 'aVertexIndex');
+    gl.enableVertexAttribArray(shaderProgram.vertexIndexAttribute);
+
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-    shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
-    gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
     shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
     gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
@@ -131,20 +133,29 @@ WebGL.prototype = {
     return shaderProgram;
   },
 
+  createIndices: function(size) {
+    let arr = new Float32Array(size);
+    arr.forEach(function(index, n) {
+      arr[n] = n;
+    });
+    return arr;
+  },
+
   initBuffers: Profiler('WebGL.initBuffers()', function(vertices) {
     this.buffers = {};
 
     if (vertices.points) {
+      let size = vertices.points.positions.length/2;
       this.buffers.points = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
-        colors: this.createBuffer(vertices.points.colors, 4, this.layer.scene.context),
+        colors: this.createBuffer(vertices.points.colors, 1, this.layer.scene.context),
         sizes: this.createBuffer(vertices.points.sizes, 1, this.layer.scene.context),
         focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
         // unfortunately, have to have dedicated hitPositions and hitSizes because these buffers need to be bound
         // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
+        hitIndices: this.createBuffer(this.createIndices(size), 1, this.layer.hit.context),
         hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context),
-        hitColors: this.createBuffer(vertices.points.hitColors, 4, this.layer.hit.context),
         hitSizes: this.createBuffer(vertices.points.sizes, 1, this.layer.hit.context)
       };
     }
@@ -152,7 +163,7 @@ WebGL.prototype = {
     if (vertices.triangles) {
       this.buffers.triangles = {
         positions: this.createBuffer(vertices.triangles.positions, 2, this.layer.scene.context),
-        colors: this.createBuffer(vertices.triangles.colors, 4, this.layer.scene.context)
+        colors: this.createBuffer(vertices.triangles.colors, 1, this.layer.scene.context)
       };
     }
   }),
@@ -266,8 +277,8 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
 
+    this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
-    this.bindBuffer(pointBuffers.hitColors, shaderProgram.vertexColorAttribute, gl);
     this.bindBuffer(pointBuffers.hitSizes, shaderProgram.vertexSizeAttribute, gl);
 
     // TODO: maybe num items should be stored in a different way?

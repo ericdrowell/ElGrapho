@@ -97,7 +97,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*
  * Concrete v3.0.2
  * A lightweight Html5 Canvas framework that enables hit detection, layering, multi buffering, 
  * pixel ratio management, exports, and image downloads
- * Release Date: 11-23-2018
+ * Release Date: 11-28-2018
  * https://github.com/ericdrowell/concrete
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -908,6 +908,33 @@ void main(void) {
 
 /***/ }),
 
+/***/ "./engine/dist/shaders/hitPoint.vert.js":
+/*!**********************************************!*\
+  !*** ./engine/dist/shaders/hitPoint.vert.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `attribute vec4 aVertexPosition;
+
+attribute float aVertexIndex;
+attribute float aVertexSize;
+
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+
+varying vec4 vVertexColor;
+
+void main() {
+  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  // scale points with zoom.  Using scale of x component
+  gl_PointSize = aVertexSize * length(uModelViewMatrix[0]);
+
+  vVertexColor = vec4(0.0, 0.0, aVertexIndex/255.0, 1.0); 
+}`;
+
+/***/ }),
+
 /***/ "./engine/dist/shaders/point.vert.js":
 /*!*******************************************!*\
   !*** ./engine/dist/shaders/point.vert.js ***!
@@ -916,7 +943,8 @@ void main(void) {
 /***/ (function(module, exports) {
 
 module.exports = `attribute vec4 aVertexPosition;
-attribute vec4 aVertexColor;
+
+attribute float aVertexColor;
 attribute float aVertexSize;
 attribute float aVertexFocused;
 
@@ -932,11 +960,20 @@ void main() {
 
   // normal color
   if (aVertexFocused == 0.0) {
-    vVertexColor = aVertexColor;
+    //vVertexColor = aVertexColor;
+    if (aVertexColor == 0.0) {
+      vVertexColor = vec4(1.0, 0.0, 0.0, 1.0); 
+    }
+    else if (aVertexColor == 1.0) {
+      vVertexColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+    else {
+      vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
+    }
   }
   // focused color
   else {
-    vVertexColor = vec4(0.0, 0.0, 255.0, 1.0); 
+    vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
   }
 }`;
 
@@ -950,7 +987,8 @@ void main() {
 /***/ (function(module, exports) {
 
 module.exports = `attribute vec4 aVertexPosition;
-attribute vec4 aVertexColor;
+
+attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -959,7 +997,18 @@ varying vec4 vVertexColor;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  vVertexColor = aVertexColor;
+  //vVertexColor = aVertexColor;
+
+  //vVertexColor = aVertexColor;
+  if (aVertexColor == 0.0) {
+    vVertexColor = vec4(1.0, 0.0, 0.0, 1.0); 
+  }
+  else if (aVertexColor == 1.0) {
+    vVertexColor = vec4(0.0, 1.0, 0.0, 1.0);
+  }
+  else {
+    vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
+  }
 }`;
 
 /***/ }),
@@ -1159,7 +1208,12 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = config.vertices;
+  let vertices = this.vertices = config.vertices || VertexBridges.nodesAndEdgesToVertices(config.nodes, config.edges);
+
+  // need to add focused array to the vertices object here because we need to be able to
+  // modify the focused array by reference, which is passed into webgl buffers
+  let numPoints = vertices.points.positions.length/2;
+  vertices.points.focused = new Float32Array(numPoints);
 
 
 
@@ -1678,7 +1732,7 @@ module.exports = Util;
 
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 const Theme = __webpack_require__(/*! ./Theme */ "./engine/src/Theme.js");
-const Color = __webpack_require__(/*! ./Color */ "./engine/src/Color.js");
+//const Color = require('./Color');
 const Util = __webpack_require__(/*! ./Util */ "./engine/src/Util.js");
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const vec2 = glMatrix.vec2;
@@ -1700,30 +1754,27 @@ const VertexBridges = {
     for (let n=0; n<num*4; n+=4) {
 
       let colorIndex = Math.floor(Math.random() * Theme.palette.length/3); // between 0 and palette length
-      colors[n] = Theme.palette[colorIndex * 3 + 0]/255;
-      colors[n+1] = Theme.palette[colorIndex * 3 + 1]/255;
-      colors[n+2] = Theme.palette[colorIndex * 3 + 2]/255;
-      colors[n+3] = 1;
+      colors[n] = colorIndex;
     }
     return colors;
   }),
 
-  getHitColors: Profiler('VertexBridges.getHitColors', function(num) {
-    let hitColors = new Float32Array(num*4);
-    let counter = 0;
-    for (let n=0; n<num*4; n+=4) {
-      let rgb = Color.intToRGB(counter++);
-      let r = rgb[0];
-      let g = rgb[1];
-      let b = rgb[2];
+  // getHitColors: Profiler('VertexBridges.getHitColors', function(num) {
+  //   let hitColors = new Float32Array(num*4);
+  //   let counter = 0;
+  //   for (let n=0; n<num*4; n+=4) {
+  //     let rgb = Color.intToRGB(counter++);
+  //     let r = rgb[0];
+  //     let g = rgb[1];
+  //     let b = rgb[2];
 
-      hitColors[n] = r/255;
-      hitColors[n+1] = g/255;
-      hitColors[n+2] = b/255;
-      hitColors[n+3] = 1;
-    }
-    return hitColors;
-  }),
+  //     hitColors[n] = r/255;
+  //     hitColors[n+1] = g/255;
+  //     hitColors[n+2] = b/255;
+  //     hitColors[n+3] = 1;
+  //   }
+  //   return hitColors;
+  // }),
   getRandomSizes: Profiler('VertexBridges.getRandomSizes', function(num, minPointSize, maxPointSize) {
     let sizes = new Float32Array(num);
     for (let n=0; n<num; n++) {
@@ -1741,13 +1792,95 @@ const VertexBridges = {
     return sizes;
   }),
 
-  getFocused: Profiler('VertexBridges.getFocused', function(num) {
-    let focused = new Float32Array(num);
-    for (let n=0; n<num; n++) {
-      focused[n] = 0;
+  nodesAndEdgesToVertices: Profiler('VertexBridges.nodesAndEdgesToVertices', function(nodes, edges) {
+    let positions = new Float32Array(nodes.xs.length*2);
+
+    let positionCounter = 0;
+    for (let n=0; n<nodes.xs.length; n++) {
+      positions[positionCounter++] = nodes.xs[n];
+      positions[positionCounter++] = nodes.ys[n];
     }
-    return focused;
+
+    let colors = new Float32Array(nodes.colors);
+    let sizes = new Float32Array(nodes.sizes);
+
+    // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
+    let numEdges = edges.length / 2;
+    let trianglePositions = new Float32Array(numEdges * 12);
+    let triangleColors = new Float32Array(numEdges * 6);
+
+    let trianglePositionsIndex = 0;
+    let triangleColorsIndex = 0;
+
+    let edgeSize = Math.min.apply(Math, nodes.sizes)/2 * 0.5;
+    let normalDistance = edgeSize/2;
+
+    for (let n=0; n<edges.length; n+=2) {
+      let pointIndex0 = edges[n];
+      let pointIndex1 = edges[n+1];
+      
+
+      let x0 = nodes.xs[pointIndex0];
+      let x1 = nodes.xs[pointIndex1];
+      let y0 = nodes.ys[pointIndex0];
+      let y1 = nodes.ys[pointIndex1];
+      let vectorX = x1 - x0;
+      let vectorY = y1 - y0;
+      let vector = vec2.fromValues(vectorX, vectorY);
+      let normalizedVector = vec2.normalize(vec2.create(), vector);
+      let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
+      let offsetVector = vec2.scale(vec2.create(), perpVector, normalDistance);
+      let xOffset = -1 * offsetVector[0];
+      let yOffset = offsetVector[1];
+
+      // first triangle
+      trianglePositions[trianglePositionsIndex++] = x0 - xOffset;
+      trianglePositions[trianglePositionsIndex++] = y0 + yOffset;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+      trianglePositions[trianglePositionsIndex++] = x1 - xOffset;
+      trianglePositions[trianglePositionsIndex++] = y1 + yOffset;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+
+      trianglePositions[trianglePositionsIndex++] = x0 + xOffset;
+      trianglePositions[trianglePositionsIndex++] = y0 - yOffset;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+
+      // second triangle
+      trianglePositions[trianglePositionsIndex++] = x1 + xOffset;
+      trianglePositions[trianglePositionsIndex++] = y1 - yOffset;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+
+      trianglePositions[trianglePositionsIndex++] = x0 + xOffset;
+      trianglePositions[trianglePositionsIndex++] = y0 - yOffset;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+      trianglePositions[trianglePositionsIndex++] = x1 - xOffset;
+      trianglePositions[trianglePositionsIndex++] = y1 + yOffset;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+    }
+
+    return {
+      points: {
+        positions: positions,
+        colors: colors,
+        sizes: sizes
+      },
+      triangles: {
+        positions: trianglePositions,
+        colors: triangleColors
+      }
+    };
   }),
+
+  // getFocused: Profiler('VertexBridges.getFocused', function(num) {
+  //   let focused = new Float32Array(num);
+  //   for (let n=0; n<num; n++) {
+  //     focused[n] = 0;
+  //   }
+  //   return focused;
+  // }),
 
   /**
    * generate line connections between random nodes
@@ -1761,19 +1894,16 @@ const VertexBridges = {
     let numNodes = points.positions.length/2;
     let numLines = numNodes * maxConnectionsPerNode;
 
-    let trianglePositions = new Float32Array(numLines*12);
+    let trianglePositions = new Float32Array(numLines*6);
     let trianglePositionIndex = 0;
     let triangleColorIndex = 0;
 
     const NORMAL_DISTANCE = edgeSize/2;
 
-    let triangleColors = new Float32Array(numLines*24);
+    let triangleColors = new Float32Array(numLines*3);
 
     function addColor(n) {
-      triangleColors[triangleColorIndex++] = points.colors[n*4];
-      triangleColors[triangleColorIndex++] = points.colors[n*4+1];
-      triangleColors[triangleColorIndex++] = points.colors[n*4+2];
-      triangleColors[triangleColorIndex++] = points.colors[n*4+3];
+      triangleColors[triangleColorIndex++] = points.colors[n];
     }
 
     for (let n=0; n<numNodes-1; n++) {
@@ -1858,9 +1988,7 @@ const VertexBridges = {
     return {
       positions: VertexBridges.getRandomPointPositions(numPoints, width, height),
       colors: VertexBridges.getRandomColors(numPoints),
-      hitColors: VertexBridges.getHitColors(numPoints),
       sizes: VertexBridges.getConstantSizes(numPoints, pointSize),
-      focused: VertexBridges.getFocused(numPoints)
     };
   }),
 
@@ -1868,7 +1996,6 @@ const VertexBridges = {
     return {
       positions: VertexBridges.getRandomPointPositions(numPoints, width, height),
       colors: VertexBridges.getRandomColors(numPoints),
-      hitColors: VertexBridges.getHitColors(numPoints),
       sizes: VertexBridges.getConstantSizes(numPoints, edgeSize)
     };
   }),
@@ -1901,7 +2028,7 @@ const VertexBridges = {
     ];
 
     let positions = new Float32Array(numPoints*2);
-    let colors = new Float32Array(numPoints*4);
+    let colors = new Float32Array(numPoints);
     let positionIndex = 0;
     let colorIndex = 0;
 
@@ -1919,19 +2046,13 @@ const VertexBridges = {
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
 
-      colors[colorIndex++] = Theme.palette[clusterIndex * 3 + 0]/255;
-      colors[colorIndex++] = Theme.palette[clusterIndex * 3 + 1]/255;
-      colors[colorIndex++] = Theme.palette[clusterIndex * 3 + 2]/255;
-      colors[colorIndex++] = 1;
-
+      colors[colorIndex++] = clusterIndex;
     }
 
     return {
       positions: positions,
       colors: colors,
-      hitColors: VertexBridges.getHitColors(numPoints),
-      sizes: VertexBridges.getRandomSizes(numPoints, minPointSize, maxPointSize),
-      focused: VertexBridges.getFocused(numPoints)
+      sizes: VertexBridges.getRandomSizes(numPoints, minPointSize, maxPointSize)
     };
   })
 
@@ -1959,8 +2080,10 @@ const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/
 const mat4 = glMatrix.mat4;
 const Concrete = __webpack_require__(/*! ../../../../concrete/build/concrete.js */ "../../concrete/build/concrete.js");
 const pointVert = __webpack_require__(/*! ../dist/shaders/point.vert */ "./engine/dist/shaders/point.vert.js");
-const genericFrag = __webpack_require__(/*! ../dist/shaders/generic.frag */ "./engine/dist/shaders/generic.frag.js");
+const hitPointVert = __webpack_require__(/*! ../dist/shaders/hitPoint.vert */ "./engine/dist/shaders/hitPoint.vert.js");
 const triangleVert = __webpack_require__(/*! ../dist/shaders/triangle.vert */ "./engine/dist/shaders/triangle.vert.js");
+
+const genericFrag = __webpack_require__(/*! ../dist/shaders/generic.frag */ "./engine/dist/shaders/generic.frag.js");
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 
 let WebGL = function(config) {
@@ -2027,7 +2150,7 @@ WebGL.prototype = {
   },
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
-    let vertexShader = this.getShader('vertex', pointVert, gl);
+    let vertexShader = this.getShader('vertex', hitPointVert, gl);
     let fragmentShader = this.getShader('fragment', genericFrag, gl);
     let shaderProgram = gl.createProgram();
 
@@ -2042,11 +2165,11 @@ WebGL.prototype = {
     gl.useProgram(shaderProgram);
 
     // attribute variables per data point
+    shaderProgram.vertexIndexAttribute = gl.getAttribLocation(shaderProgram, 'aVertexIndex');
+    gl.enableVertexAttribArray(shaderProgram.vertexIndexAttribute);
+
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-    shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
-    gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
     shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
     gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
@@ -2088,20 +2211,29 @@ WebGL.prototype = {
     return shaderProgram;
   },
 
+  createIndices: function(size) {
+    let arr = new Float32Array(size);
+    arr.forEach(function(index, n) {
+      arr[n] = n;
+    });
+    return arr;
+  },
+
   initBuffers: Profiler('WebGL.initBuffers()', function(vertices) {
     this.buffers = {};
 
     if (vertices.points) {
+      let size = vertices.points.positions.length/2;
       this.buffers.points = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
-        colors: this.createBuffer(vertices.points.colors, 4, this.layer.scene.context),
+        colors: this.createBuffer(vertices.points.colors, 1, this.layer.scene.context),
         sizes: this.createBuffer(vertices.points.sizes, 1, this.layer.scene.context),
         focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
         // unfortunately, have to have dedicated hitPositions and hitSizes because these buffers need to be bound
         // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
+        hitIndices: this.createBuffer(this.createIndices(size), 1, this.layer.hit.context),
         hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context),
-        hitColors: this.createBuffer(vertices.points.hitColors, 4, this.layer.hit.context),
         hitSizes: this.createBuffer(vertices.points.sizes, 1, this.layer.hit.context)
       };
     }
@@ -2109,7 +2241,7 @@ WebGL.prototype = {
     if (vertices.triangles) {
       this.buffers.triangles = {
         positions: this.createBuffer(vertices.triangles.positions, 2, this.layer.scene.context),
-        colors: this.createBuffer(vertices.triangles.colors, 4, this.layer.scene.context)
+        colors: this.createBuffer(vertices.triangles.colors, 1, this.layer.scene.context)
       };
     }
   }),
@@ -2223,8 +2355,8 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
 
+    this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
-    this.bindBuffer(pointBuffers.hitColors, shaderProgram.vertexColorAttribute, gl);
     this.bindBuffer(pointBuffers.hitSizes, shaderProgram.vertexSizeAttribute, gl);
 
     // TODO: maybe num items should be stored in a different way?
@@ -2320,7 +2452,7 @@ const Count = function(config) {
   let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
   let triangleCount = vertices.triangles ? vertices.triangles.positions.length/6 : 0;
 
-  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' points + ' + NumberFormatter.addCommas(triangleCount) + ' triangles';
+  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' nodes + ' + NumberFormatter.addCommas(triangleCount) + ' edges';
   wrapper.className = 'el-grapho-count';
 
   container.appendChild(wrapper);

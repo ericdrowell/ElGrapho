@@ -76,7 +76,12 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = config.vertices;
+  let vertices = this.vertices = config.vertices || VertexBridges.nodesAndEdgesToVertices(config.nodes, config.edges);
+
+  // need to add focused array to the vertices object here because we need to be able to
+  // modify the focused array by reference, which is passed into webgl buffers
+  let numPoints = vertices.points.positions.length/2;
+  vertices.points.focused = new Float32Array(numPoints);
 
 
 
