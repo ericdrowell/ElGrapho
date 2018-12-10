@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Random</h1>
+    <div id="container"></div>
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+      const WIDTH = 500;
+      const HEIGHT = 500;
+
+
+      // let points = ElGrapho.VertexBridges.getRandomClusteredGraphPoints({
+      //   numPoints: 100,
+      //   width: WIDTH,
+      //   height: HEIGHT,
+      //   minPointSize: 0.5,
+      //   maxPointSize: 0.7
+      // });
+
+      // let triangles = ElGrapho.VertexBridges.getGraphTriangles({
+      //   points: points, 
+      //   maxConnectionsPerNode: 1,
+      //   edgeSize: 0.4
+      // });
+
+      const numNodes = 100000;
+
+      let nodes = {
+        xs: new Float32Array(numNodes),
+        ys: new Float32Array(numNodes),
+        colors: new Float32Array(numNodes),
+        sizes: new Float32Array(numNodes)
+      };
+
+      let edges = new Float32Array(numNodes);
+
+      for (let n=0; n<numNodes; n++) {
+        nodes.xs[n] = Math.random() * 300 - 150;
+        nodes.ys[n] = Math.random() * 300 - 150;
+        nodes.colors[n] = Math.floor(Math.random() * 3);
+        nodes.sizes[n] = 2;
+      }
+
+      for (let n=0; n<numNodes; n+=2) {
+        edges[n] = n;
+        edges[n+1] = n+1;
+
+
+      }
+
+      let graph = new ElGrapho({
+        container: document.getElementById('container'),
+        // vertices: {
+        //   points: points,
+        //   triangles: triangles
+        // },
+
+        nodes: nodes,
+        edges: edges,
+        width: WIDTH,
+        height: HEIGHT,
+        renderingMode: 'ux'
+      });
+
+    </script>
+  </body>
+</html>

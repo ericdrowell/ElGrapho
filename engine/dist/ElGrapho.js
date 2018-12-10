@@ -973,7 +973,8 @@ void main() {
   }
   // focused color
   else {
-    vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
+    // pink for now
+    vVertexColor = vec4(255.0/255.0, 105.0/255.0, 147.0/255.0, 1.0); 
   }
 }`;
 
@@ -1812,7 +1813,7 @@ const VertexBridges = {
     let trianglePositionsIndex = 0;
     let triangleColorsIndex = 0;
 
-    let edgeSize = Math.min.apply(Math, nodes.sizes)/2 * 0.5;
+    let edgeSize = Math.min.apply(Math, nodes.sizes)/2 * 0.3;
     let normalDistance = edgeSize/2;
 
     for (let n=0; n<edges.length; n+=2) {

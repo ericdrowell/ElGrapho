@@ -29,6 +29,7 @@ void main() {
   }
   // focused color
   else {
-    vVertexColor = vec4(0.0, 0.0, 1.0, 1.0); 
+    // pink for now
+    vVertexColor = vec4(255.0/255.0, 105.0/255.0, 147.0/255.0, 1.0); 
   }
 }

@@ -80,7 +80,7 @@ const VertexBridges = {
     let trianglePositionsIndex = 0;
     let triangleColorsIndex = 0;
 
-    let edgeSize = Math.min.apply(Math, nodes.sizes)/2 * 0.5;
+    let edgeSize = Math.min.apply(Math, nodes.sizes)/2 * 0.3;
     let normalDistance = edgeSize/2;
 
     for (let n=0; n<edges.length; n+=2) {
