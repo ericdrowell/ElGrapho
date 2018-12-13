@@ -3,6 +3,7 @@
   "unused": true, // prevent unused variables
   "undef": true,
   "debug": true, // allow debugger
+  "loopfunc": true,
   "globals": {
     "require": true,
     "document": true,

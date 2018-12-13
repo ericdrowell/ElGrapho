@@ -12,8 +12,11 @@ const Color = require('./Color');
 const Theme = require('./Theme');
 const Tooltip = require('./components/Tooltip/Tooltip');
 const NumberFormatter = require('./formatters/NumberFormatter');
-const VertexBridges = require('./VertexBridges');
+const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
+
+// models
+const Tree = require('./models/Tree');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -76,7 +79,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = config.vertices || VertexBridges.nodesAndEdgesToVertices(config.nodes, config.edges);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
@@ -321,7 +324,9 @@ ElGrapho.Theme = Theme;
 ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
-ElGrapho.VertexBridges = VertexBridges;
+ElGrapho.models = {
+  Tree: Tree
+};
 
 module.exports = ElGrapho;
 

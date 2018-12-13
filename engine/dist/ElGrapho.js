@@ -1145,8 +1145,11 @@ const Color = __webpack_require__(/*! ./Color */ "./engine/src/Color.js");
 const Theme = __webpack_require__(/*! ./Theme */ "./engine/src/Theme.js");
 const Tooltip = __webpack_require__(/*! ./components/Tooltip/Tooltip */ "./engine/src/components/Tooltip/Tooltip.js");
 const NumberFormatter = __webpack_require__(/*! ./formatters/NumberFormatter */ "./engine/src/formatters/NumberFormatter.js");
-const VertexBridges = __webpack_require__(/*! ./VertexBridges */ "./engine/src/VertexBridges.js");
+const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/VertexBridge.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
+
+// models
+const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -1209,7 +1212,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = config.vertices || VertexBridges.nodesAndEdgesToVertices(config.nodes, config.edges);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
@@ -1454,7 +1457,9 @@ ElGrapho.Theme = Theme;
 ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
-ElGrapho.VertexBridges = VertexBridges;
+ElGrapho.models = {
+  Tree: Tree
+};
 
 module.exports = ElGrapho;
 
@@ -1707,94 +1712,32 @@ module.exports = UUID;
 
 /***/ }),
 
-/***/ "./engine/src/Util.js":
-/*!****************************!*\
-  !*** ./engine/src/Util.js ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-const Util = {
-  getRandomInt: function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-};
-
-module.exports = Util;
-
-/***/ }),
-
-/***/ "./engine/src/VertexBridges.js":
-/*!*************************************!*\
-  !*** ./engine/src/VertexBridges.js ***!
-  \*************************************/
+/***/ "./engine/src/VertexBridge.js":
+/*!************************************!*\
+  !*** ./engine/src/VertexBridge.js ***!
+  \************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
-const Theme = __webpack_require__(/*! ./Theme */ "./engine/src/Theme.js");
-//const Color = require('./Color');
-const Util = __webpack_require__(/*! ./Util */ "./engine/src/Util.js");
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const vec2 = glMatrix.vec2;
 
-const VertexBridges = {
-  getRandomPointPositions: Profiler('VertexBridges.getRandomPointPositions', function(num, width, height) {
-    let points = new Float32Array(num*2);
-    for (let n=0; n<num*2; n+=2) {
-      let x = Math.random()*width - width/2;
-      let y = Math.random()*height - height/2;
-      points[n] = x;
-      points[n+1] = y;
-    }
-    return points;
-  }),
-
-  getRandomColors: Profiler('VertexBridges.getRandomColors', function(num) {
-    let colors = new Float32Array(num*4);
-    for (let n=0; n<num*4; n+=4) {
-
-      let colorIndex = Math.floor(Math.random() * Theme.palette.length/3); // between 0 and palette length
-      colors[n] = colorIndex;
-    }
-    return colors;
-  }),
-
-  // getHitColors: Profiler('VertexBridges.getHitColors', function(num) {
-  //   let hitColors = new Float32Array(num*4);
-  //   let counter = 0;
-  //   for (let n=0; n<num*4; n+=4) {
-  //     let rgb = Color.intToRGB(counter++);
-  //     let r = rgb[0];
-  //     let g = rgb[1];
-  //     let b = rgb[2];
-
-  //     hitColors[n] = r/255;
-  //     hitColors[n+1] = g/255;
-  //     hitColors[n+2] = b/255;
-  //     hitColors[n+3] = 1;
-  //   }
-  //   return hitColors;
-  // }),
-  getRandomSizes: Profiler('VertexBridges.getRandomSizes', function(num, minPointSize, maxPointSize) {
-    let sizes = new Float32Array(num);
-    for (let n=0; n<num; n++) {
-      let size = (Math.random() * Math.random() * Math.random() * (maxPointSize-minPointSize)) + minPointSize;
-      sizes[n] = size;
-    }
-    return sizes;
-  }),
-
-  getConstantSizes: Profiler('VertexBridges.getConstantSizes', function(num, size) {
-    let sizes = new Float32Array(num);
-    for (let n=0; n<num; n++) {
-      sizes[n] = size;
-    }
-    return sizes;
-  }),
-
-  nodesAndEdgesToVertices: Profiler('VertexBridges.nodesAndEdgesToVertices', function(nodes, edges) {
+const VertexBridge = {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
+    let nodes = model.nodes;
+    let edges = model.edges;
     let positions = new Float32Array(nodes.xs.length*2);
+    let halfWidth = width/2;
+    let halfHeight = height/2;
+
+    // convert normalized xs and ys to pixel values
+    nodes.xs = nodes.xs.map(function(el) {
+      return el * halfWidth;
+    });
+    nodes.ys = nodes.ys.map(function(el) {
+      return el * halfHeight;
+    });
 
     let positionCounter = 0;
     for (let n=0; n<nodes.xs.length; n++) {
@@ -1874,196 +1817,10 @@ const VertexBridges = {
         colors: triangleColors
       }
     };
-  }),
-
-  // getFocused: Profiler('VertexBridges.getFocused', function(num) {
-  //   let focused = new Float32Array(num);
-  //   for (let n=0; n<num; n++) {
-  //     focused[n] = 0;
-  //   }
-  //   return focused;
-  // }),
-
-  /**
-   * generate line connections between random nodes
-   * @param {Float32Array} points
-   * @param {Number} maxConnectionsPerNode
-   */
-  getGraphTriangles: Profiler('VertexBridges.getGraphTriangles', function(config) {
-    let points = config.points;
-    let maxConnectionsPerNode = config.maxConnectionsPerNode;
-    let edgeSize = config.edgeSize;
-    let numNodes = points.positions.length/2;
-    let numLines = numNodes * maxConnectionsPerNode;
-
-    let trianglePositions = new Float32Array(numLines*6);
-    let trianglePositionIndex = 0;
-    let triangleColorIndex = 0;
-
-    const NORMAL_DISTANCE = edgeSize/2;
-
-    let triangleColors = new Float32Array(numLines*3);
-
-    function addColor(n) {
-      triangleColors[triangleColorIndex++] = points.colors[n];
-    }
-
-    for (let n=0; n<numNodes-1; n++) {
-      let connectedNodes = {};
-
-      for (let i=0; i<maxConnectionsPerNode; i++) {
-        let randomNodeIndex = Util.getRandomInt(n+1, numNodes-1);
-        //let randomNodeIndex = n+i;
-
-        // make sure we don't dupe lines
-        if (!connectedNodes[randomNodeIndex]) {
-          // TODO: offsets need to be calculated from normals
-          // normal.x - -dy
-          // normal.y = dx
-          let x1 = points.positions[randomNodeIndex*2];
-          let x0 = points.positions[n*2];
-          let y1 = points.positions[randomNodeIndex*2 + 1];
-          let y0 = points.positions[n*2 + 1];
-          let vectorX = x1 - x0;
-          let vectorY = y1 - y0;
-          let vector = vec2.fromValues(vectorX, vectorY);
-          let normalizedVector = vec2.normalize(vec2.create(), vector);
-          let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
-          let offsetVector = vec2.scale(vec2.create(), perpVector, NORMAL_DISTANCE);
-
-
-          // let length = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
-          // let normalX = vectorX / length;
-          // let normalY = vectorY / length;
-          // let xOffset = -1 * normalX * NORMAL_DISTANCE;
-          // let yOffset = -1 * normalY * NORMAL_DISTANCE;
-
-          let xOffset = -1 * offsetVector[0];
-          let yOffset = offsetVector[1];
-
-          //console.log(n, randomNodeIndex, perpVector);
-
-          // triangle 1
-          trianglePositions[trianglePositionIndex++] = x0 - xOffset;
-          trianglePositions[trianglePositionIndex++] = y0 + yOffset;
-          addColor(n);
-
-          trianglePositions[trianglePositionIndex++] = x1 - xOffset;
-          trianglePositions[trianglePositionIndex++] = y1 + yOffset;
-          addColor(randomNodeIndex);
-
-          trianglePositions[trianglePositionIndex++] = x0 + xOffset;
-          trianglePositions[trianglePositionIndex++] = y0 - yOffset;
-          addColor(n);
-
-          // triangle 2
-          trianglePositions[trianglePositionIndex++] = x1 + xOffset;
-          trianglePositions[trianglePositionIndex++] = y1 - yOffset;
-          addColor(randomNodeIndex);
-
-          trianglePositions[trianglePositionIndex++] = x0 + xOffset;
-          trianglePositions[trianglePositionIndex++] = y0 - yOffset;
-          addColor(n);
-
-          trianglePositions[trianglePositionIndex++] = x1 - xOffset;
-          trianglePositions[trianglePositionIndex++] = y1 + yOffset;
-          addColor(randomNodeIndex);
-
-
-
-          connectedNodes[randomNodeIndex] = 1;
-        }
-      }
-    }
-
-    return {
-      positions: trianglePositions,
-      colors: triangleColors
-    };
-  }),
-
-  getRandomPoints: Profiler('VertexBridges.getRandomPoints', function(config) {
-    let numPoints = config.numPoints;
-    let width = config.width;
-    let height = config.height;
-    let pointSize = config.pointSize;
-    return {
-      positions: VertexBridges.getRandomPointPositions(numPoints, width, height),
-      colors: VertexBridges.getRandomColors(numPoints),
-      sizes: VertexBridges.getConstantSizes(numPoints, pointSize),
-    };
-  }),
-
-  getRandomGraphPoints: Profiler('VertexBridges.getRandomGraphPoints', function(numPoints, width, height, edgeSize) {
-    return {
-      positions: VertexBridges.getRandomPointPositions(numPoints, width, height),
-      colors: VertexBridges.getRandomColors(numPoints),
-      sizes: VertexBridges.getConstantSizes(numPoints, edgeSize)
-    };
-  }),
-
-  getRandomClusteredGraphPoints: Profiler('VertexBridges.getRandomClusteredGraphPoints', function(config) {
-    let numPoints = config.numPoints;
-    let width = config.width;
-    let height = config.height;
-    let minPointSize = config.minPointSize;
-    let maxPointSize = config.maxPointSize;
-
-    let minWidthHeight = Math.min(width, height);
-
-    let clusters = [
-      {
-        x: 0,
-        y: height/4,
-        radius: minWidthHeight/4
-      },
-      {
-        x: width/4,
-        y: -height/4,
-        radius: minWidthHeight/4
-      },
-      {
-        x: -width/4,
-        y: -height/4,
-        radius: minWidthHeight/4
-      }
-    ];
-
-    let positions = new Float32Array(numPoints*2);
-    let colors = new Float32Array(numPoints);
-    let positionIndex = 0;
-    let colorIndex = 0;
-
-    for (let n=0; n<numPoints; n++) {
-      let clusterIndex = Math.floor(Math.random() * clusters.length);
-      let cluster = clusters[clusterIndex];
-
-      let radius = Math.random()*cluster.radius;
-      let angle = Math.random() * Math.PI*2;
-
-
-      let x = cluster.x + Math.cos(angle) * radius;
-      let y = cluster.y + Math.sin(angle) * radius;
-
-      positions[positionIndex++] = x;
-      positions[positionIndex++] = y;
-
-      colors[colorIndex++] = clusterIndex;
-    }
-
-    return {
-      positions: positions,
-      colors: colors,
-      sizes: VertexBridges.getRandomSizes(numPoints, minPointSize, maxPointSize)
-    };
   })
-
-
-
-
 };
 
-module.exports = VertexBridges;
+module.exports = VertexBridge;
 
 
 
@@ -2452,7 +2209,7 @@ const Count = function(config) {
   let container = config.container;
   let vertices = config.vertices;
   let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
-  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/6 : 0;
+  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/12 : 0;
 
   wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' nodes + ' + NumberFormatter.addCommas(triangleCount) + ' edges';
   wrapper.className = 'el-grapho-count';
@@ -2529,6 +2286,115 @@ const NumberFormatter = {
 };
 
 module.exports = NumberFormatter;
+
+/***/ }),
+
+/***/ "./engine/src/models/Tree.js":
+/*!***********************************!*\
+  !*** ./engine/src/models/Tree.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+let bfs = function(root, level, callback) {
+  let children = [[root]];
+  let numNodes = 0;
+  let nodeIndex = 0;
+  let parentIndex = -1;
+
+  while(children.length) {
+
+    let grandChildren = [];
+
+    children.forEach(function(childSet) {
+
+      childSet.forEach(function(child) {
+        callback(child, level, nodeIndex++, parentIndex);
+        numNodes++;
+        if (child.children) {
+          grandChildren.push(child.children);
+        }
+      });
+      parentIndex++;
+    });
+
+    children = grandChildren;
+    level++;
+  }
+
+  return numNodes;
+};
+
+const Tree = function(rootNode) {
+  let levels = [];
+
+  let numNodes = bfs(rootNode, 0, function(node, level, nodeIndex, parentIndex) {
+    if (!levels[level]) {
+      levels[level] = [];
+    }
+    levels[level].push({
+      index: nodeIndex,
+      parentIndex: parentIndex
+    });
+  });
+
+  let model = {
+    nodes: {
+      xs:     new Float32Array(numNodes),
+      ys:     new Float32Array(numNodes),
+      colors: new Float32Array(numNodes),
+      sizes:  new Float32Array(numNodes)
+    },
+    edges: new Float32Array((numNodes-1)*2) // num edges = num nodes - 1
+  };
+
+  let edgeIndex = 0;
+  let numLevels = levels.length;
+  levels.forEach(function(level, l) {
+    let numLevelNodes = level.length;
+    let numSpaces = numLevelNodes + 1;
+    let spacing = 2 / numSpaces;
+    level.forEach(function(node, n) {
+      let nodeIndex = node.index;
+      let parentIndex = node.parentIndex;
+
+      model.nodes.xs[nodeIndex] = -1 + n*spacing + spacing;
+      model.nodes.ys[nodeIndex] = 1 - (2*l)/(numLevels-1);
+      model.nodes.colors[nodeIndex] = l%3;
+      model.nodes.sizes[nodeIndex] = 1;
+
+      if (l>0) {
+        model.edges[edgeIndex++] = parentIndex;
+        model.edges[edgeIndex++] = nodeIndex; 
+      }
+      
+
+    });
+  });
+
+  console.log(levels);
+
+  return model;
+
+  // return {
+  //   nodes: {
+  //     xs:     new Float32Array([0,  -100, 100, -150,  -50,  50,   150]),
+  //     ys:     new Float32Array([150, 0,   0,   -150, -150, -150, -150]),
+  //     colors: new Float32Array([0,   1,   1,    2,    2,    2,    2]),
+  //     sizes:  new Float32Array([60,  30,  30,   15,   15,   15,   15])
+  //   },
+  //   edges: new Float32Array([
+  //     0, 1, 
+  //     0, 2, 
+  //     1, 3,
+  //     1, 4,
+  //     2, 5,
+  //     2, 6
+  //   ])
+  // };
+};
+
+module.exports = Tree;
 
 /***/ }),
 
