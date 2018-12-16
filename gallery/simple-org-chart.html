@@ -45,7 +45,10 @@
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Tree(rootNode),
+        model: ElGrapho.models.Tree({
+          rootNode: rootNode,
+          nodeSize: 10
+        }),
         width: WIDTH,
         height: HEIGHT,
         renderingMode: 'ux'

@@ -27,7 +27,9 @@ let bfs = function(root, level, callback) {
   return numNodes;
 };
 
-const Tree = function(rootNode) {
+const Tree = function(config) {
+  let rootNode = config.rootNode;
+  let nodeSize = config.nodeSize;
   let levels = [];
 
   let numNodes = bfs(rootNode, 0, function(node, level, nodeIndex, parentIndex) {
@@ -63,7 +65,7 @@ const Tree = function(rootNode) {
       model.nodes.xs[nodeIndex] = -1 + n*spacing + spacing;
       model.nodes.ys[nodeIndex] = 1 - (2*l)/(numLevels-1);
       model.nodes.colors[nodeIndex] = l%3;
-      model.nodes.sizes[nodeIndex] = 1;
+      model.nodes.sizes[nodeIndex] = nodeSize;
 
       if (l>0) {
         model.edges[edgeIndex++] = parentIndex;
