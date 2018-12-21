@@ -2296,49 +2296,92 @@ module.exports = NumberFormatter;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-let bfs = function(root, level, callback) {
-  let children = [[root]];
-  let numNodes = 0;
-  let nodeIndex = 0;
-  let parentIndex = -1;
+// let bfs = function(root, level, callback) {
+//   let children = [[root]];
+//   let nodeIndex = 0;
+//   let parentIndex = -1;
 
-  while(children.length) {
+//   while(children.length) {
 
-    let grandChildren = [];
+//     let grandChildren = [];
 
-    children.forEach(function(childSet) {
+//     children.forEach(function(childSet) {
 
-      childSet.forEach(function(child) {
-        callback(child, level, nodeIndex++, parentIndex);
-        numNodes++;
-        if (child.children) {
-          grandChildren.push(child.children);
-        }
+//       childSet.forEach(function(child) {
+//         callback(child, level, nodeIndex++, parentIndex);
+//         if (child.children) {
+//           grandChildren.push(child.children);
+//         }
+//       });
+//       parentIndex++;
+//     });
+
+//     children = grandChildren;
+//     level++;
+//   }
+// };
+
+// let incrementAncestorTotals = function(node, val) {
+//   node.totalDescendants+=val;
+
+//   if (node.parent) {
+//     incrementAncestorTotals(node.parent, val);
+//   }
+// };
+
+let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) {
+  targetNode.children = [];
+  //targetNode.totalDescendants = 0;
+
+  targetNode.left = left;
+  targetNode.right = right;
+  targetNode.x = (left + right) / 2;
+  targetNode.level = level;
+
+  if (srcNode.children) {
+    let range = right - left;
+    let childRange = range / srcNode.children.length;
+    let childLeft = left;
+
+
+    for (let n=0; n<srcNode.children.length; n++) {
+      let childRight = childLeft + childRange;
+
+      targetNode.children.push({
+        parent: targetNode
       });
-      parentIndex++;
-    });
+      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, callback);
 
-    children = grandChildren;
-    level++;
+      childLeft += childRange;
+    }
+
+    callback(targetNode);
+
+    //incrementAncestorTotals(targetNode, srcNode.children.length);
   }
-
-  return numNodes;
 };
 
 const Tree = function(config) {
   let rootNode = config.rootNode;
   let nodeSize = config.nodeSize;
-  let levels = [];
+  let newRootNode = {};
 
-  let numNodes = bfs(rootNode, 0, function(node, level, nodeIndex, parentIndex) {
-    if (!levels[level]) {
-      levels[level] = [];
+  let nodes = [];
+  let n=0;
+  let maxLevel = 0;
+
+  // O(n)
+  buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
+    node.index = n;
+    nodes[n] = node;
+    n++;
+
+    if (node.level > maxLevel) {
+      maxLevel = node.level;
     }
-    levels[level].push({
-      index: nodeIndex,
-      parentIndex: parentIndex
-    });
   });
+
+  let numNodes = nodes.length;
 
   let model = {
     nodes: {
@@ -2351,30 +2394,49 @@ const Tree = function(config) {
   };
 
   let edgeIndex = 0;
-  let numLevels = levels.length;
-  levels.forEach(function(level, l) {
-    let numLevelNodes = level.length;
-    let numSpaces = numLevelNodes + 1;
-    let spacing = 2 / numSpaces;
-    level.forEach(function(node, n) {
-      let nodeIndex = node.index;
-      let parentIndex = node.parentIndex;
 
-      model.nodes.xs[nodeIndex] = -1 + n*spacing + spacing;
-      model.nodes.ys[nodeIndex] = 1 - (2*l)/(numLevels-1);
-      model.nodes.colors[nodeIndex] = l%3;
-      model.nodes.sizes[nodeIndex] = nodeSize;
+  // O(n)
+  nodes.forEach(function(node, n) {
+    model.nodes.xs[n] = node.x;
+    model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
+    model.nodes.colors[n] = 0;
+    model.nodes.sizes[n] = nodeSize;
 
-      if (l>0) {
-        model.edges[edgeIndex++] = parentIndex;
-        model.edges[edgeIndex++] = nodeIndex; 
-      }
-      
-
-    });
+    if (node.parent) {
+      model.edges[edgeIndex++] = node.parent.index;
+      model.edges[edgeIndex++] = node.index;
+    }
   });
 
-  console.log(levels);
+  console.log(nodes);
+
+  // let edgeIndex = 0;
+  // let numLevels = levels.length;
+  // levels.forEach(function(level, l) {
+  //   let numLevelNodes = level.length;
+  //   let numSpaces = numLevelNodes + 1;
+  //   let spacing = 2 / numSpaces;
+  //   level.forEach(function(node, n) {
+  //     let nodeIndex = node.index;
+  //     let parentIndex = node.parentIndex;
+
+  //     model.nodes.xs[nodeIndex] = -1 + n*spacing + spacing;
+  //     model.nodes.ys[nodeIndex] = 1 - (2*l)/(numLevels-1);
+  //     model.nodes.colors[nodeIndex] = l%3;
+  //     model.nodes.sizes[nodeIndex] = nodeSize;
+
+  //     if (l>0) {
+  //       model.edges[edgeIndex++] = parentIndex;
+  //       model.edges[edgeIndex++] = nodeIndex; 
+  //     }
+      
+
+  //   });
+  // });
+
+  //console.log(levels);
+
+
 
   return model;
 
