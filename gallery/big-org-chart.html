@@ -17,8 +17,8 @@
 
       
 
-      let numLevels = 10;
-      let maxChildren = 4;
+      let numLevels = 8;
+      let maxChildren = 5;
 
 
       function addChildren(node, level) {
@@ -43,7 +43,7 @@
         container: document.getElementById('container'),
         model: ElGrapho.models.Tree({
           rootNode: rootNode,
-          nodeSize: 5
+          rootNodeSize: 16
         }),
         width: WIDTH,
         height: HEIGHT,

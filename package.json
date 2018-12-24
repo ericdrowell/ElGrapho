@@ -12,15 +12,32 @@
     "node-sass": "^4.9.0",
     "uglifycss": "0.0.29",
     "webpack": "^4.10.2",
-    "webpack-cli": "^3.0.0"
+    "webpack-cli": "^3.0.0",
+    "npm-watch": "^0.4.0"
   },
   "dependencies": {
     "concretejs": "^3.0.2"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "engine/src"
+      ],
+      "extensions": [
+        "js",
+        "scss",
+        "frag",
+        "vert"
+      ],
+      "legacyWatch": true,
+      "delay": 0
+    }
   },
   "scripts": {
     "build": "npm run jshint && npm run prep-dists && node engine/scripts/build-icons.js && node engine/scripts/build-shaders.js && npm run sass && webpack --config webpack.config.js",
     "jshint": "jshint engine/src/",
     "sass": "node-sass engine/src/styles.scss engine/dist/styles/ElGrapho.css && uglifycss engine/dist/styles/ElGrapho.css > engine/dist/styles/ElGrapho.min.css && node engine/scripts/build-styles.js",
-    "prep-dists": "rm -rf engine/dist && mkdir engine/dist && mkdir engine/dist/icons && mkdir engine/dist/shaders && mkdir engine/dist/styles"
+    "prep-dists": "rm -rf engine/dist && mkdir engine/dist && mkdir engine/dist/icons && mkdir engine/dist/shaders && mkdir engine/dist/styles",
+    "watch": "npm-watch"
   }
 }

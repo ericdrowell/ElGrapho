@@ -23,15 +23,15 @@
 //   }
 // };
 
-// let incrementAncestorTotals = function(node, val) {
-//   node.totalDescendants+=val;
+let incrementAncestorTotals = function(node, val) {
+  node.totalDescendants+=val;
 
-//   if (node.parent) {
-//     incrementAncestorTotals(node.parent, val);
-//   }
-// };
+  if (node.parent) {
+    incrementAncestorTotals(node.parent, val);
+  }
+};
 
-let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) {
+let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, callback) {
   targetNode.children = [];
   //targetNode.totalDescendants = 0;
 
@@ -39,12 +39,15 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
+  targetNode.size = nodeSize;
+
+  callback(targetNode);
 
   if (srcNode.children) {
     let range = right - left;
     let childRange = range / srcNode.children.length;
     let childLeft = left;
-
+    let childNodeSize = nodeSize * 0.7;
 
     for (let n=0; n<srcNode.children.length; n++) {
       let childRight = childLeft + childRange;
@@ -52,20 +55,19 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
       targetNode.children.push({
         parent: targetNode
       });
-      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, callback);
+      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, childNodeSize, callback);
 
       childLeft += childRange;
     }
 
-    callback(targetNode);
-
-    //incrementAncestorTotals(targetNode, srcNode.children.length);
+    incrementAncestorTotals(targetNode, srcNode.children.length);
   }
+
 };
 
 const Tree = function(config) {
   let rootNode = config.rootNode;
-  let nodeSize = config.nodeSize;
+  let rootNodeSize = config.rootNodeSize;
   let newRootNode = {};
 
   let nodes = [];
@@ -73,7 +75,7 @@ const Tree = function(config) {
   let maxLevel = 0;
 
   // O(n)
-  buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
+  buildMetaTree(rootNode, newRootNode, -1, 1, 1, rootNodeSize, function(node) {
     node.index = n;
     nodes[n] = node;
     n++;
@@ -102,7 +104,7 @@ const Tree = function(config) {
     model.nodes.xs[n] = node.x;
     model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
     model.nodes.colors[n] = 0;
-    model.nodes.sizes[n] = nodeSize;
+    model.nodes.sizes[n] = node.size;
 
     if (node.parent) {
       model.edges[edgeIndex++] = node.parent.index;

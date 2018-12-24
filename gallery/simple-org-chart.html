@@ -16,28 +16,17 @@
       const HEIGHT = 500;
 
       let rootNode = {
-        index: 0,
         children: [
           {
-            index: 1,
             children: [
-              {
-                index: 3
-              },
-              { 
-                index: 4
-              }
+              {},
+              {}
             ]
           },
           {
-            index: 2,
             children: [
-              {
-                index: 5
-              },
-              {
-                index: 6
-              }
+              {},
+              {}
             ]
           }
         ]
@@ -47,7 +36,7 @@
         container: document.getElementById('container'),
         model: ElGrapho.models.Tree({
           rootNode: rootNode,
-          nodeSize: 10
+          rootNodeSize: 16
         }),
         width: WIDTH,
         height: HEIGHT,

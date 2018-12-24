@@ -925,12 +925,27 @@ uniform mat4 uProjectionMatrix;
 
 varying vec4 vVertexColor;
 
+// unsigned rIntValue = (u_color / 256 / 256) % 256;
+// unsigned gIntValue = (u_color / 256      ) % 256;
+// unsigned bIntValue = (u_color            ) % 256;
+
+// https://stackoverflow.com/questions/6893302/decode-rgb-value-to-single-float-without-bit-shift-in-glsl
+// had to flip r and b to match concrete notation
+vec3 unpackColor(float f) {
+  vec3 color;
+  color.r = floor(f / 256.0 / 256.0);
+  color.g = floor((f - color.r * 256.0 * 256.0) / 256.0);
+  color.b = floor(f - color.r * 256.0 * 256.0 - color.g * 256.0);
+  // now we have a vec3 with the 3 components in range [0..255]. Let's normalize it!
+  return color / 255.0;
+}
+
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
   // scale points with zoom.  Using scale of x component
   gl_PointSize = aVertexSize * length(uModelViewMatrix[0]);
 
-  vVertexColor = vec4(0.0, 0.0, aVertexIndex/255.0, 1.0); 
+  vVertexColor = vec4(unpackColor(aVertexIndex), 1.0);
 }`;
 
 /***/ }),
@@ -1138,8 +1153,8 @@ const ElGraphoCollection = __webpack_require__(/*! ./ElGraphoCollection */ "./en
 const Controls = __webpack_require__(/*! ./components/Controls/Controls */ "./engine/src/components/Controls/Controls.js");
 const Count = __webpack_require__(/*! ./components/Count/Count */ "./engine/src/components/Count/Count.js");
 const Events = __webpack_require__(/*! ./Events */ "./engine/src/Events.js");
-//const Concrete = require('../../../../concrete/build/concrete.js');
-const Concrete = __webpack_require__(/*! concretejs */ "./node_modules/concretejs/build/concrete.min.js");
+const Concrete = __webpack_require__(/*! ../../../../concrete/build/concrete.js */ "../../concrete/build/concrete.js");
+//const Concrete = require('concretejs');
 const _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 const Color = __webpack_require__(/*! ./Color */ "./engine/src/Color.js");
 const Theme = __webpack_require__(/*! ./Theme */ "./engine/src/Theme.js");
@@ -2321,15 +2336,15 @@ module.exports = NumberFormatter;
 //   }
 // };
 
-// let incrementAncestorTotals = function(node, val) {
-//   node.totalDescendants+=val;
+let incrementAncestorTotals = function(node, val) {
+  node.totalDescendants+=val;
 
-//   if (node.parent) {
-//     incrementAncestorTotals(node.parent, val);
-//   }
-// };
+  if (node.parent) {
+    incrementAncestorTotals(node.parent, val);
+  }
+};
 
-let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) {
+let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, callback) {
   targetNode.children = [];
   //targetNode.totalDescendants = 0;
 
@@ -2337,12 +2352,15 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
+  targetNode.size = nodeSize;
+
+  callback(targetNode);
 
   if (srcNode.children) {
     let range = right - left;
     let childRange = range / srcNode.children.length;
     let childLeft = left;
-
+    let childNodeSize = nodeSize * 0.7;
 
     for (let n=0; n<srcNode.children.length; n++) {
       let childRight = childLeft + childRange;
@@ -2350,20 +2368,19 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
       targetNode.children.push({
         parent: targetNode
       });
-      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, callback);
+      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, childNodeSize, callback);
 
       childLeft += childRange;
     }
 
-    callback(targetNode);
-
-    //incrementAncestorTotals(targetNode, srcNode.children.length);
+    incrementAncestorTotals(targetNode, srcNode.children.length);
   }
+
 };
 
 const Tree = function(config) {
   let rootNode = config.rootNode;
-  let nodeSize = config.nodeSize;
+  let rootNodeSize = config.rootNodeSize;
   let newRootNode = {};
 
   let nodes = [];
@@ -2371,7 +2388,7 @@ const Tree = function(config) {
   let maxLevel = 0;
 
   // O(n)
-  buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
+  buildMetaTree(rootNode, newRootNode, -1, 1, 1, rootNodeSize, function(node) {
     node.index = n;
     nodes[n] = node;
     n++;
@@ -2400,7 +2417,7 @@ const Tree = function(config) {
     model.nodes.xs[n] = node.x;
     model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
     model.nodes.colors[n] = 0;
-    model.nodes.sizes[n] = nodeSize;
+    model.nodes.sizes[n] = node.size;
 
     if (node.parent) {
       model.edges[edgeIndex++] = node.parent.index;
@@ -2459,46 +2476,6 @@ const Tree = function(config) {
 };
 
 module.exports = Tree;
-
-/***/ }),
-
-/***/ "./node_modules/concretejs/build/concrete.min.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/concretejs/build/concrete.min.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_RESULT__;/*
- * Concrete v3.0.2
- * A lightweight Html5 Canvas framework that enables hit detection, layering, multi buffering, 
- * pixel ratio management, exports, and image downloads
- * Release Date: 11-20-2018
- * https://github.com/ericdrowell/concrete
- * Licensed under the MIT or GPL Version 2 licenses.
- *
- * Copyright (C) 2018 Eric Rowell @ericdrowell
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-var Concrete={},idCounter=0;Concrete.PIXEL_RATIO=window&&window.navigator&&window.navigator.userAgent&&!/PhantomJS/.test(window.navigator.userAgent)?2:1,Concrete.viewports=[],Concrete.Viewport=function(t){t||(t={}),this.container=t.container,this.layers=[],this.id=idCounter++,this.scene=new Concrete.Scene,this.setSize(t.width||0,t.height||0),t.container.innerHTML="",t.container.appendChild(this.scene.canvas),Concrete.viewports.push(this)},Concrete.Viewport.prototype={add:function(t){return this.layers.push(t),t.setSize(t.width||this.width,t.height||this.height),t.viewport=this},setSize:function(t,e){return this.width=t,this.height=e,this.scene.setSize(t,e),this},getIntersection:function(t,e){var i,n,s=this.layers;for(i=s.length-1;0<=i;i--)if(0<=(n=s[i].hit.getIntersection(t,e)))return n;return-1},getIndex:function(){var t,e=Concrete.viewports,i=e.length,n=0;for(n=0;n<i;n++)if(t=e[n],this.id===t.id)return n;return null},destroy:function(){this.layers.forEach(function(t){t.destroy()}),this.container.innerHTML="",Concrete.viewports.splice(this.getIndex(),1)},render:function(){var e=this.scene;e.clear(),this.layers.forEach(function(t){t.visible&&e.context.drawImage(t.scene.canvas,0,0,t.width,t.height)})}},Concrete.Layer=function(t){t||(t={}),this.x=0,this.y=0,this.width=0,this.height=0,this.visible=!0,this.id=idCounter++,this.hit=new Concrete.Hit({contextType:t.contextType}),this.scene=new Concrete.Scene({contextType:t.contextType}),t.x&&t.y&&this.setPosition(t.x,t.y),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Layer.prototype={setPosition:function(t,e){return this.x=t,this.y=e,this},setSize:function(t,e){return this.width=t,this.height=e,this.scene.setSize(t,e),this.hit.setSize(t,e),this},moveUp:function(){var t=this.getIndex(),e=this.viewport.layers;return t<e.length-1&&(e[t]=e[t+1],e[t+1]=this),this},moveDown:function(){var t=this.getIndex(),e=this.viewport.layers;return 0<t&&(e[t]=e[t-1],e[t-1]=this),this},moveToTop:function(){var t=this.getIndex(),e=this.viewport.layers;e.splice(t,1),e.push(this)},moveToBottom:function(){var t=this.getIndex(),e=this.viewport.layers;return e.splice(t,1),e.unshift(this),this},getIndex:function(){var t,e=this.viewport.layers,i=e.length,n=0;for(n=0;n<i;n++)if(t=e[n],this.id===t.id)return n;return null},destroy:function(){this.viewport.layers.splice(this.getIndex(),1)}},Concrete.Scene=function(t){t||(t={}),this.width=0,this.height=0,this.contextType=t.contextType||"2d",this.id=idCounter++,this.canvas=document.createElement("canvas"),this.canvas.className="concrete-scene-canvas",this.canvas.style.display="inline-block",this.context=this.canvas.getContext(this.contextType),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Scene.prototype={setSize:function(t,e){return this.width=t,this.height=e,this.id=idCounter++,this.canvas.width=t*Concrete.PIXEL_RATIO,this.canvas.style.width=t+"px",this.canvas.height=e*Concrete.PIXEL_RATIO,this.canvas.style.height=e+"px","2d"===this.contextType&&1!==Concrete.PIXEL_RATIO&&this.context.scale(Concrete.PIXEL_RATIO,Concrete.PIXEL_RATIO),this},clear:function(){var t=this.context;return"2d"===this.contextType?t.clearRect(0,0,this.width*Concrete.PIXEL_RATIO,this.height*Concrete.PIXEL_RATIO):t.clear(t.COLOR_BUFFER_BIT|t.DEPTH_BUFFER_BIT),this},toImage:function(t){var e=this,i=new Image,n=this.canvas.toDataURL("image/png");i.onload=function(){i.width=e.width,i.height=e.height,t(i)},i.src=n},download:function(h){this.canvas.toBlob(function(t){var e,i=document.createElement("a"),n=URL.createObjectURL(t),s=h.fileName||"canvas.png";i.setAttribute("href",n),i.setAttribute("target","_blank"),i.setAttribute("download",s),document.createEvent?((e=document.createEvent("MouseEvents")).initEvent("click",!0,!0),i.dispatchEvent(e)):i.click&&i.click()})}},Concrete.Hit=function(t){t||(t={}),this.width=0,this.height=0,this.contextType=t.contextType||"2d",this.canvas=document.createElement("canvas"),this.canvas.className="concrete-hit-canvas",this.canvas.style.display="none",this.canvas.style.position="relative",this.context=this.canvas.getContext(this.contextType,{preserveDrawingBuffer:!0,antialias:!1}),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Hit.prototype={setSize:function(t,e){return this.width=t,this.height=e,this.canvas.width=t*Concrete.PIXEL_RATIO,this.canvas.style.width=t+"px",this.canvas.height=e*Concrete.PIXEL_RATIO,this.canvas.style.height=e+"px",this},clear:function(){var t=this.context;return"2d"===this.contextType?t.clearRect(0,0,this.width*Concrete.PIXEL_RATIO,this.height*Concrete.PIXEL_RATIO):t.clear(t.COLOR_BUFFER_BIT|t.DEPTH_BUFFER_BIT),this},getIntersection:function(t,e){var i,n=this.context;if("2d"===this.contextType){if(0===(i=n.getImageData(Math.round(t),Math.round(e),1,1).data)[3])return-1}else if(i=new Uint8Array(4),n.readPixels(Math.round(t*Concrete.PIXEL_RATIO),Math.round((this.height-e)*Concrete.PIXEL_RATIO),1,1,n.RGBA,n.UNSIGNED_BYTE,i),255===i[0]&&255===i[1]&&255===i[2])return-1;return this.rgbToInt(i)},getColorFromIndex:function(t){var e=this.intToRGB(t);return"rgb("+e[0]+", "+e[1]+", "+e[2]+")"},rgbToInt:function(t){return(t[0]<<16)+(t[1]<<8)+t[2]},intToRGB:function(t){return[(16711680&t)>>16,(65280&t)>>8,255&t]}},function(t){"use strict"; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Concrete}).call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):undefined}(this);
 
 /***/ }),
 
