@@ -1359,6 +1359,8 @@ ElGrapho.prototype = {
           y: mousePos.y - that.panStart.y
         };
 
+        // that.panX += mouseDiff.x / that.scale;
+        // that.panY -= mouseDiff.y / that.scale;
         that.panX += mouseDiff.x;
         that.panY -= mouseDiff.y;
 
@@ -1397,6 +1399,20 @@ ElGrapho.prototype = {
         endTime: new Date().getTime() + 300,
         prop: 'scale'
       });
+      this.animations.push({
+        startVal: that.panX,
+        endVal: that.panX/ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'panX'
+      });
+      this.animations.push({
+        startVal: that.panY,
+        endVal: that.panY/ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'panY'
+      });
       this.dirty = true;
     }
   },
@@ -1416,6 +1432,20 @@ ElGrapho.prototype = {
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
         prop: 'scale'
+      });
+      this.animations.push({
+        startVal: that.panX,
+        endVal: that.panX*ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'panX'
+      });
+      this.animations.push({
+        startVal: that.panY,
+        endVal: that.panY*ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'panY'
       });
       this.dirty = true;
     }
