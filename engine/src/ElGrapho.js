@@ -14,7 +14,7 @@ const Tooltip = require('./components/Tooltip/Tooltip');
 const NumberFormatter = require('./formatters/NumberFormatter');
 const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
-
+const BoxZoom = require('./components/BoxZoom/BoxZoom');
 // models
 const Tree = require('./models/Tree');
 
@@ -26,7 +26,8 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.id = UUID.generate();
   this.dirty = true;
   this.hitDirty = true;
-  this.scale = START_SCALE;
+  this.scaleX = START_SCALE;
+  this.scaleY = START_SCALE;
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
@@ -155,6 +156,21 @@ ElGrapho.prototype = {
       that.setInteractionMode(Enums.interactionMode.PAN);
     });
 
+    this.on('box-zoom', function() {
+      that.setInteractionMode(Enums.interactionMode.BOX_ZOOM);
+    });
+
+    document.addEventListener('mousedown', function(evt) {
+      if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
+        let mousePos = that.getMousePosition(evt);
+        that.zoomBoxAnchor = {
+          x: mousePos.x,
+          y: mousePos.y
+        };
+
+        BoxZoom.create(evt.pageX, evt.pageY);
+      }
+    });
     viewport.container.addEventListener('mousedown', function(evt) {
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
@@ -164,44 +180,61 @@ ElGrapho.prototype = {
       }
     });
 
+    document.addEventListener('mousemove', _.throttle(function(evt) {
+      if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
+        BoxZoom.update(evt.pageX, evt.pageY);
+
+      }
+    }));
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
-      // if panning
-      if (that.panStart) {
-        let mouseDiff = {
-          x: mousePos.x - that.panStart.x,
-          y: mousePos.y - that.panStart.y
-        };
+      if (that.interactionMode === Enums.interactionMode.PAN) {
+        if (that.panStart) {
+          let mouseDiff = {
+            x: mousePos.x - that.panStart.x,
+            y: mousePos.y - that.panStart.y
+          };
 
-        viewport.scene.canvas.style.marginLeft = mouseDiff.x + 'px';
-        viewport.scene.canvas.style.marginTop = mouseDiff.y + 'px';
+          viewport.scene.canvas.style.marginLeft = mouseDiff.x + 'px';
+          viewport.scene.canvas.style.marginTop = mouseDiff.y + 'px';
+        }
+      }
+
+      // show tooltips for all cases
+      if (dataIndex === -1) {
+        Tooltip.hide();
       }
       else {
-        // if pixel data is not white (empty)
-        if (dataIndex === -1) {
-          Tooltip.hide();
-        }
-        else {
-          Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
-        }
-
-
-        // change point state
-        if (dataIndex !== that.hoveredDataIndex) {
-          if (that.hoveredDataIndex > -1) {
-            that.vertices.points.focused[that.hoveredDataIndex] = 0;
-          }
-
-          that.vertices.points.focused[dataIndex] = 1;
-          that.webgl.initBuffers(that.vertices);
-          that.dirty = true;
-          that.hoveredDataIndex = dataIndex;          
-        }
+        Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
       }
+
+      // change point state
+      if (dataIndex !== that.hoveredDataIndex) {
+        if (that.hoveredDataIndex > -1) {
+          that.vertices.points.focused[that.hoveredDataIndex] = 0;
+        }
+
+        that.vertices.points.focused[dataIndex] = 1;
+        that.webgl.initBuffers(that.vertices);
+        that.dirty = true;
+        that.hoveredDataIndex = dataIndex;          
+      }
+      
     }));
 
+
+    document.addEventListener('mouseup', function() {
+      if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
+        //let mousePos = that.getMousePosition(evt);
+
+        // console.log(that.zoomBoxAnchor);
+        // console.log(mousePos);
+
+        BoxZoom.destroy();
+      }
+    });
     viewport.container.addEventListener('mouseup', function(evt) {
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
@@ -226,6 +259,7 @@ ElGrapho.prototype = {
       }
     });
 
+
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
@@ -236,7 +270,8 @@ ElGrapho.prototype = {
   },
   zoomOut: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scale/=ZOOM_FACTOR;
+      this.scaleX /= ZOOM_FACTOR;
+      this.scaleY /= ZOOM_FACTOR;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -245,11 +280,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scale,
-        endVal: that.scale/ZOOM_FACTOR,
+        startVal: that.scaleX,
+        endVal: that.scaleX / ZOOM_FACTOR,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scale'
+        prop: 'scaleX'
+      });
+      this.animations.push({
+        startVal: that.scaleY,
+        endVal: that.scaleY / ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'scaleY'
       });
       this.animations.push({
         startVal: that.panX,
@@ -270,7 +312,8 @@ ElGrapho.prototype = {
   },
   zoomIn: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scale*=ZOOM_FACTOR;
+      this.scaleX *= ZOOM_FACTOR;
+      this.scaleY *= ZOOM_FACTOR;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -279,11 +322,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scale,
-        endVal: that.scale*ZOOM_FACTOR,
+        startVal: that.scaleX,
+        endVal: that.scaleX * ZOOM_FACTOR,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scale'
+        prop: 'scaleX'
+      });
+      this.animations.push({
+        startVal: that.scaleY,
+        endVal: that.scaleY * ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'scaleY'
       });
       this.animations.push({
         startVal: that.panX,
@@ -304,7 +354,8 @@ ElGrapho.prototype = {
   },
   reset: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scale = START_SCALE;
+      this.scaleX = START_SCALE;
+      this.scaleY = START_SCALE;
       this.panX = 0;
       this.panY = 0;
       this.dirty = true;
@@ -315,11 +366,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scale,
+        startVal: that.scaleX,
         endVal: START_SCALE,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scale'
+        prop: 'scaleX'
+      });
+      this.animations.push({
+        startVal: that.scaleY,
+        endVal: START_SCALE,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'scaleY'
       });
 
       this.animations.push({

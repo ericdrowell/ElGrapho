@@ -2,6 +2,7 @@ const zoomInIcon = require('../../../dist/icons/zoomInIcon.svg');
 const zoomOutIcon = require('../../../dist/icons/zoomOutIcon.svg');
 const moveIcon = require('../../../dist/icons/moveIcon.svg');
 const selectIcon = require('../../../dist/icons/selectIcon.svg');
+const boxZoomIcon = require('../../../dist/icons/boxZoomIcon.svg');
 const resetIcon = require('../../../dist/icons/resetIcon.svg');
 
 const Controls = function(config) {
@@ -15,6 +16,10 @@ const Controls = function(config) {
   this.selectButton = this.addButton({
     icon: selectIcon,
     evtName: 'select'
+  });
+  this.boxZoomIcon = this.addButton({
+    icon: boxZoomIcon,
+    evtName: 'box-zoom'
   });
   this.panButton = this.addButton({
     icon: moveIcon,

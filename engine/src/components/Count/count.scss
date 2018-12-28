@@ -4,4 +4,8 @@
   right: 5px;
   background: white;
   pointer-events: none;
+
+  &::selection {
+    background: transparent; 
+  }
 }

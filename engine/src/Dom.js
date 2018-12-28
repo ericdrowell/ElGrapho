@@ -1,7 +1,7 @@
 const Dom = {
-  create: function(className) {
+  create: function(classNameSuffix) {
     let el = document.createElement('div');
-    el.className = 'el-grapho-' + className;
+    el.className = 'el-grapho-' + classNameSuffix;
     return el;
   }
 };

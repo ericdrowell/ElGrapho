@@ -666,6 +666,72 @@ Concrete.Hit.prototype = {
 
 /***/ }),
 
+/***/ "./engine/dist/icons/boxZoomIcon.svg.js":
+/*!**********************************************!*\
+  !*** ./engine/dist/icons/boxZoomIcon.svg.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+   width="20" hei ght="20" viewBox="0 0 611.997 611.998" 
+   xml:space="preserve">
+<g>
+  <g>
+    <path d="M601.444,535.785L433.663,368.39c1.512-2.27,2.646-6.033,3.772-10.939c17.719-29.785,28.682-62.207,32.052-96.519
+      c0.772-7.915,1.126-16.208,1.126-24.13c0-26.012-4.343-52.088-13.19-77.665c-11.51-33.243-29.905-62.842-55.426-88.218
+      c-45.364-45.13-105.189-68.625-166.64-68.625c-60.702,0-120.801,23.607-166.269,68.625
+      c-30.315,30.009-50.391,65.633-61.08,105.938c-10.802,40.755-10.553,80.681,0,121.026c10.561,40.346,30.652,75.67,61.08,105.945
+      c45.355,45.131,105.567,68.617,166.269,68.617c47.125,0,89.964-13.625,129.688-38.455l6.033-3.771l168.529,168.15
+      c6.418,6.402,13.199,10.176,19.609,10.932c1.504,0.377,2.638,0.449,3.764,0.377c4.537-0.297,8.695-1.463,12.065-3.395
+      c4.552-2.598,9.427-6.41,14.703-11.686l7.544-7.537c5.276-5.285,9.089-10.158,11.688-14.703c1.922-3.369,3.016-7.922,3.016-13.576
+      v-3.018C611.997,549.345,608.048,542.373,601.444,535.785z M422.354,287.33c-8.848,33.131-25.634,62.207-50.52,87.092
+      c-36.194,36.188-84.832,56.553-136.478,56.553c-50.905,0-99.221-20.695-136.863-56.553c-73.957-70.466-73.651-202.198,0-273.34
+      c37.2-35.937,85.588-56.93,136.863-56.93c53.914,0,98.892,19.11,136.478,56.93c24.62,24.765,41.849,53.536,50.52,86.714
+      C431.024,220.973,431.226,254.103,422.354,287.33z"/>
+    <polygon points="258.353,138.401 212.732,138.401 212.732,214.563 136.571,214.563 136.571,260.184 212.732,260.184 
+      212.732,336.714 258.353,336.714 258.353,260.184 334.885,260.184 334.885,214.563 258.353,214.563     "/>
+  </g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+</svg>
+`;
+
+/***/ }),
+
 /***/ "./engine/dist/icons/moveIcon.svg.js":
 /*!*******************************************!*\
   !*** ./engine/dist/icons/moveIcon.svg.js ***!
@@ -1036,7 +1102,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1084,9 +1150,9 @@ module.exports = Color;
 /***/ (function(module, exports) {
 
 const Dom = {
-  create: function(className) {
+  create: function(classNameSuffix) {
     let el = document.createElement('div');
-    el.className = 'el-grapho-' + className;
+    el.className = 'el-grapho-' + classNameSuffix;
     return el;
   }
 };
@@ -1162,7 +1228,7 @@ const Tooltip = __webpack_require__(/*! ./components/Tooltip/Tooltip */ "./engin
 const NumberFormatter = __webpack_require__(/*! ./formatters/NumberFormatter */ "./engine/src/formatters/NumberFormatter.js");
 const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/VertexBridge.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
-
+const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
 // models
 const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
 
@@ -1174,7 +1240,8 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.id = UUID.generate();
   this.dirty = true;
   this.hitDirty = true;
-  this.scale = START_SCALE;
+  this.scaleX = START_SCALE;
+  this.scaleY = START_SCALE;
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
@@ -1303,6 +1370,21 @@ ElGrapho.prototype = {
       that.setInteractionMode(Enums.interactionMode.PAN);
     });
 
+    this.on('box-zoom', function() {
+      that.setInteractionMode(Enums.interactionMode.BOX_ZOOM);
+    });
+
+    document.addEventListener('mousedown', function(evt) {
+      if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
+        let mousePos = that.getMousePosition(evt);
+        that.zoomBoxAnchor = {
+          x: mousePos.x,
+          y: mousePos.y
+        };
+
+        BoxZoom.create(evt.pageX, evt.pageY);
+      }
+    });
     viewport.container.addEventListener('mousedown', function(evt) {
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
@@ -1312,44 +1394,61 @@ ElGrapho.prototype = {
       }
     });
 
+    document.addEventListener('mousemove', _.throttle(function(evt) {
+      if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
+        BoxZoom.update(evt.pageX, evt.pageY);
+
+      }
+    }));
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
-      // if panning
-      if (that.panStart) {
-        let mouseDiff = {
-          x: mousePos.x - that.panStart.x,
-          y: mousePos.y - that.panStart.y
-        };
+      if (that.interactionMode === Enums.interactionMode.PAN) {
+        if (that.panStart) {
+          let mouseDiff = {
+            x: mousePos.x - that.panStart.x,
+            y: mousePos.y - that.panStart.y
+          };
 
-        viewport.scene.canvas.style.marginLeft = mouseDiff.x + 'px';
-        viewport.scene.canvas.style.marginTop = mouseDiff.y + 'px';
+          viewport.scene.canvas.style.marginLeft = mouseDiff.x + 'px';
+          viewport.scene.canvas.style.marginTop = mouseDiff.y + 'px';
+        }
+      }
+
+      // show tooltips for all cases
+      if (dataIndex === -1) {
+        Tooltip.hide();
       }
       else {
-        // if pixel data is not white (empty)
-        if (dataIndex === -1) {
-          Tooltip.hide();
-        }
-        else {
-          Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
-        }
-
-
-        // change point state
-        if (dataIndex !== that.hoveredDataIndex) {
-          if (that.hoveredDataIndex > -1) {
-            that.vertices.points.focused[that.hoveredDataIndex] = 0;
-          }
-
-          that.vertices.points.focused[dataIndex] = 1;
-          that.webgl.initBuffers(that.vertices);
-          that.dirty = true;
-          that.hoveredDataIndex = dataIndex;          
-        }
+        Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
       }
+
+      // change point state
+      if (dataIndex !== that.hoveredDataIndex) {
+        if (that.hoveredDataIndex > -1) {
+          that.vertices.points.focused[that.hoveredDataIndex] = 0;
+        }
+
+        that.vertices.points.focused[dataIndex] = 1;
+        that.webgl.initBuffers(that.vertices);
+        that.dirty = true;
+        that.hoveredDataIndex = dataIndex;          
+      }
+      
     }));
 
+
+    document.addEventListener('mouseup', function() {
+      if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
+        //let mousePos = that.getMousePosition(evt);
+
+        // console.log(that.zoomBoxAnchor);
+        // console.log(mousePos);
+
+        BoxZoom.destroy();
+      }
+    });
     viewport.container.addEventListener('mouseup', function(evt) {
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
@@ -1374,6 +1473,7 @@ ElGrapho.prototype = {
       }
     });
 
+
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
@@ -1384,7 +1484,8 @@ ElGrapho.prototype = {
   },
   zoomOut: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scale/=ZOOM_FACTOR;
+      this.scaleX /= ZOOM_FACTOR;
+      this.scaleY /= ZOOM_FACTOR;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -1393,11 +1494,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scale,
-        endVal: that.scale/ZOOM_FACTOR,
+        startVal: that.scaleX,
+        endVal: that.scaleX / ZOOM_FACTOR,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scale'
+        prop: 'scaleX'
+      });
+      this.animations.push({
+        startVal: that.scaleY,
+        endVal: that.scaleY / ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'scaleY'
       });
       this.animations.push({
         startVal: that.panX,
@@ -1418,7 +1526,8 @@ ElGrapho.prototype = {
   },
   zoomIn: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scale*=ZOOM_FACTOR;
+      this.scaleX *= ZOOM_FACTOR;
+      this.scaleY *= ZOOM_FACTOR;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -1427,11 +1536,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scale,
-        endVal: that.scale*ZOOM_FACTOR,
+        startVal: that.scaleX,
+        endVal: that.scaleX * ZOOM_FACTOR,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scale'
+        prop: 'scaleX'
+      });
+      this.animations.push({
+        startVal: that.scaleY,
+        endVal: that.scaleY * ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'scaleY'
       });
       this.animations.push({
         startVal: that.panX,
@@ -1452,7 +1568,8 @@ ElGrapho.prototype = {
   },
   reset: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scale = START_SCALE;
+      this.scaleX = START_SCALE;
+      this.scaleY = START_SCALE;
       this.panX = 0;
       this.panY = 0;
       this.dirty = true;
@@ -1463,11 +1580,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scale,
+        startVal: that.scaleX,
         endVal: START_SCALE,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scale'
+        prop: 'scaleX'
+      });
+      this.animations.push({
+        startVal: that.scaleY,
+        endVal: START_SCALE,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'scaleY'
       });
 
       this.animations.push({
@@ -1571,13 +1695,13 @@ let ElGraphoCollection = {
       }
 
       if (graph.dirty) {
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.scale);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.scaleX, graph.scaleY);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.scale);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.scaleX, graph.scaleY);
         graph.hitDirty = false; 
       }
     });
@@ -1608,7 +1732,8 @@ const Enums = {
   },
   interactionMode: {
     SELECT: 'select',
-    PAN: 'pan'
+    PAN: 'pan',
+    BOX_ZOOM: 'box-zoom'
   }
 };
 
@@ -2091,7 +2216,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, scale) {
+  drawScene: function(panX, panY, scaleX, scaleY) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -2114,7 +2239,7 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [scale, scale, 1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [scaleX, scaleY, 1]);
 
     //console.log(modelViewMatrix);
 
@@ -2127,7 +2252,7 @@ WebGL.prototype = {
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
-  drawHit: function(panX, panY, scale) {
+  drawHit: function(panX, panY, scaleX, scaleY) {
     let layer = this.layer;
     let gl = layer.hit.context;
     let modelViewMatrix = mat4.create();
@@ -2154,7 +2279,7 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [scale, scale, 1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [scaleX, scaleY, 1]);
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
@@ -2173,6 +2298,86 @@ module.exports = WebGL;
 
 /***/ }),
 
+/***/ "./engine/src/components/BoxZoom/BoxZoom.js":
+/*!**************************************************!*\
+  !*** ./engine/src/components/BoxZoom/BoxZoom.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const Dom = __webpack_require__(/*! ../../Dom */ "./engine/src/Dom.js");
+
+let BoxZoom = {
+  active: false,
+  x: null,
+  y: null,
+  el: null,
+  create: function(x, y) {
+
+    BoxZoom.anchorX = x;
+    BoxZoom.anchorY = y;
+
+    BoxZoom.destroy();
+
+    let el = Dom.create('box-zoom-component');
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    document.body.appendChild(el);
+
+    BoxZoom.el = el;
+
+    BoxZoom.active = true;
+
+  },
+  update: function(x, y) {
+    if (BoxZoom.active) {
+      let x0, x1, y0, y1;
+
+      if (x > BoxZoom.anchorX) {
+        x0 = BoxZoom.anchorX;
+        x1 = x;
+      }
+      else {
+        x0 = x;
+        x1 = BoxZoom.anchorX;      
+      }
+
+      if (y > BoxZoom.anchorY) {
+        y0 = BoxZoom.anchorY;
+        y1 = y;
+      }
+      else {
+        y0 = y;
+        y1 = BoxZoom.anchorY;      
+      }
+
+      let width = x1 - x0;
+      let height = y1 - y0;
+
+      BoxZoom.el.style.left = x0 + 'px';
+      BoxZoom.el.style.top = y0 + 'px';
+      BoxZoom.el.style.width = width + 'px';
+      BoxZoom.el.style.height = height + 'px';
+    }
+
+
+  },
+  destroy: function() {
+    let el = document.querySelector('.el-grapho-box-zoom-component');
+
+    if (el) {
+      el.remove();
+    }
+
+    BoxZoom.active = false;
+  }
+};
+
+module.exports = BoxZoom;
+
+/***/ }),
+
 /***/ "./engine/src/components/Controls/Controls.js":
 /*!****************************************************!*\
   !*** ./engine/src/components/Controls/Controls.js ***!
@@ -2184,6 +2389,7 @@ const zoomInIcon = __webpack_require__(/*! ../../../dist/icons/zoomInIcon.svg */
 const zoomOutIcon = __webpack_require__(/*! ../../../dist/icons/zoomOutIcon.svg */ "./engine/dist/icons/zoomOutIcon.svg.js");
 const moveIcon = __webpack_require__(/*! ../../../dist/icons/moveIcon.svg */ "./engine/dist/icons/moveIcon.svg.js");
 const selectIcon = __webpack_require__(/*! ../../../dist/icons/selectIcon.svg */ "./engine/dist/icons/selectIcon.svg.js");
+const boxZoomIcon = __webpack_require__(/*! ../../../dist/icons/boxZoomIcon.svg */ "./engine/dist/icons/boxZoomIcon.svg.js");
 const resetIcon = __webpack_require__(/*! ../../../dist/icons/resetIcon.svg */ "./engine/dist/icons/resetIcon.svg.js");
 
 const Controls = function(config) {
@@ -2197,6 +2403,10 @@ const Controls = function(config) {
   this.selectButton = this.addButton({
     icon: selectIcon,
     evtName: 'select'
+  });
+  this.boxZoomIcon = this.addButton({
+    icon: boxZoomIcon,
+    evtName: 'box-zoom'
   });
   this.panButton = this.addButton({
     icon: moveIcon,
@@ -2341,31 +2551,6 @@ module.exports = NumberFormatter;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-// let bfs = function(root, level, callback) {
-//   let children = [[root]];
-//   let nodeIndex = 0;
-//   let parentIndex = -1;
-
-//   while(children.length) {
-
-//     let grandChildren = [];
-
-//     children.forEach(function(childSet) {
-
-//       childSet.forEach(function(child) {
-//         callback(child, level, nodeIndex++, parentIndex);
-//         if (child.children) {
-//           grandChildren.push(child.children);
-//         }
-//       });
-//       parentIndex++;
-//     });
-
-//     children = grandChildren;
-//     level++;
-//   }
-// };
-
 let incrementAncestorTotals = function(node, val) {
   node.totalDescendants+=val;
 
@@ -2455,54 +2640,7 @@ const Tree = function(config) {
     }
   });
 
-  console.log(nodes);
-
-  // let edgeIndex = 0;
-  // let numLevels = levels.length;
-  // levels.forEach(function(level, l) {
-  //   let numLevelNodes = level.length;
-  //   let numSpaces = numLevelNodes + 1;
-  //   let spacing = 2 / numSpaces;
-  //   level.forEach(function(node, n) {
-  //     let nodeIndex = node.index;
-  //     let parentIndex = node.parentIndex;
-
-  //     model.nodes.xs[nodeIndex] = -1 + n*spacing + spacing;
-  //     model.nodes.ys[nodeIndex] = 1 - (2*l)/(numLevels-1);
-  //     model.nodes.colors[nodeIndex] = l%3;
-  //     model.nodes.sizes[nodeIndex] = nodeSize;
-
-  //     if (l>0) {
-  //       model.edges[edgeIndex++] = parentIndex;
-  //       model.edges[edgeIndex++] = nodeIndex; 
-  //     }
-      
-
-  //   });
-  // });
-
-  //console.log(levels);
-
-
-
   return model;
-
-  // return {
-  //   nodes: {
-  //     xs:     new Float32Array([0,  -100, 100, -150,  -50,  50,   150]),
-  //     ys:     new Float32Array([150, 0,   0,   -150, -150, -150, -150]),
-  //     colors: new Float32Array([0,   1,   1,    2,    2,    2,    2]),
-  //     sizes:  new Float32Array([60,  30,  30,   15,   15,   15,   15])
-  //   },
-  //   edges: new Float32Array([
-  //     0, 1, 
-  //     0, 2, 
-  //     1, 3,
-  //     1, 4,
-  //     2, 5,
-  //     2, 6
-  //   ])
-  // };
 };
 
 module.exports = Tree;

@@ -25,6 +25,14 @@
   right: 5px;
   background: white;
   pointer-events: none; }
+  .el-grapho-count::selection {
+    background: transparent; }
+
+.el-grapho-box-zoom-component {
+  position: fixed;
+  border: 1px solid #119fe0;
+  background-color: rgba(17, 159, 224, 0.1);
+  pointer-events: none; }
 
 .el-grapho-wrapper {
   display: inline-block;
@@ -35,11 +43,17 @@
     cursor: default; }
     .el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control {
       border-color: #119fe0; }
-      .el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path {
+      .el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path, .el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon {
         fill: #119fe0; }
   .el-grapho-wrapper.el-grapho-pan-interaction-mode {
     cursor: move; }
     .el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control {
       border-color: #119fe0; }
-      .el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path {
+      .el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path, .el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon {
+        fill: #119fe0; }
+  .el-grapho-wrapper.el-grapho-box-zoom-interaction-mode {
+    cursor: zoom-in; }
+    .el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control {
+      border-color: #119fe0; }
+      .el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path, .el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon {
         fill: #119fe0; }

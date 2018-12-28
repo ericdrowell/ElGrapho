@@ -48,13 +48,13 @@ let ElGraphoCollection = {
       }
 
       if (graph.dirty) {
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.scale);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.scaleX, graph.scaleY);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.scale);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.scaleX, graph.scaleY);
         graph.hitDirty = false; 
       }
     });

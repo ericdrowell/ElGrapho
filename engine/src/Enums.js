@@ -5,7 +5,8 @@ const Enums = {
   },
   interactionMode: {
     SELECT: 'select',
-    PAN: 'pan'
+    PAN: 'pan',
+    BOX_ZOOM: 'box-zoom'
   }
 };
 
