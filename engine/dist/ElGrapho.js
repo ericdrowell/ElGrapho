@@ -1154,6 +1154,14 @@ const Dom = {
     let el = document.createElement('div');
     el.className = 'el-grapho-' + classNameSuffix;
     return el;
+  },
+  closest: function(el, s) {
+    if (!document.documentElement.contains(el)) return null;
+    do {
+      if (el.matches(s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null && el.nodeType === 1); 
+    return null;
   }
 };
 
@@ -1231,6 +1239,7 @@ const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
 // models
 const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
+const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -1240,8 +1249,8 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.id = UUID.generate();
   this.dirty = true;
   this.hitDirty = true;
-  this.scaleX = START_SCALE;
-  this.scaleY = START_SCALE;
+  this.zoomX = START_SCALE;
+  this.zoomY = START_SCALE;
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
@@ -1375,6 +1384,9 @@ ElGrapho.prototype = {
     });
 
     document.addEventListener('mousedown', function(evt) {
+      if (Dom.closest(evt.target, '.el-grapho-controls')) {
+        return;
+      }
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
         let mousePos = that.getMousePosition(evt);
         that.zoomBoxAnchor = {
@@ -1386,6 +1398,9 @@ ElGrapho.prototype = {
       }
     });
     viewport.container.addEventListener('mousedown', function(evt) {
+      if (Dom.closest(evt.target, '.el-grapho-controls')) {
+        return;
+      }
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
         that.panStart = mousePos;
@@ -1416,40 +1431,101 @@ ElGrapho.prototype = {
         }
       }
 
-      // show tooltips for all cases
-      if (dataIndex === -1) {
-        Tooltip.hide();
-      }
-      else {
-        Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
-      }
-
-      // change point state
-      if (dataIndex !== that.hoveredDataIndex) {
-        if (that.hoveredDataIndex > -1) {
-          that.vertices.points.focused[that.hoveredDataIndex] = 0;
+      // don't show tooltips if actively panning or zoom boxing
+      if (!that.panStart && !that.zoomBoxAnchor) {
+        if (dataIndex === -1) {
+          Tooltip.hide();
+        }
+        else {
+          Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
         }
 
-        that.vertices.points.focused[dataIndex] = 1;
-        that.webgl.initBuffers(that.vertices);
-        that.dirty = true;
-        that.hoveredDataIndex = dataIndex;          
+        // change point state
+        if (dataIndex !== that.hoveredDataIndex) {
+          if (that.hoveredDataIndex > -1) {
+            that.vertices.points.focused[that.hoveredDataIndex] = 0;
+          }
+
+          that.vertices.points.focused[dataIndex] = 1;
+          that.webgl.initBuffers(that.vertices);
+          that.dirty = true;
+          that.hoveredDataIndex = dataIndex;          
+        }
       }
       
     }));
 
 
-    document.addEventListener('mouseup', function() {
+    document.addEventListener('mouseup', function(evt) {
+      if (Dom.closest(evt.target, '.el-grapho-controls')) {
+        return;
+      }
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
-        //let mousePos = that.getMousePosition(evt);
+        if (!that.zoomBoxAnchor) {
+          return;
+        }
+
+        let mousePos = that.getMousePosition(evt);
+        let topLeftX, topLeftY;
 
         // console.log(that.zoomBoxAnchor);
         // console.log(mousePos);
 
+        let width, height;
+        let zoomX, zoomY;
+
+        if (mousePos.x > that.zoomBoxAnchor.x) {
+          topLeftX = that.zoomBoxAnchor.x;
+          topLeftY = that.zoomBoxAnchor.y;
+          width = mousePos.x - that.zoomBoxAnchor.x;
+          height = mousePos.y - that.zoomBoxAnchor.y;
+        }
+        else {
+          topLeftX = mousePos.x;
+          topLeftY = mousePos.y;
+          width = that.zoomBoxAnchor.x - mousePos.x;
+          height = that.zoomBoxAnchor.y - mousePos.y;    
+        }
+
+        // if just clicking on a point...
+        if (width < 2 || height < 2) {
+          zoomX = ZOOM_FACTOR;
+          zoomY = ZOOM_FACTOR;
+          width = 0;
+          height = 0;
+          topLeftX = mousePos.x;
+          topLeftY = mousePos.y;
+        }
+        else if (width > height) {
+          zoomX = ZOOM_FACTOR * width / height;
+          zoomY = ZOOM_FACTOR;
+        }
+        else {
+          zoomX = ZOOM_FACTOR;
+          zoomY = ZOOM_FACTOR * height / width;
+        }
+
+        let viewportWidth = viewport.width;
+        let viewportHeight = viewport.height;
+        let viewportCenterX = viewportWidth/2;
+        let viewportCenterY = viewportHeight/2;
+
+        let boxCenterX = (topLeftX + width/2);
+        let panX = (viewportCenterX - boxCenterX) * that.zoomX;
+        let boxCenterY = (topLeftY + height/2);
+        let panY = (boxCenterY - viewportCenterY) * that.zoomY;
+
+        console.log(panX, panY);
+
+        that.zoomToPoint(panX, panY, zoomX, zoomY);
         BoxZoom.destroy();
+        that.zoomBoxAnchor = null;
       }
     });
     viewport.container.addEventListener('mouseup', function(evt) {
+      if (Dom.closest(evt.target, '.el-grapho-controls')) {
+        return;
+      }
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
 
@@ -1482,10 +1558,12 @@ ElGrapho.prototype = {
     this.interactionMode = mode;
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
   },
-  zoomOut: function() {
+  zoomToPoint: function(panX, panY, zoomX, zoomY) {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scaleX /= ZOOM_FACTOR;
-      this.scaleY /= ZOOM_FACTOR;
+      this.panX += panX;
+      this.panY += panY;
+      this.zoomX *= zoomX;
+      this.zoomY *= zoomY;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -1494,29 +1572,29 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scaleX,
-        endVal: that.scaleX / ZOOM_FACTOR,
+        startVal: that.zoomX,
+        endVal: that.zoomX * zoomX,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scaleX'
+        prop: 'zoomX'
       });
       this.animations.push({
-        startVal: that.scaleY,
-        endVal: that.scaleY / ZOOM_FACTOR,
+        startVal: that.zoomY,
+        endVal: that.zoomY * zoomY,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scaleY'
+        prop: 'zoomY'
       });
       this.animations.push({
         startVal: that.panX,
-        endVal: that.panX/ZOOM_FACTOR,
+        endVal: (that.panX + panX / that.zoomX) * zoomX,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
         prop: 'panX'
       });
       this.animations.push({
         startVal: that.panY,
-        endVal: that.panY/ZOOM_FACTOR,
+        endVal: (that.panY + panY / that.zoomY) * zoomY,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
         prop: 'panY'
@@ -1526,8 +1604,8 @@ ElGrapho.prototype = {
   },
   zoomIn: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scaleX *= ZOOM_FACTOR;
-      this.scaleY *= ZOOM_FACTOR;
+      this.zoomX *= ZOOM_FACTOR;
+      this.zoomY *= ZOOM_FACTOR;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -1536,18 +1614,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scaleX,
-        endVal: that.scaleX * ZOOM_FACTOR,
+        startVal: that.zoomX,
+        endVal: that.zoomX * ZOOM_FACTOR,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scaleX'
+        prop: 'zoomX'
       });
       this.animations.push({
-        startVal: that.scaleY,
-        endVal: that.scaleY * ZOOM_FACTOR,
+        startVal: that.zoomY,
+        endVal: that.zoomY * ZOOM_FACTOR,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scaleY'
+        prop: 'zoomY'
       });
       this.animations.push({
         startVal: that.panX,
@@ -1566,10 +1644,52 @@ ElGrapho.prototype = {
       this.dirty = true;
     }
   },
+  zoomOut: function() {
+    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
+      this.zoomX /= ZOOM_FACTOR;
+      this.zoomY /= ZOOM_FACTOR;
+      this.dirty = true;
+      this.hitDirty = true;
+    }
+    else {
+      this.animations = [];
+
+      let that = this;
+      this.animations.push({
+        startVal: that.zoomX,
+        endVal: that.zoomX / ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'zoomX'
+      });
+      this.animations.push({
+        startVal: that.zoomY,
+        endVal: that.zoomY / ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'zoomY'
+      });
+      this.animations.push({
+        startVal: that.panX,
+        endVal: that.panX/ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'panX'
+      });
+      this.animations.push({
+        startVal: that.panY,
+        endVal: that.panY/ZOOM_FACTOR,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 300,
+        prop: 'panY'
+      });
+      this.dirty = true;
+    }
+  },
   reset: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.scaleX = START_SCALE;
-      this.scaleY = START_SCALE;
+      this.zoomX = START_SCALE;
+      this.zoomY = START_SCALE;
       this.panX = 0;
       this.panY = 0;
       this.dirty = true;
@@ -1580,18 +1700,18 @@ ElGrapho.prototype = {
 
       let that = this;
       this.animations.push({
-        startVal: that.scaleX,
+        startVal: that.zoomX,
         endVal: START_SCALE,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scaleX'
+        prop: 'zoomX'
       });
       this.animations.push({
-        startVal: that.scaleY,
+        startVal: that.zoomY,
         endVal: START_SCALE,
         startTime: new Date().getTime(),
         endTime: new Date().getTime() + 300,
-        prop: 'scaleY'
+        prop: 'zoomY'
       });
 
       this.animations.push({
@@ -1695,13 +1815,13 @@ let ElGraphoCollection = {
       }
 
       if (graph.dirty) {
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.scaleX, graph.scaleY);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.scaleX, graph.scaleY);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
         graph.hitDirty = false; 
       }
     });
@@ -2216,7 +2336,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, scaleX, scaleY) {
+  drawScene: function(panX, panY, zoomX, zoomY) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -2239,7 +2359,7 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [scaleX, scaleY, 1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
 
@@ -2252,7 +2372,7 @@ WebGL.prototype = {
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
-  drawHit: function(panX, panY, scaleX, scaleY) {
+  drawHit: function(panX, panY, zoomX, zoomY) {
     let layer = this.layer;
     let gl = layer.hit.context;
     let modelViewMatrix = mat4.create();
@@ -2279,7 +2399,7 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [scaleX, scaleY, 1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);

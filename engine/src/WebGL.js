@@ -209,7 +209,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, scaleX, scaleY) {
+  drawScene: function(panX, panY, zoomX, zoomY) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -232,7 +232,7 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [scaleX, scaleY, 1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
 
@@ -245,7 +245,7 @@ WebGL.prototype = {
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
-  drawHit: function(panX, panY, scaleX, scaleY) {
+  drawHit: function(panX, panY, zoomX, zoomY) {
     let layer = this.layer;
     let gl = layer.hit.context;
     let modelViewMatrix = mat4.create();
@@ -272,7 +272,7 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
-    mat4.scale(modelViewMatrix, modelViewMatrix, [scaleX, scaleY, 1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
