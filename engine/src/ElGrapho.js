@@ -252,18 +252,39 @@ ElGrapho.prototype = {
         let width, height;
         let zoomX, zoomY;
 
-        if (mousePos.x > that.zoomBoxAnchor.x) {
-          topLeftX = that.zoomBoxAnchor.x;
-          topLeftY = that.zoomBoxAnchor.y;
+        // direction: right down
+        if (mousePos.x > that.zoomBoxAnchor.x && mousePos.y > that.zoomBoxAnchor.y) {
           width = mousePos.x - that.zoomBoxAnchor.x;
           height = mousePos.y - that.zoomBoxAnchor.y;
+          topLeftX = that.zoomBoxAnchor.x;
+          topLeftY = that.zoomBoxAnchor.y;
         }
-        else {
-          topLeftX = mousePos.x;
+        // direction: right up
+        else if (mousePos.x > that.zoomBoxAnchor.x && mousePos.y <= that.zoomBoxAnchor.y) {
+          width = mousePos.x - that.zoomBoxAnchor.x;
+          height = that.zoomBoxAnchor.y - mousePos.y;
+          topLeftX = that.zoomBoxAnchor.x;
           topLeftY = mousePos.y;
-          width = that.zoomBoxAnchor.x - mousePos.x;
-          height = that.zoomBoxAnchor.y - mousePos.y;    
         }
+        // direction: left up
+        else if (mousePos.x <= that.zoomBoxAnchor.x && mousePos.y <= that.zoomBoxAnchor.y) {
+          width = that.zoomBoxAnchor.x - mousePos.x;
+          height =  that.zoomBoxAnchor.y - mousePos.y; 
+          topLeftX = mousePos.x;
+          topLeftY = mousePos.y; 
+        }
+        // direction: left down
+        else if (mousePos.x <= that.zoomBoxAnchor.x && mousePos.y > that.zoomBoxAnchor.y) {
+          width = that.zoomBoxAnchor.x - mousePos.x;
+          height =  mousePos.y - that.zoomBoxAnchor.y; 
+          topLeftX = mousePos.x;
+          topLeftY = that.zoomBoxAnchor.y;   
+        }
+
+        console.log(width, height);
+
+        let viewportWidth = viewport.width;
+        let viewportHeight = viewport.height;
 
         // if just clicking on a point...
         if (width < 2 || height < 2) {
@@ -274,17 +295,12 @@ ElGrapho.prototype = {
           topLeftX = mousePos.x;
           topLeftY = mousePos.y;
         }
-        else if (width > height) {
-          zoomX = ZOOM_FACTOR * width / height;
-          zoomY = ZOOM_FACTOR;
-        }
         else {
-          zoomX = ZOOM_FACTOR;
-          zoomY = ZOOM_FACTOR * height / width;
+          zoomX = viewportWidth / width;
+          zoomY = viewportHeight / height;
         }
 
-        let viewportWidth = viewport.width;
-        let viewportHeight = viewport.height;
+
         let viewportCenterX = viewportWidth/2;
         let viewportCenterY = viewportHeight/2;
 
@@ -292,8 +308,6 @@ ElGrapho.prototype = {
         let panX = (viewportCenterX - boxCenterX) * that.zoomX;
         let boxCenterY = (topLeftY + height/2);
         let panY = (boxCenterY - viewportCenterY) * that.zoomY;
-
-        console.log(panX, panY);
 
         that.zoomToPoint(panX, panY, zoomX, zoomY);
         BoxZoom.destroy();
