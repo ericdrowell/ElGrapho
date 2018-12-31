@@ -15,24 +15,33 @@
       const WIDTH = 1000;
       const HEIGHT = 500;
 
-      let numLevels = 10;
+      let numLevels = 8;
       let maxChildren = 5;
 
-      function addChildren(node, level) {
+      function addChildren(node, level, color) {
+        node.color = color;
+
         let numChildren = Math.ceil(Math.random() * maxChildren);
         if (level < numLevels) {
           node.children = [];
 
           for (let n=0; n<numChildren; n++) {
+            let childColor;
+            if (level === 0) {
+              childColor = n+1;
+            }
+            else {
+              childColor = color;
+            }
             let child = {};
             node.children.push(child);
-            addChildren(child, level+1);
+            addChildren(child, level+1, childColor);
           }
         }
       }
 
       let rootNode = {};
-      addChildren(rootNode, 0);
+      addChildren(rootNode, 0, 0);
 
 
 
@@ -46,6 +55,10 @@
         height: HEIGHT,
         renderingMode: 'ux'
       });
+
+      graph.tooltipTemplate = function(index, el) {
+        el.innerHTML = 'my custom value: ' + ElGrapho.NumberFormatter.addCommas(index);;
+      };
 
     </script>
   </body>

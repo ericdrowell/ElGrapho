@@ -14,6 +14,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
+  targetNode.color = srcNode.color || 0;
 
   callback(targetNode);
 
@@ -74,7 +75,7 @@ const Tree = function(config) {
   nodes.forEach(function(node, n) {
     model.nodes.xs[n] = node.x;
     model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
-    model.nodes.colors[n] = 0;
+    model.nodes.colors[n] = node.color;
 
     if (node.parent) {
       model.edges[edgeIndex++] = node.parent.index;
