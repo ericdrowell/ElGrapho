@@ -352,10 +352,10 @@ ElGrapho.prototype = {
   },
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.panX += panX;
-      this.panY += panY;
-      this.zoomX *= zoomX;
-      this.zoomY *= zoomY;
+      this.panX = (this.panX + panX / this.zoomX) * zoomX;
+      this.panY = (this.panY + panY / this.zoomY) * zoomY;
+      this.zoomX = this.zoomX * zoomX;
+      this.zoomY = this.zoomY * zoomY;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -395,88 +395,10 @@ ElGrapho.prototype = {
     }
   },
   zoomIn: function() {
-    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.zoomX *= ZOOM_FACTOR;
-      this.zoomY *= ZOOM_FACTOR;
-      this.dirty = true;
-      this.hitDirty = true;
-    }
-    else {
-      this.animations = [];
-
-      let that = this;
-      this.animations.push({
-        startVal: that.zoomX,
-        endVal: that.zoomX * ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomX'
-      });
-      this.animations.push({
-        startVal: that.zoomY,
-        endVal: that.zoomY * ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomY'
-      });
-      this.animations.push({
-        startVal: that.panX,
-        endVal: that.panX*ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panX'
-      });
-      this.animations.push({
-        startVal: that.panY,
-        endVal: that.panY*ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panY'
-      });
-      this.dirty = true;
-    }
+    this.zoomToPoint(0, 0, ZOOM_FACTOR, ZOOM_FACTOR);
   },
   zoomOut: function() {
-    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.zoomX /= ZOOM_FACTOR;
-      this.zoomY /= ZOOM_FACTOR;
-      this.dirty = true;
-      this.hitDirty = true;
-    }
-    else {
-      this.animations = [];
-
-      let that = this;
-      this.animations.push({
-        startVal: that.zoomX,
-        endVal: that.zoomX / ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomX'
-      });
-      this.animations.push({
-        startVal: that.zoomY,
-        endVal: that.zoomY / ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomY'
-      });
-      this.animations.push({
-        startVal: that.panX,
-        endVal: that.panX/ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panX'
-      });
-      this.animations.push({
-        startVal: that.panY,
-        endVal: that.panY/ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panY'
-      });
-      this.dirty = true;
-    }
+    this.zoomToPoint(0, 0, 1/ZOOM_FACTOR, 1/ZOOM_FACTOR);
   },
   reset: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {

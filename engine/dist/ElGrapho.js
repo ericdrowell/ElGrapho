@@ -984,7 +984,6 @@ void main(void) {
 module.exports = `attribute vec4 aVertexPosition;
 
 attribute float aVertexIndex;
-attribute float aVertexSize;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -1008,8 +1007,7 @@ vec3 unpackColor(float f) {
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  // scale points with zoom.  Using scale of x component
-  gl_PointSize = aVertexSize * length(uModelViewMatrix[0]);
+  gl_PointSize = 16.0;
 
   vVertexColor = vec4(unpackColor(aVertexIndex), 1.0);
 }`;
@@ -1026,7 +1024,6 @@ void main() {
 module.exports = `attribute vec4 aVertexPosition;
 
 attribute float aVertexColor;
-attribute float aVertexSize;
 attribute float aVertexFocused;
 
 uniform mat4 uModelViewMatrix;
@@ -1036,8 +1033,7 @@ varying vec4 vVertexColor;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  // scale points with zoom.  Using scale of x component
-  gl_PointSize = aVertexSize * length(uModelViewMatrix[0]);
+  gl_PointSize = 16.0;
 
   // normal color
   if (aVertexFocused == 0.0) {
@@ -1069,19 +1065,19 @@ void main() {
 /***/ (function(module, exports) {
 
 module.exports = `attribute vec4 aVertexPosition;
-
+attribute vec4 normal;
 attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 varying vec4 vVertexColor;
-
+// https://mattdesl.svbtle.com/drawing-lines-is-hard
+// https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  //vVertexColor = aVertexColor;
+  //gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + vec4(normal.xyz, 0.0));
 
-  //vVertexColor = aVertexColor;
   if (aVertexColor == 0.0) {
     vVertexColor = vec4(1.0, 0.0, 0.0, 1.0); 
   }
@@ -1574,10 +1570,10 @@ ElGrapho.prototype = {
   },
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.panX += panX;
-      this.panY += panY;
-      this.zoomX *= zoomX;
-      this.zoomY *= zoomY;
+      this.panX = (this.panX + panX / this.zoomX) * zoomX;
+      this.panY = (this.panY + panY / this.zoomY) * zoomY;
+      this.zoomX = this.zoomX * zoomX;
+      this.zoomY = this.zoomY * zoomY;
       this.dirty = true;
       this.hitDirty = true;
     }
@@ -1617,88 +1613,10 @@ ElGrapho.prototype = {
     }
   },
   zoomIn: function() {
-    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.zoomX *= ZOOM_FACTOR;
-      this.zoomY *= ZOOM_FACTOR;
-      this.dirty = true;
-      this.hitDirty = true;
-    }
-    else {
-      this.animations = [];
-
-      let that = this;
-      this.animations.push({
-        startVal: that.zoomX,
-        endVal: that.zoomX * ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomX'
-      });
-      this.animations.push({
-        startVal: that.zoomY,
-        endVal: that.zoomY * ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomY'
-      });
-      this.animations.push({
-        startVal: that.panX,
-        endVal: that.panX*ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panX'
-      });
-      this.animations.push({
-        startVal: that.panY,
-        endVal: that.panY*ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panY'
-      });
-      this.dirty = true;
-    }
+    this.zoomToPoint(0, 0, ZOOM_FACTOR, ZOOM_FACTOR);
   },
   zoomOut: function() {
-    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.zoomX /= ZOOM_FACTOR;
-      this.zoomY /= ZOOM_FACTOR;
-      this.dirty = true;
-      this.hitDirty = true;
-    }
-    else {
-      this.animations = [];
-
-      let that = this;
-      this.animations.push({
-        startVal: that.zoomX,
-        endVal: that.zoomX / ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomX'
-      });
-      this.animations.push({
-        startVal: that.zoomY,
-        endVal: that.zoomY / ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'zoomY'
-      });
-      this.animations.push({
-        startVal: that.panX,
-        endVal: that.panX/ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panX'
-      });
-      this.animations.push({
-        startVal: that.panY,
-        endVal: that.panY/ZOOM_FACTOR,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 300,
-        prop: 'panY'
-      });
-      this.dirty = true;
-    }
+    this.zoomToPoint(0, 0, 1/ZOOM_FACTOR, 1/ZOOM_FACTOR);
   },
   reset: function() {
     if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
@@ -2027,6 +1945,8 @@ const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const vec2 = glMatrix.vec2;
 
+const NODE_SIZE = 16;
+
 const VertexBridge = {
   modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
     let nodes = model.nodes;
@@ -2050,21 +1970,22 @@ const VertexBridge = {
     }
 
     let colors = new Float32Array(nodes.colors);
-    let sizes = new Float32Array(nodes.sizes);
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
     let numEdges = edges.length / 2;
     let trianglePositions = new Float32Array(numEdges * 12);
+    let triangleNormals = new Float32Array(numEdges * 12);
     let triangleColors = new Float32Array(numEdges * 6);
 
     let trianglePositionsIndex = 0;
+    let triangleNormalsIndex = 0;
     let triangleColorsIndex = 0;
 
     for (let n=0; n<edges.length; n+=2) {
       let pointIndex0 = edges[n];
       let pointIndex1 = edges[n+1];
-      let normalDistance0 = nodes.sizes[pointIndex0]*0.1;
-      let normalDistance1 = nodes.sizes[pointIndex1]*0.1;
+      let normalDistance0 = NODE_SIZE*0.1;
+      let normalDistance1 = NODE_SIZE*0.1;
 
       let x0 = nodes.xs[pointIndex0];
       let x1 = nodes.xs[pointIndex1];
@@ -2083,41 +2004,53 @@ const VertexBridge = {
       let yOffset1 = offsetVector1[1];
 
       // first triangle
-      trianglePositions[trianglePositionsIndex++] = x0 - xOffset0;
-      trianglePositions[trianglePositionsIndex++] = y0 + yOffset0;
+      trianglePositions[trianglePositionsIndex++] = x0;
+      trianglePositions[trianglePositionsIndex++] = y0;
+      triangleNormals[triangleNormalsIndex++] = xOffset0 * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset0;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-      trianglePositions[trianglePositionsIndex++] = x1 - xOffset1;
-      trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
+      trianglePositions[trianglePositionsIndex++] = x1;
+      trianglePositions[trianglePositionsIndex++] = y1;
+      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
-      trianglePositions[trianglePositionsIndex++] = y0 - yOffset0;
+      trianglePositions[trianglePositionsIndex++] = x0;
+      trianglePositions[trianglePositionsIndex++] = y0;
+      triangleNormals[triangleNormalsIndex++] = xOffset0;
+      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
 
       // second triangle
-      trianglePositions[trianglePositionsIndex++] = x1 + xOffset1;
-      trianglePositions[trianglePositionsIndex++] = y1 - yOffset1;
+      trianglePositions[trianglePositionsIndex++] = x1;
+      trianglePositions[trianglePositionsIndex++] = y1;
+      triangleNormals[triangleNormalsIndex++] = xOffset1;
+      triangleNormals[triangleNormalsIndex++] = yOffset1 * -1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
-      trianglePositions[trianglePositionsIndex++] = y0 - yOffset0;
+      trianglePositions[trianglePositionsIndex++] = x0;
+      trianglePositions[trianglePositionsIndex++] = y0;
+      triangleNormals[triangleNormalsIndex++] = xOffset0;
+      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-      trianglePositions[trianglePositionsIndex++] = x1 - xOffset1;
-      trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
+      trianglePositions[trianglePositionsIndex++] = x1;
+      trianglePositions[trianglePositionsIndex++] = y1;
+      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset1;
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
     }
 
     return {
       points: {
         positions: positions,
-        colors: colors,
-        sizes: sizes
+        colors: colors
       },
       triangles: {
         positions: trianglePositions,
+        normals: triangleNormals,
         colors: triangleColors
       }
     };
@@ -2199,9 +2132,6 @@ WebGL.prototype = {
     shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
     gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
-    shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
-    gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
-
     shaderProgram.vertexFocusedAttribute = gl.getAttribLocation(shaderProgram, 'aVertexFocused');
     gl.enableVertexAttribArray(shaderProgram.vertexFocusedAttribute);
 
@@ -2234,9 +2164,6 @@ WebGL.prototype = {
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-    shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
-    gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
-
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
@@ -2264,6 +2191,9 @@ WebGL.prototype = {
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
+    shaderProgram.normalsAttribute = gl.getAttribLocation(shaderProgram, 'normal');
+    gl.enableVertexAttribArray(shaderProgram.normalsAttribute);
+
     shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
     gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
@@ -2290,20 +2220,19 @@ WebGL.prototype = {
       this.buffers.points = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.points.colors, 1, this.layer.scene.context),
-        sizes: this.createBuffer(vertices.points.sizes, 1, this.layer.scene.context),
         focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
-        // unfortunately, have to have dedicated hitPositions and hitSizes because these buffers need to be bound
+        // unfortunately, have to have dedicated hitPositions because these buffers need to be bound
         // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
         hitIndices: this.createBuffer(this.createIndices(size), 1, this.layer.hit.context),
-        hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context),
-        hitSizes: this.createBuffer(vertices.points.sizes, 1, this.layer.hit.context)
+        hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context)
       };
     }
 
     if (vertices.triangles) {
       this.buffers.triangles = {
         positions: this.createBuffer(vertices.triangles.positions, 2, this.layer.scene.context),
+        normals: this.createBuffer(vertices.triangles.normals, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.triangles.colors, 1, this.layer.scene.context)
       };
     }
@@ -2331,7 +2260,6 @@ WebGL.prototype = {
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
-    this.bindBuffer(buffers.sizes, shaderProgram.vertexSizeAttribute, gl);
     this.bindBuffer(buffers.focused, shaderProgram.vertexFocusedAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
@@ -2346,6 +2274,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
+    this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
@@ -2420,7 +2349,6 @@ WebGL.prototype = {
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
-    this.bindBuffer(pointBuffers.hitSizes, shaderProgram.vertexSizeAttribute, gl);
 
     // TODO: maybe num items should be stored in a different way?
     gl.drawArrays(gl.POINTS, 0, pointBuffers.positions.numItems);
@@ -2693,7 +2621,7 @@ let incrementAncestorTotals = function(node, val) {
   }
 };
 
-let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, callback) {
+let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) {
   targetNode.children = [];
   //targetNode.totalDescendants = 0;
 
@@ -2701,7 +2629,6 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
-  targetNode.size = nodeSize;
 
   callback(targetNode);
 
@@ -2709,7 +2636,6 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
     let range = right - left;
     let childRange = range / srcNode.children.length;
     let childLeft = left;
-    let childNodeSize = nodeSize * 0.7;
 
     for (let n=0; n<srcNode.children.length; n++) {
       let childRight = childLeft + childRange;
@@ -2717,7 +2643,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
       targetNode.children.push({
         parent: targetNode
       });
-      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, childNodeSize, callback);
+      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, callback);
 
       childLeft += childRange;
     }
@@ -2729,7 +2655,6 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
 
 const Tree = function(config) {
   let rootNode = config.rootNode;
-  let rootNodeSize = config.rootNodeSize;
   let newRootNode = {};
 
   let nodes = [];
@@ -2737,7 +2662,7 @@ const Tree = function(config) {
   let maxLevel = 0;
 
   // O(n)
-  buildMetaTree(rootNode, newRootNode, -1, 1, 1, rootNodeSize, function(node) {
+  buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
     node.index = n;
     nodes[n] = node;
     n++;
@@ -2753,8 +2678,7 @@ const Tree = function(config) {
     nodes: {
       xs:     new Float32Array(numNodes),
       ys:     new Float32Array(numNodes),
-      colors: new Float32Array(numNodes),
-      sizes:  new Float32Array(numNodes)
+      colors: new Float32Array(numNodes)
     },
     edges: new Float32Array((numNodes-1)*2) // num edges = num nodes - 1
   };
@@ -2766,7 +2690,6 @@ const Tree = function(config) {
     model.nodes.xs[n] = node.x;
     model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
     model.nodes.colors[n] = 0;
-    model.nodes.sizes[n] = node.size;
 
     if (node.parent) {
       model.edges[edgeIndex++] = node.parent.index;

@@ -58,9 +58,6 @@ WebGL.prototype = {
     shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
     gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
-    shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
-    gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
-
     shaderProgram.vertexFocusedAttribute = gl.getAttribLocation(shaderProgram, 'aVertexFocused');
     gl.enableVertexAttribArray(shaderProgram.vertexFocusedAttribute);
 
@@ -93,9 +90,6 @@ WebGL.prototype = {
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-    shaderProgram.vertexSizeAttribute = gl.getAttribLocation(shaderProgram, 'aVertexSize');
-    gl.enableVertexAttribArray(shaderProgram.vertexSizeAttribute);
-
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
@@ -123,6 +117,9 @@ WebGL.prototype = {
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
+    shaderProgram.normalsAttribute = gl.getAttribLocation(shaderProgram, 'normal');
+    gl.enableVertexAttribArray(shaderProgram.normalsAttribute);
+
     shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
     gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
@@ -149,20 +146,19 @@ WebGL.prototype = {
       this.buffers.points = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.points.colors, 1, this.layer.scene.context),
-        sizes: this.createBuffer(vertices.points.sizes, 1, this.layer.scene.context),
         focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
-        // unfortunately, have to have dedicated hitPositions and hitSizes because these buffers need to be bound
+        // unfortunately, have to have dedicated hitPositions because these buffers need to be bound
         // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
         hitIndices: this.createBuffer(this.createIndices(size), 1, this.layer.hit.context),
-        hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context),
-        hitSizes: this.createBuffer(vertices.points.sizes, 1, this.layer.hit.context)
+        hitPositions: this.createBuffer(vertices.points.positions, 2, this.layer.hit.context)
       };
     }
 
     if (vertices.triangles) {
       this.buffers.triangles = {
         positions: this.createBuffer(vertices.triangles.positions, 2, this.layer.scene.context),
+        normals: this.createBuffer(vertices.triangles.normals, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.triangles.colors, 1, this.layer.scene.context)
       };
     }
@@ -190,7 +186,6 @@ WebGL.prototype = {
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
-    this.bindBuffer(buffers.sizes, shaderProgram.vertexSizeAttribute, gl);
     this.bindBuffer(buffers.focused, shaderProgram.vertexFocusedAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
@@ -205,6 +200,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
+    this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
@@ -279,7 +275,6 @@ WebGL.prototype = {
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
-    this.bindBuffer(pointBuffers.hitSizes, shaderProgram.vertexSizeAttribute, gl);
 
     // TODO: maybe num items should be stored in a different way?
     gl.drawArrays(gl.POINTS, 0, pointBuffers.positions.numItems);

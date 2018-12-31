@@ -1,7 +1,6 @@
 attribute vec4 aVertexPosition;
 
 attribute float aVertexColor;
-attribute float aVertexSize;
 attribute float aVertexFocused;
 
 uniform mat4 uModelViewMatrix;
@@ -11,8 +10,7 @@ varying vec4 vVertexColor;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  // scale points with zoom.  Using scale of x component
-  gl_PointSize = aVertexSize * length(uModelViewMatrix[0]);
+  gl_PointSize = 16.0;
 
   // normal color
   if (aVertexFocused == 0.0) {

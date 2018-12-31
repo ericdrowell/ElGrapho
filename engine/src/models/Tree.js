@@ -6,7 +6,7 @@ let incrementAncestorTotals = function(node, val) {
   }
 };
 
-let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, callback) {
+let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) {
   targetNode.children = [];
   //targetNode.totalDescendants = 0;
 
@@ -14,7 +14,6 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
-  targetNode.size = nodeSize;
 
   callback(targetNode);
 
@@ -22,7 +21,6 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
     let range = right - left;
     let childRange = range / srcNode.children.length;
     let childLeft = left;
-    let childNodeSize = nodeSize * 0.7;
 
     for (let n=0; n<srcNode.children.length; n++) {
       let childRight = childLeft + childRange;
@@ -30,7 +28,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
       targetNode.children.push({
         parent: targetNode
       });
-      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, childNodeSize, callback);
+      buildMetaTree(srcNode.children[n], targetNode.children[n], childLeft, childRight, level+1, callback);
 
       childLeft += childRange;
     }
@@ -42,7 +40,6 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, nodeSize, 
 
 const Tree = function(config) {
   let rootNode = config.rootNode;
-  let rootNodeSize = config.rootNodeSize;
   let newRootNode = {};
 
   let nodes = [];
@@ -50,7 +47,7 @@ const Tree = function(config) {
   let maxLevel = 0;
 
   // O(n)
-  buildMetaTree(rootNode, newRootNode, -1, 1, 1, rootNodeSize, function(node) {
+  buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
     node.index = n;
     nodes[n] = node;
     n++;
@@ -66,8 +63,7 @@ const Tree = function(config) {
     nodes: {
       xs:     new Float32Array(numNodes),
       ys:     new Float32Array(numNodes),
-      colors: new Float32Array(numNodes),
-      sizes:  new Float32Array(numNodes)
+      colors: new Float32Array(numNodes)
     },
     edges: new Float32Array((numNodes-1)*2) // num edges = num nodes - 1
   };
@@ -79,7 +75,6 @@ const Tree = function(config) {
     model.nodes.xs[n] = node.x;
     model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
     model.nodes.colors[n] = 0;
-    model.nodes.sizes[n] = node.size;
 
     if (node.parent) {
       model.edges[edgeIndex++] = node.parent.index;
