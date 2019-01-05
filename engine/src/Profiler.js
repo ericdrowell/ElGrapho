@@ -5,9 +5,14 @@ let Profiler = function(funcName, func) {
     let end = new Date().getTime();
     let duration = end - start;
 
-    console.log(funcName + '() took ' + duration + 'ms');
+    if (Profiler.enabled) {
+      console.log(funcName + '() took ' + duration + 'ms');
+    }
+
     return returnVal;
   };
 };
+
+Profiler.enabled = false;
 
 module.exports = Profiler;

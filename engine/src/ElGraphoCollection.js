@@ -1,5 +1,6 @@
 const EasingFunctions = require('./EasingFunctions');
 const styles = require('../dist/styles/ElGrapho.min.css.js');
+const Enums = require('./Enums');
 
 let ElGraphoCollection = {
   graphs: [],
@@ -20,9 +21,10 @@ let ElGraphoCollection = {
     head.appendChild(s);
   },
   executeFrame: function() {
+    let now = new Date().getTime();
     ElGraphoCollection.graphs.forEach(function(graph) {
-      let now = new Date().getTime();
       let n = 0;
+      let idle = true;
 
       // update properties from animations
       while(n < graph.animations.length) {
@@ -43,20 +45,29 @@ let ElGraphoCollection = {
           graph.animations.splice(n, 1);
           graph.hitDirty = true;
         }
-
         graph.dirty = true; 
       }
 
       if (graph.dirty) {
+        idle = false;
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
+        idle = false;
         graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
         graph.hitDirty = false; 
       }
+
+      if (idle && !graph.idle) {
+        graph.fire(Enums.events.IDLE);
+      }
+
+      graph.idle = idle;
+
+
     });
 
     requestAnimationFrame(ElGraphoCollection.executeFrame);

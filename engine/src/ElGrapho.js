@@ -45,6 +45,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.PERFORMANCE : config.renderingMode;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
+  this.idle = true;
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
     el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
@@ -104,9 +105,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 
   this.listen();
 
-  // add self to dashboard
   ElGraphoCollection.graphs.push(this);
-
 });
 
 ElGrapho.prototype = {
@@ -227,10 +226,22 @@ ElGrapho.prototype = {
           that.vertices.points.focused[dataIndex] = 1;
           that.webgl.initBuffers(that.vertices);
           that.dirty = true;
-          that.hoveredDataIndex = dataIndex;          
+
+          if (that.hoveredDataIndex !== -1) {
+            that.fire(Enums.events.NODE_MOUSEOUT, {
+              dataIndex: that.hoveredDataIndex
+            });  
+          }
+          
+          that.hoveredDataIndex = dataIndex; 
+
+          if (that.hoveredDataIndex !== -1) {
+            that.fire(Enums.events.NODE_MOUSEOVER, {
+              dataIndex: that.hoveredDataIndex
+            });  
+          }       
         }
-      }
-      
+      }      
     }));
 
 
@@ -245,10 +256,6 @@ ElGrapho.prototype = {
 
         let mousePos = that.getMousePosition(evt);
         let topLeftX, topLeftY;
-
-        // console.log(that.zoomBoxAnchor);
-        // console.log(mousePos);
-
         let width, height;
         let zoomX, zoomY;
 
@@ -280,8 +287,6 @@ ElGrapho.prototype = {
           topLeftX = mousePos.x;
           topLeftY = that.zoomBoxAnchor.y;   
         }
-
-        console.log(width, height);
 
         let viewportWidth = viewport.width;
         let viewportHeight = viewport.height;
@@ -318,6 +323,20 @@ ElGrapho.prototype = {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
+
+
+      if (!that.panStart && !that.zoomBoxAnchor) {
+        let mousePos = that.getMousePosition(evt);
+        let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
+
+        if (dataIndex !== -1) {
+          that.fire(Enums.events.NODE_CLICK, {
+            dataIndex: dataIndex
+          });  
+        } 
+      }
+
+
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
 

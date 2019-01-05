@@ -4,7 +4,10 @@
   pointer-events: none;
   padding: 10px;
   border: 1px solid #aaa;
-  border-radius: 3px; }
+  border-radius: 3px;
+  font-family: verdana;
+  font-size: 12px;
+  user-select: none; }
 
 .el-grapho-controls {
   position: absolute;
@@ -24,7 +27,8 @@
   bottom: 5px;
   right: 5px;
   background: white;
-  pointer-events: none; }
+  pointer-events: none;
+  font-family: monospace; }
   .el-grapho-count::selection {
     background: transparent; }
 

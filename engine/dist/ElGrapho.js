@@ -1149,7 +1149,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1314,6 +1314,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.PERFORMANCE : config.renderingMode;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
+  this.idle = true;
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
     el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
@@ -1373,9 +1374,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 
   this.listen();
 
-  // add self to dashboard
   ElGraphoCollection.graphs.push(this);
-
 });
 
 ElGrapho.prototype = {
@@ -1496,10 +1495,22 @@ ElGrapho.prototype = {
           that.vertices.points.focused[dataIndex] = 1;
           that.webgl.initBuffers(that.vertices);
           that.dirty = true;
-          that.hoveredDataIndex = dataIndex;          
+
+          if (that.hoveredDataIndex !== -1) {
+            that.fire(Enums.events.NODE_MOUSEOUT, {
+              dataIndex: that.hoveredDataIndex
+            });  
+          }
+          
+          that.hoveredDataIndex = dataIndex; 
+
+          if (that.hoveredDataIndex !== -1) {
+            that.fire(Enums.events.NODE_MOUSEOVER, {
+              dataIndex: that.hoveredDataIndex
+            });  
+          }       
         }
-      }
-      
+      }      
     }));
 
 
@@ -1514,10 +1525,6 @@ ElGrapho.prototype = {
 
         let mousePos = that.getMousePosition(evt);
         let topLeftX, topLeftY;
-
-        // console.log(that.zoomBoxAnchor);
-        // console.log(mousePos);
-
         let width, height;
         let zoomX, zoomY;
 
@@ -1549,8 +1556,6 @@ ElGrapho.prototype = {
           topLeftX = mousePos.x;
           topLeftY = that.zoomBoxAnchor.y;   
         }
-
-        console.log(width, height);
 
         let viewportWidth = viewport.width;
         let viewportHeight = viewport.height;
@@ -1587,6 +1592,20 @@ ElGrapho.prototype = {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
+
+
+      if (!that.panStart && !that.zoomBoxAnchor) {
+        let mousePos = that.getMousePosition(evt);
+        let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
+
+        if (dataIndex !== -1) {
+          that.fire(Enums.events.NODE_CLICK, {
+            dataIndex: dataIndex
+          });  
+        } 
+      }
+
+
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
 
@@ -1750,6 +1769,7 @@ if (window) {
 
 const EasingFunctions = __webpack_require__(/*! ./EasingFunctions */ "./engine/src/EasingFunctions.js");
 const styles = __webpack_require__(/*! ../dist/styles/ElGrapho.min.css.js */ "./engine/dist/styles/ElGrapho.min.css.js");
+const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 
 let ElGraphoCollection = {
   graphs: [],
@@ -1770,9 +1790,10 @@ let ElGraphoCollection = {
     head.appendChild(s);
   },
   executeFrame: function() {
+    let now = new Date().getTime();
     ElGraphoCollection.graphs.forEach(function(graph) {
-      let now = new Date().getTime();
       let n = 0;
+      let idle = true;
 
       // update properties from animations
       while(n < graph.animations.length) {
@@ -1793,20 +1814,29 @@ let ElGraphoCollection = {
           graph.animations.splice(n, 1);
           graph.hitDirty = true;
         }
-
         graph.dirty = true; 
       }
 
       if (graph.dirty) {
+        idle = false;
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
+        idle = false;
         graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
         graph.hitDirty = false; 
       }
+
+      if (idle && !graph.idle) {
+        graph.fire(Enums.events.IDLE);
+      }
+
+      graph.idle = idle;
+
+
     });
 
     requestAnimationFrame(ElGraphoCollection.executeFrame);
@@ -1829,6 +1859,12 @@ if (window) {
 /***/ (function(module, exports) {
 
 const Enums = {
+  events: {
+    IDLE: 'idle',
+    NODE_MOUSEOVER: 'node-mouseover',
+    NODE_MOUSEOUT: 'node-mouseout',
+    NODE_CLICK: 'node-click'
+  },
   renderingMode: {
     PERFORMANCE: 'performance',
     UX: 'ux'
@@ -1891,10 +1927,15 @@ let Profiler = function(funcName, func) {
     let end = new Date().getTime();
     let duration = end - start;
 
-    console.log(funcName + '() took ' + duration + 'ms');
+    if (Profiler.enabled) {
+      console.log(funcName + '() took ' + duration + 'ms');
+    }
+
     return returnVal;
   };
 };
+
+Profiler.enabled = false;
 
 module.exports = Profiler;
 

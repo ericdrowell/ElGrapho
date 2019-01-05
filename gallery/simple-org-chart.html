@@ -32,6 +32,9 @@
         ]
       };
 
+      // for debugging
+      //ElGrapho.Profiler.enabled = true;
+
       let graph = new ElGrapho({
         container: document.getElementById('container'),
         model: ElGrapho.models.Tree({
@@ -40,6 +43,22 @@
         width: WIDTH,
         height: HEIGHT,
         renderingMode: 'ux'
+      });
+
+      graph.on('idle', function() {
+        console.log('idle');
+      });
+
+      graph.on('node-mouseover', function(evt) {
+        console.log('node-mouseover: ' + evt.dataIndex);
+      });
+
+      graph.on('node-mouseout', function(evt) {
+        console.log('node-mouseout: ' + evt.dataIndex);
+      });
+
+      graph.on('node-click', function(evt) {
+        console.log('node-click: ' + evt.dataIndex);
       });
 
     </script>
