@@ -324,7 +324,6 @@ ElGrapho.prototype = {
         return;
       }
 
-
       if (!that.panStart && !that.zoomBoxAnchor) {
         let mousePos = that.getMousePosition(evt);
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
@@ -335,7 +334,6 @@ ElGrapho.prototype = {
           });  
         } 
       }
-
 
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
