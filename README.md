@@ -1,6 +1,6 @@
 # El Grapho
 
-![alt text](https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/el-grapho-logo-white.png)
+<img width="200" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/el-grapho-logo-white.png"/>
 
 ## Summary
 
