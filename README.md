@@ -1,5 +1,7 @@
 # El Grapho
 
+![alt text](https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/el-grapho-logo-white.png)
+
 ## Summary
 
 El Grapho is a high performance graph visualization library leveraging WebGL and streaming technologies.  El Grapho can support millions of interactive nodes and edges in any modern browser.
