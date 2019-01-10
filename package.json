@@ -4,7 +4,11 @@
   "main": "engine/dist/elgrapho.min.js",
   "author": "Eric Rowell",
   "license": "SEE LICENSE IN <LICENSE.md>",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericdrowell/ElGrapho.git"
+  },
+  "keywords": ["graph", "data", "visualization", "tree", "webgl", "force", "directed", "network"],
   "devDependencies": {
     "gl-matrix": "^2.6.1",
     "jshint": "^2.9.5",
