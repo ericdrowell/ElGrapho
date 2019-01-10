@@ -24,7 +24,7 @@ The following is an example org chart made up of five divisions and 12,613 emplo
 
 To get started, you can install it from npm like this
 
-```npm install el-grapho```
+```npm install elgrapho```
 
 or you can download the latest El Grapho distribution file found here 
 
