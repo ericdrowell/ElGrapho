@@ -4,6 +4,7 @@ attribute float aVertexFocused;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
 
 varying vec4 vVertexColor;
 
@@ -32,7 +33,13 @@ varying vec4 vVertexColor;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  gl_PointSize = 16.0;
+
+  if (magicZoom) {
+    gl_PointSize = 16.0; 
+  }
+  else {
+    gl_PointSize = 16.0 * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+  }
 
   // normal color
   if (aVertexFocused == 0.0) {

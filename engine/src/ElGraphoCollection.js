@@ -50,14 +50,14 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
         idle = false;
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom);
         graph.hitDirty = false; 
       }
 

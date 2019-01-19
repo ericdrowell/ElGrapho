@@ -987,6 +987,7 @@ attribute float aVertexIndex;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
 
 varying vec4 vVertexColor;
 
@@ -1007,7 +1008,13 @@ vec3 unpackColor(float f) {
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  gl_PointSize = 16.0;
+
+  if (magicZoom) {
+    gl_PointSize = 16.0; 
+  }
+  else {
+    gl_PointSize = 16.0 * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+  }
 
   vVertexColor = vec4(unpackColor(aVertexIndex), 1.0);
 }`;
@@ -1027,6 +1034,7 @@ attribute float aVertexFocused;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
 
 varying vec4 vVertexColor;
 
@@ -1055,7 +1063,13 @@ varying vec4 vVertexColor;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  gl_PointSize = 16.0;
+
+  if (magicZoom) {
+    gl_PointSize = 16.0; 
+  }
+  else {
+    gl_PointSize = 16.0 * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+  }
 
   // normal color
   if (aVertexFocused == 0.0) {
@@ -1303,6 +1317,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.events = new Events();
   this.width = config.width;
   this.height = config.height;
+  this.magicZoom = config.magicZoom === undefined ? true : config.magicZoom;
   this.animations = [];
   this.wrapper = document.createElement('div');
   this.wrapper.className = 'el-grapho-wrapper';
@@ -1351,7 +1366,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.magicZoom);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
@@ -1817,14 +1832,14 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
         idle = false;
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom);
         graph.hitDirty = false; 
       }
 
@@ -1948,25 +1963,6 @@ module.exports = Profiler;
 
 const Color = __webpack_require__(/*! ./Color */ "./engine/src/Color.js");
 
-//https://www.pinterest.com/pin/567453621777194930/
-// const PALETTE_HEX = [
-//   '2980B9', // Belize Hold dark blue
-//   'E74C3C', // Alizarin light red
-//   '27AE60', // Nephritis dark green
-//   'E67E22', // Carrot light orange 
-//   '9B59B6', // Amethyst light purple
-//   '16A085', // Green Sea dark green blue
-//   'F39C12', // Orange 
-
-//   '3498D8', // Peter River light blue
-//   'C0392B', // Pomegranate dark red
-//   '2ECC71', // Emerald light green
-//   'D35400', // Pumpkin dark orange
-//   '8E44AD', // Wisteria
-//   '1ABC9C', // Turquoise light blue green
-//   'F1C40F' // Sun Flower yellow
-// ];
-
 //http://there4.io/2012/05/02/google-chart-color-list/
 const PALETTE_HEX = [
   '3366CC',
@@ -2038,7 +2034,7 @@ const vec2 = glMatrix.vec2;
 const NODE_SIZE = 16;
 
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, magicZoom) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.xs.length*2);
@@ -2093,44 +2089,86 @@ const VertexBridge = {
       let xOffset1 = -1 * offsetVector1[0];
       let yOffset1 = offsetVector1[1];
 
-      // first triangle
-      trianglePositions[trianglePositionsIndex++] = x0;
-      trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset0 * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset0;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      if (magicZoom) {
+        // first triangle
+        trianglePositions[trianglePositionsIndex++] = x0;
+        trianglePositions[trianglePositionsIndex++] = y0;
+        triangleNormals[triangleNormalsIndex++] = xOffset0 * -1;
+        triangleNormals[triangleNormalsIndex++] = yOffset0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
+        triangleNormals[triangleNormalsIndex++] = yOffset1;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x0;
-      trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset0;
-      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+        trianglePositions[trianglePositionsIndex++] = x0;
+        trianglePositions[trianglePositionsIndex++] = y0;
+        triangleNormals[triangleNormalsIndex++] = xOffset0;
+        triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
 
-      // second triangle
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset1;
-      triangleNormals[triangleNormalsIndex++] = yOffset1 * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        // second triangle
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = xOffset1;
+        triangleNormals[triangleNormalsIndex++] = yOffset1 * -1;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x0;
-      trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset0;
-      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+        trianglePositions[trianglePositionsIndex++] = x0;
+        trianglePositions[trianglePositionsIndex++] = y0;
+        triangleNormals[triangleNormalsIndex++] = xOffset0;
+        triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
+        triangleNormals[triangleNormalsIndex++] = yOffset1;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      }
+      else {
+        // first triangle
+        trianglePositions[trianglePositionsIndex++] = x0 + xOffset0 * -1;
+        trianglePositions[trianglePositionsIndex++] = y0 + yOffset0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+        trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
+        trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+
+        trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
+        trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+
+        // second triangle
+        trianglePositions[trianglePositionsIndex++] = x1 + xOffset1;
+        trianglePositions[trianglePositionsIndex++] = y1 + yOffset1 * -1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+
+        trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
+        trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+        trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
+        trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      }
     }
 
     return {
@@ -2228,6 +2266,7 @@ WebGL.prototype = {
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
 
     return shaderProgram;
   },
@@ -2257,6 +2296,7 @@ WebGL.prototype = {
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
 
     return shaderProgram;
   },
@@ -2290,6 +2330,7 @@ WebGL.prototype = {
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
 
     return shaderProgram;
   },
@@ -2339,7 +2380,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -2347,6 +2388,7 @@ WebGL.prototype = {
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -2354,7 +2396,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -2362,6 +2404,7 @@ WebGL.prototype = {
  
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
@@ -2369,7 +2412,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -2397,15 +2440,15 @@ WebGL.prototype = {
     //console.log(modelViewMatrix);
 
     if (this.buffers.points) {
-      this.drawScenePoints(projectionMatrix, modelViewMatrix);
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom);
     }
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom);
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
-  drawHit: function(panX, panY, zoomX, zoomY) {
+  drawHit: function(panX, panY, zoomX, zoomY, magicZoom) {
     let layer = this.layer;
     let gl = layer.hit.context;
     let modelViewMatrix = mat4.create();
@@ -2436,6 +2479,7 @@ WebGL.prototype = {
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
