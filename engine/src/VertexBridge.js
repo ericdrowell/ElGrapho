@@ -2,10 +2,8 @@ const Profiler = require('./Profiler');
 const glMatrix = require('gl-matrix');
 const vec2 = glMatrix.vec2;
 
-const NODE_SIZE = 16;
-
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, magicZoom) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, magicZoom, nodeSize) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.xs.length*2);
@@ -41,8 +39,8 @@ const VertexBridge = {
     for (let n=0; n<edges.length; n+=2) {
       let pointIndex0 = edges[n];
       let pointIndex1 = edges[n+1];
-      let normalDistance0 = NODE_SIZE*0.1;
-      let normalDistance1 = NODE_SIZE*0.1;
+      let normalDistance0 = nodeSize*0.1;
+      let normalDistance1 = nodeSize*0.1;
 
       let x0 = nodes.xs[pointIndex0];
       let x1 = nodes.xs[pointIndex1];

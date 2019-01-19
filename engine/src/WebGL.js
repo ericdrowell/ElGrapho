@@ -65,6 +65,7 @@ WebGL.prototype = {
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
 
     return shaderProgram;
   },
@@ -95,6 +96,7 @@ WebGL.prototype = {
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
 
     return shaderProgram;
   },
@@ -129,6 +131,7 @@ WebGL.prototype = {
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
 
     return shaderProgram;
   },
@@ -178,7 +181,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -187,6 +190,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -194,7 +198,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -203,6 +207,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
@@ -210,7 +215,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -238,15 +243,15 @@ WebGL.prototype = {
     //console.log(modelViewMatrix);
 
     if (this.buffers.points) {
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom);
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
     }
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
-  drawHit: function(panX, panY, zoomX, zoomY, magicZoom) {
+  drawHit: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.hit.context;
     let modelViewMatrix = mat4.create();
@@ -278,6 +283,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);

@@ -35,6 +35,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.width = config.width;
   this.height = config.height;
   this.magicZoom = config.magicZoom === undefined ? true : config.magicZoom;
+  this.nodeSize = config.nodeSize || 16;
   this.animations = [];
   this.wrapper = document.createElement('div');
   this.wrapper.className = 'el-grapho-wrapper';
@@ -83,7 +84,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.magicZoom);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.magicZoom, this.nodeSize);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
