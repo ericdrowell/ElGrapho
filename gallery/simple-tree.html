@@ -8,29 +8,12 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Simple Org Chart</h1>
+    <h1>El Grapho Simple Tree</h1>
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
       const WIDTH = 500;
       const HEIGHT = 500;
-
-      let rootNode = {
-        children: [
-          {
-            children: [
-              {},
-              {}
-            ]
-          },
-          {
-            children: [
-              {},
-              {}
-            ]
-          }
-        ]
-      };
 
       // for debugging
       //ElGrapho.Profiler.enabled = true;
@@ -38,7 +21,22 @@
       let graph = new ElGrapho({
         container: document.getElementById('container'),
         model: ElGrapho.models.Tree({
-          rootNode: rootNode
+          rootNode: {
+            children: [
+              {
+                children: [
+                  {},
+                  {}
+                ]
+              },
+              {
+                children: [
+                  {},
+                  {}
+                ]
+              }
+            ]
+          }
         }),
         width: WIDTH,
         height: HEIGHT

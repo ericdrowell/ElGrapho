@@ -31,7 +31,8 @@ void main() {
     gl_PointSize = nodeSize; 
   }
   else {
-    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    float size = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    gl_PointSize = max(size, 5.0);
   }
 
   vVertexColor = vec4(unpackColor(aVertexIndex), 1.0);

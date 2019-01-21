@@ -58,15 +58,15 @@ const Tree = function(config) {
     }
   });
 
-  let numNodes = nodes.length;
+  //let numNodes = nodes.length;
 
   let model = {
     nodes: {
-      xs:     new Float32Array(numNodes),
-      ys:     new Float32Array(numNodes),
-      colors: new Float32Array(numNodes)
+      xs:     [],
+      ys:     [],
+      colors: []
     },
-    edges: new Float32Array((numNodes-1)*2) // num edges = num nodes - 1
+    edges: [] // num edges = num nodes - 1
   };
 
   let edgeIndex = 0;

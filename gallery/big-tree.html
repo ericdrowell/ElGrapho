@@ -8,7 +8,7 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Big Org Chart</h1>
+    <h1>El Grapho Big Tree</h1>
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.min.js"></script>
     <script>
@@ -48,12 +48,10 @@
       let graph = new ElGrapho({
         container: document.getElementById('container'),
         model: ElGrapho.models.Tree({
-          rootNode: rootNode,
-          rootNodeSize: 16
+          rootNode: rootNode
         }),
         width: WIDTH,
         height: HEIGHT,
-        renderingMode: 'ux',
         magicZoom: true
       });
 

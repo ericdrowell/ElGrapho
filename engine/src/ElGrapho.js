@@ -15,8 +15,8 @@ const NumberFormatter = require('./formatters/NumberFormatter');
 const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
 const BoxZoom = require('./components/BoxZoom/BoxZoom');
-// models
 const Tree = require('./models/Tree');
+const Cluster = require('./models/Cluster');
 const Dom = require('./Dom');
 
 const ZOOM_FACTOR = 2;
@@ -44,7 +44,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.container.appendChild(this.wrapper);
   this.defaultComponents(config);
   this.components = config.components;
-  this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.PERFORMANCE : config.renderingMode;
+  this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.UX : config.renderingMode;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
   this.idle = true;
@@ -480,7 +480,8 @@ ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
-  Tree: Tree
+  Tree: Tree,
+  Cluster: Cluster
 };
 
 module.exports = ElGrapho;

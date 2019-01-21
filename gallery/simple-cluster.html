@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Simple Cluster</h1>
+    <div id="container"></div>
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+      const WIDTH = 500;
+      const HEIGHT = 500;
+
+      // for debugging
+      //ElGrapho.Profiler.enabled = true;
+
+      let graph = new ElGrapho({
+        container: document.getElementById('container'),
+        model: ElGrapho.models.Cluster({
+          nodes: {
+            colors: [0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+          },
+          edges: [
+            0, 1,
+
+            0, 2, 
+            0, 3,
+            0, 4,
+            0, 5,
+            0, 6,
+            0, 7,
+            0, 8,
+
+            1, 9,
+            2, 10,
+            3, 11,
+            4, 12,
+            5, 13,
+            6, 14,
+            7, 15,
+            8, 16,
+            1, 17,
+            2, 18,
+            3, 19,
+            4, 20,
+            5, 21, 
+            6, 22,
+            7, 23,
+            8, 24,
+
+            0, 25, 
+            0, 26,
+            0, 27,
+            0, 28,
+
+            29, 30,
+            31, 32,
+            33, 34,
+            34, 35,
+            36, 37,
+            38, 39,
+            40, 41,
+            42, 43, 
+            44, 45,
+            46, 47,
+            48, 49,
+            50, 51,
+            52, 53,
+            53, 55, 
+            56, 57,
+            
+            0, 58,
+            0, 59,
+            0, 60
+          ]
+        }),
+        width: WIDTH,
+        height: HEIGHT
+      });
+
+    </script>
+  </body>
+</html>

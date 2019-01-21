@@ -1014,7 +1014,8 @@ void main() {
     gl_PointSize = nodeSize; 
   }
   else {
-    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    float size = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    gl_PointSize = max(size, 5.0);
   }
 
   vVertexColor = vec4(unpackColor(aVertexIndex), 1.0);
@@ -1300,8 +1301,8 @@ const NumberFormatter = __webpack_require__(/*! ./formatters/NumberFormatter */ 
 const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/VertexBridge.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
-// models
 const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
+const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models/Cluster.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 
 const ZOOM_FACTOR = 2;
@@ -1329,7 +1330,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.container.appendChild(this.wrapper);
   this.defaultComponents(config);
   this.components = config.components;
-  this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.PERFORMANCE : config.renderingMode;
+  this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.UX : config.renderingMode;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
   this.idle = true;
@@ -1765,7 +1766,8 @@ ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
-  Tree: Tree
+  Tree: Tree,
+  Cluster: Cluster
 };
 
 module.exports = ElGrapho;
@@ -2747,6 +2749,78 @@ module.exports = NumberFormatter;
 
 /***/ }),
 
+/***/ "./engine/src/models/Cluster.js":
+/*!**************************************!*\
+  !*** ./engine/src/models/Cluster.js ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+let Cluster = function(config) {
+  let model = {
+    nodes: {
+      xs: [],
+      ys: [],
+      colors: config.nodes.colors.slice()
+    },
+    edges: config.edges.slice()
+  };
+
+  // keys are color integers, values are arrays.  The arrays contain node indices
+  let groups = {};
+
+  config.nodes.colors.forEach(function(color, n) {
+    if (groups[color] === undefined) {
+      groups[color] = [];
+    }
+
+    groups[color].push(n);
+  });
+
+  //console.log(groups);
+
+  let keys = Object.keys(groups);
+  let numGroups = keys.length;
+  //let clusterRadius = 0.2;
+
+  let key;
+  let groupIndex = 0;
+  for (key in groups) {
+    let indices = groups[key];
+    let centerAngle = -2*Math.PI*groupIndex/numGroups;
+    let clusterCenterX = Math.cos(centerAngle);
+    let clusterCenterY = Math.sin(centerAngle);
+
+    
+    let ARC_LENGTH = 0.1;
+
+  
+    let radius = ARC_LENGTH / 4;
+    let angleStep = ARC_LENGTH / radius; // arc length = radius * angle -> angle = arc length / radius
+    let angle = 0;
+
+    indices.forEach(function(index) {
+      let x = Math.cos(angle) * radius;
+      let y = Math.sin(angle) * radius;
+
+      model.nodes.xs[index] = clusterCenterX + x;
+      model.nodes.ys[index] = clusterCenterY + y;
+
+      radius += ARC_LENGTH * angleStep / (2 * Math.PI);
+      angleStep = ARC_LENGTH / radius;
+      angle -= angleStep;
+    });
+    
+    groupIndex++;
+  }
+
+  return model;
+};
+
+module.exports = Cluster;
+
+/***/ }),
+
 /***/ "./engine/src/models/Tree.js":
 /*!***********************************!*\
   !*** ./engine/src/models/Tree.js ***!
@@ -2814,15 +2888,15 @@ const Tree = function(config) {
     }
   });
 
-  let numNodes = nodes.length;
+  //let numNodes = nodes.length;
 
   let model = {
     nodes: {
-      xs:     new Float32Array(numNodes),
-      ys:     new Float32Array(numNodes),
-      colors: new Float32Array(numNodes)
+      xs:     [],
+      ys:     [],
+      colors: []
     },
-    edges: new Float32Array((numNodes-1)*2) // num edges = num nodes - 1
+    edges: [] // num edges = num nodes - 1
   };
 
   let edgeIndex = 0;
