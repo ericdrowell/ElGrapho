@@ -5,10 +5,6 @@ const Enums = {
     NODE_MOUSEOUT: 'node-mouseout',
     NODE_CLICK: 'node-click'
   },
-  renderingMode: {
-    PERFORMANCE: 'performance',
-    UX: 'ux'
-  },
   interactionMode: {
     SELECT: 'select',
     PAN: 'pan',

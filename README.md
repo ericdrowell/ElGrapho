@@ -61,21 +61,19 @@ let graph = new ElGrapho({
 });
 ```
 
-### container
+* ```container``` - DOM element that will contain the El Grapho graph.
 
-The ```container``` config property defines the DOM element that will contain the El Grapho graph.
+* ```nodes``` - object that contains information about all of the nodes in the graph (graphs are made up of nodes and edges).  Each node is defined by a position (x and y), and also a color.  El Grapho x and y ranges are between -1 and 1.  For example, if x is -1, then the node position is on the very left of the viewport.  If x is 0 it is in the center.  And if x is 1 it is on the very right of the viewport.  Colors are integer values between 0 and 7.  These integer values map to the El Grapho color palette.  
 
-### nodes
+* ```edges``` - array that defines the edges between nodes based on their indices.  In the example above, the first edge begins at node ```0``` and ends at node ```1```.  For non directed graphs, or bi-directional graphs, the order of the first node and second node do not matter.  However, for directed graphs, the first index is the *from* node, and the second index is the *to* node.
 
-The ```nodes``` object contains information about all of the nodes in the graph (graphs are made up of nodes and edges).  Each node is defined by a position (x and y), and also a color.  El Grapho x and y ranges are between -1 and 1.  For example, if x is -1, then the node position is on the very left of the viewport.  If x is 0 it is in the center.  And if x is 1 it is on the very right of the viewport.  Colors are integer values between 0 and 7.  These integer values map to the El Grapho color palette.  
+* ```width``` - number that defines the width of the El Grapho viewport in pixels.
 
-### edges
+* ```height``` - number defines the height of the El Grapho viewport in pixels.
 
-The ```edges``` array defines the edges between nodes based on their indices.  In the example above, the first edge begins at node ```0``` and ends at node ```1```.  For non directed graphs, or bi-directional graphs, the order of the first node and second node do not matter.  However, for directed graphs, the first index is the *from* node, and the second index is the *to* node.
+* ```magicZoom``` - boolean that defines the zoom strategy.  When magicZoom is true, zooming does not affect the size of nodes and edges.  When magicZoom is false, zooming does affect the size of nodes and edges, i.e. equivalent to moving the camera in the z direction in real space.  The default is true.
 
-### width and height
-
-The ```width``` and ```height``` properties simply define the width and height of the El Grapho viewport in pixels.
+* ```animations``` - boolean that defines animation strategy.  When animations is true, zoom and pan transitions will be animated.  Otherwise the transitions will be immediate.  Although animations utilize requestAnimationFrame for dynamic frame rates, in some situations you may prefer to set animations to false to improve transition performance for very high cardinality graphs with millions of nodes and edges.  The default is true.
 
 ### Models
 

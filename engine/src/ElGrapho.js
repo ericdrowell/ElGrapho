@@ -44,7 +44,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.container.appendChild(this.wrapper);
   this.defaultComponents(config);
   this.components = config.components;
-  this.renderingMode = config.renderingMode === undefined ? Enums.renderingMode.UX : config.renderingMode;
+  this.animations = config.animations === undefined ? true : false;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
   this.idle = true;
@@ -370,15 +370,7 @@ ElGrapho.prototype = {
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
   },
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
-    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.panX = (this.panX + panX / this.zoomX) * zoomX;
-      this.panY = (this.panY + panY / this.zoomY) * zoomY;
-      this.zoomX = this.zoomX * zoomX;
-      this.zoomY = this.zoomY * zoomY;
-      this.dirty = true;
-      this.hitDirty = true;
-    }
-    else {
+    if (this.animations) {
       this.animations = [];
 
       let that = this;
@@ -412,6 +404,14 @@ ElGrapho.prototype = {
       });
       this.dirty = true;
     }
+    else {
+      this.panX = (this.panX + panX / this.zoomX) * zoomX;
+      this.panY = (this.panY + panY / this.zoomY) * zoomY;
+      this.zoomX = this.zoomX * zoomX;
+      this.zoomY = this.zoomY * zoomY;
+      this.dirty = true;
+      this.hitDirty = true;
+    }
   },
   zoomIn: function() {
     this.zoomToPoint(0, 0, ZOOM_FACTOR, ZOOM_FACTOR);
@@ -420,15 +420,7 @@ ElGrapho.prototype = {
     this.zoomToPoint(0, 0, 1/ZOOM_FACTOR, 1/ZOOM_FACTOR);
   },
   reset: function() {
-    if (this.renderingMode === Enums.renderingMode.PERFORMANCE) {
-      this.zoomX = START_SCALE;
-      this.zoomY = START_SCALE;
-      this.panX = 0;
-      this.panY = 0;
-      this.dirty = true;
-      this.hitDirty = true;
-    }
-    else {
+    if (this.animations) {
       this.animations = [];
 
       let that = this;
@@ -464,6 +456,14 @@ ElGrapho.prototype = {
       });
 
       this.dirty = true;
+    }
+    else {
+      this.zoomX = START_SCALE;
+      this.zoomY = START_SCALE;
+      this.panX = 0;
+      this.panY = 0;
+      this.dirty = true;
+      this.hitDirty = true;
     }
   },
   on: function(name, func) {
