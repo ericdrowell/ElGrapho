@@ -12,9 +12,11 @@ If you need to build a graph visualization for the web of any kind, such as a tr
 
 ## What Does it Look Like?
 
-The following is an example org chart made up of five divisions and 12,613 employees.
-
 <img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-example-tree.png"/>
+
+<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-big-network.png"/>
+
+<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-spiral.png"/>
 
 ## Live Examples
 
@@ -77,7 +79,9 @@ The ```width``` and ```height``` properties simply define the width and height o
 
 ### Models
 
-Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph shapes, most El Grapho users will want to leverage the provided El Grapho models which will take in a more human readable JSON structure and generate the nodes and edges for you.  Currently, El Grapho only ships with one model, the ```Tree``` model.  It's useage looks like this:
+Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph shapes, most El Grapho users will want to leverage the provided El Grapho models which will generate node positions and edge relationships for you.  Currently, ElGrapho supports ```Tree``` and ```Spiral```
+
+#### Tree Model
 
 ```
 let rootNode = {
@@ -103,11 +107,38 @@ let graph = new ElGrapho({
     rootNode: rootNode
   }),
   width: 800,
-  height: 400,
+  height: 400
 });
 ```
 
 The ```Tree``` model takes in a nested tree structure and builds the nodes and edges for you.  In this example, the root node has two children, and each of those children have two children of their own.  In other words, this is a simple binary tree with two levels.  For more complex trees, you could have super complex trees with over one million nodes.
+
+#### Spiral Model
+
+```
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.models.Spiral({
+    nodes: {
+      colors: [0, 1, 1, 2, 2, 2, 2, 2]
+    },
+    edges: [
+      0, 1,
+      0, 2, 
+      0, 3,
+      0, 4,
+      0, 5,
+      0, 6,
+      0, 7,
+      0, 8
+    ]
+  }),
+  width: 800,
+  height: 400
+});
+```
+
+The ```Spiral``` model takes in an array of colors, and an array of edges.  The config is identical to the raw ```model``` schema except that the ```xs``` and ```ys``` are generated for you.  If a single color is used for all of the nodes, ElGrapho will generate a single centered spiral.  If there are several colors used, ElGrapho will cluster the spirals separately.  Because Spiral models can be generated in ```O(n)``` time, i.e. linear time, they are very fast to construct compared to other models such as force directed graphs which are polynomial in time.
 
 ## Server Side Model Generation
 
