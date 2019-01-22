@@ -16,7 +16,7 @@ const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
 const BoxZoom = require('./components/BoxZoom/BoxZoom');
 const Tree = require('./models/Tree');
-const Cluster = require('./models/Cluster');
+const Spiral = require('./models/Spiral');
 const Dom = require('./Dom');
 
 const ZOOM_FACTOR = 2;
@@ -481,7 +481,7 @@ ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
   Tree: Tree,
-  Cluster: Cluster
+  Spiral: Spiral
 };
 
 module.exports = ElGrapho;

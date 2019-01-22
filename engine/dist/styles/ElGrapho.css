@@ -37,6 +37,20 @@
   border: 1px solid #119fe0;
   background-color: rgba(17, 159, 224, 0.1);
   pointer-events: none; }
+  .el-grapho-box-zoom-component .el-grapho-vertical-bar {
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    background-color: #119fe0;
+    position: absolute; }
+  .el-grapho-box-zoom-component .el-grapho-horizontal-bar {
+    width: 100%;
+    height: 1px;
+    top: 50%;
+    left: 0;
+    background-color: #119fe0;
+    position: absolute; }
 
 .el-grapho-wrapper {
   display: inline-block;

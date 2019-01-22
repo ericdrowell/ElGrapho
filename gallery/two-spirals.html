@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Two Spirals</h1>
+    <div id="container"></div>
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+      const WIDTH = 500;
+      const HEIGHT = 500;
+
+      let modelConfig = {
+        nodes: {
+          colors: []
+        },
+        edges: []
+      };
+
+      for (let n=0; n<150; n++) {
+        modelConfig.nodes.colors.push(n < 100 ? 0 : 1);
+        modelConfig.edges.push(n);
+        modelConfig.edges.push(n+1);
+      }
+
+      let graph = new ElGrapho({
+        container: document.getElementById('container'),
+        model: ElGrapho.models.Spiral(modelConfig),
+        width: WIDTH,
+        height: HEIGHT
+      });
+
+    </script>
+  </body>
+</html>

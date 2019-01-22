@@ -1166,7 +1166,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-box-zoom-component .el-grapho-vertical-bar{width:1px;height:100%;top:0;left:50%;background-color:#119fe0;position:absolute}.el-grapho-box-zoom-component .el-grapho-horizontal-bar{width:100%;height:1px;top:50%;left:0;background-color:#119fe0;position:absolute}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1302,7 +1302,7 @@ const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/Ver
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
 const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
-const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models/Cluster.js");
+const Spiral = __webpack_require__(/*! ./models/Spiral */ "./engine/src/models/Spiral.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 
 const ZOOM_FACTOR = 2;
@@ -1767,7 +1767,7 @@ ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
   Tree: Tree,
-  Cluster: Cluster
+  Spiral: Spiral
 };
 
 module.exports = ElGrapho;
@@ -2525,10 +2525,13 @@ let BoxZoom = {
     BoxZoom.destroy();
 
     let el = Dom.create('box-zoom-component');
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
-
     document.body.appendChild(el);
+
+    let verticalBar = Dom.create('vertical-bar');
+    el.appendChild(verticalBar);
+
+    let horizontalBar = Dom.create('horizontal-bar');
+    el.appendChild(horizontalBar);
 
     BoxZoom.el = el;
 
@@ -2749,14 +2752,14 @@ module.exports = NumberFormatter;
 
 /***/ }),
 
-/***/ "./engine/src/models/Cluster.js":
-/*!**************************************!*\
-  !*** ./engine/src/models/Cluster.js ***!
-  \**************************************/
+/***/ "./engine/src/models/Spiral.js":
+/*!*************************************!*\
+  !*** ./engine/src/models/Spiral.js ***!
+  \*************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-let Cluster = function(config) {
+let Spiral = function(config) {
   let model = {
     nodes: {
       xs: [],
@@ -2788,14 +2791,21 @@ let Cluster = function(config) {
   for (key in groups) {
     let indices = groups[key];
     let centerAngle = -2*Math.PI*groupIndex/numGroups;
-    let clusterCenterX = Math.cos(centerAngle);
-    let clusterCenterY = Math.sin(centerAngle);
 
+    let clusterCenterX, clusterCenterY;
+
+    if (numGroups === 1) {
+      clusterCenterX = 0;
+      clusterCenterY = 0;
+    }
+    else {
+      clusterCenterX = Math.cos(centerAngle);
+      clusterCenterY = Math.sin(centerAngle);
+    }
     
     let ARC_LENGTH = 0.1;
 
-  
-    let radius = ARC_LENGTH / 4;
+    let radius = ARC_LENGTH;
     let angleStep = ARC_LENGTH / radius; // arc length = radius * angle -> angle = arc length / radius
     let angle = 0;
 
@@ -2817,7 +2827,7 @@ let Cluster = function(config) {
   return model;
 };
 
-module.exports = Cluster;
+module.exports = Spiral;
 
 /***/ }),
 

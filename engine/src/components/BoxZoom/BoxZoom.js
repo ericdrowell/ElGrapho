@@ -13,10 +13,13 @@ let BoxZoom = {
     BoxZoom.destroy();
 
     let el = Dom.create('box-zoom-component');
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
-
     document.body.appendChild(el);
+
+    let verticalBar = Dom.create('vertical-bar');
+    el.appendChild(verticalBar);
+
+    let horizontalBar = Dom.create('horizontal-bar');
+    el.appendChild(horizontalBar);
 
     BoxZoom.el = el;
 

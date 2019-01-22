@@ -6,4 +6,22 @@
   //background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=);
 
   pointer-events: none;
+
+  .el-grapho-vertical-bar {
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    background-color: rgb(17,159,224);
+    position: absolute;
+  }
+
+  .el-grapho-horizontal-bar {
+    width: 100%;
+    height: 1px;
+    top: 50%;
+    left: 0;
+    background-color: rgb(17,159,224);
+    position: absolute;
+  }
 }

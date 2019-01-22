@@ -1,4 +1,4 @@
-let Cluster = function(config) {
+let Spiral = function(config) {
   let model = {
     nodes: {
       xs: [],
@@ -30,14 +30,21 @@ let Cluster = function(config) {
   for (key in groups) {
     let indices = groups[key];
     let centerAngle = -2*Math.PI*groupIndex/numGroups;
-    let clusterCenterX = Math.cos(centerAngle);
-    let clusterCenterY = Math.sin(centerAngle);
 
+    let clusterCenterX, clusterCenterY;
+
+    if (numGroups === 1) {
+      clusterCenterX = 0;
+      clusterCenterY = 0;
+    }
+    else {
+      clusterCenterX = Math.cos(centerAngle);
+      clusterCenterY = Math.sin(centerAngle);
+    }
     
     let ARC_LENGTH = 0.1;
 
-  
-    let radius = ARC_LENGTH / 4;
+    let radius = ARC_LENGTH;
     let angleStep = ARC_LENGTH / radius; // arc length = radius * angle -> angle = arc length / radius
     let angle = 0;
 
@@ -59,4 +66,4 @@ let Cluster = function(config) {
   return model;
 };
 
-module.exports = Cluster;
+module.exports = Spiral;
