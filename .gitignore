@@ -3,3 +3,8 @@
 .tmp
 .DS_Store
 npm-debug.log
+
+engine/dist/icons
+engine/dist/shaders
+engine/dist/styles
+engine/dist/ElGrapho.js.map
