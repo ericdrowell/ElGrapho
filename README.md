@@ -77,7 +77,7 @@ let graph = new ElGrapho({
 
 ### Models
 
-Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph shapes, most El Grapho users will want to leverage the provided El Grapho models which will generate node positions and edge relationships for you.  Currently, ElGrapho supports ```Tree``` and ```Spiral```
+Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph shapes, most El Grapho users will want to leverage the provided El Grapho models which will generate node positions and edge relationships for you.  Currently, ElGrapho supports ```Tree``` and ```Cluster```
 
 #### Tree Model
 
@@ -111,12 +111,12 @@ let graph = new ElGrapho({
 
 The ```Tree``` model takes in a nested tree structure and builds the nodes and edges for you.  In this example, the root node has two children, and each of those children have two children of their own.  In other words, this is a simple binary tree with two levels.  For more complex trees, you could have super complex trees with over one million nodes.
 
-#### Spiral Model
+#### Cluster Model
 
 ```
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Spiral({
+  model: ElGrapho.models.Cluster({
     nodes: {
       colors: [0, 1, 1, 2, 2, 2, 2, 2]
     },
@@ -136,7 +136,7 @@ let graph = new ElGrapho({
 });
 ```
 
-The ```Spiral``` model takes in an array of colors, and an array of edges.  The config is identical to the raw ```model``` schema except that the ```xs``` and ```ys``` are generated for you.  If a single color is used for all of the nodes, ElGrapho will generate a single centered spiral.  If there are several colors used, ElGrapho will cluster the spirals separately.  Because Spiral models can be generated in ```O(n)``` time, i.e. linear time, they are very fast to construct compared to other models such as force directed graphs which are polynomial in time.
+The ```Cluster``` model takes in an array of colors, and an array of edges.  The config is identical to the raw ```model``` schema except that the ```xs``` and ```ys``` are generated for you.  If a single color is used for all of the nodes, ElGrapho will generate a single centered cluster.  If there are several colors used, ElGrapho will render distinct clusters.  Because Cluster models can be generated in ```O(n)``` time, i.e. linear time, they are very fast to construct compared to other models such as force directed graphs which are polynomial in time.
 
 ## Server Side Model Generation
 

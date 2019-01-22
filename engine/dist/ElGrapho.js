@@ -1302,7 +1302,7 @@ const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/Ver
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
 const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
-const Spiral = __webpack_require__(/*! ./models/Spiral */ "./engine/src/models/Spiral.js");
+const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models/Cluster.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 
 const ZOOM_FACTOR = 2;
@@ -1767,7 +1767,7 @@ ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
   Tree: Tree,
-  Spiral: Spiral
+  Cluster: Cluster
 };
 
 module.exports = ElGrapho;
@@ -2748,14 +2748,14 @@ module.exports = NumberFormatter;
 
 /***/ }),
 
-/***/ "./engine/src/models/Spiral.js":
-/*!*************************************!*\
-  !*** ./engine/src/models/Spiral.js ***!
-  \*************************************/
+/***/ "./engine/src/models/Cluster.js":
+/*!**************************************!*\
+  !*** ./engine/src/models/Cluster.js ***!
+  \**************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-let Spiral = function(config) {
+let Cluster = function(config) {
   let model = {
     nodes: {
       xs: [],
@@ -2823,7 +2823,7 @@ let Spiral = function(config) {
   return model;
 };
 
-module.exports = Spiral;
+module.exports = Cluster;
 
 /***/ }),
 

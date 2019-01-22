@@ -1,4 +1,4 @@
-let Spiral = function(config) {
+let Cluster = function(config) {
   let model = {
     nodes: {
       xs: [],
@@ -66,4 +66,4 @@ let Spiral = function(config) {
   return model;
 };
 
-module.exports = Spiral;
+module.exports = Cluster;

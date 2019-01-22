@@ -8,7 +8,7 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Two Spirals</h1>
+    <h1>El Grapho Two Clusters</h1>
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
@@ -30,7 +30,7 @@
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Spiral(modelConfig),
+        model: ElGrapho.models.Cluster(modelConfig),
         width: WIDTH,
         height: HEIGHT
       });
