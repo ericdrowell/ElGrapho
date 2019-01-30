@@ -8,15 +8,11 @@ El Grapho is a high performance graph data visualization engine that leverages W
 
 ## Why Would I Use This?
 
-If you need to build a graph visualization for the web of any kind, such as a tree, force directed graph, network graph, etc., and you want it to really scale and be super performant, then El Grapho is a great option.  It was built from the ground up to scale as much as possible given modern constraints of browser execution speeds and OpenGL shader performance on GPUs.
+If you need to build a graph visualization for the web of any kind, such as a tree, force directed graph, network graph, etc., and scale and performance are important to you, then El Grapho is a great option.  It was built from the ground up to optimize for CPU and GPU performance.
 
 ## What Does it Look Like?
 
-<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-example-tree.png"/>
-
-<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-big-network.png"/>
-
-<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-spiral.png"/>
+<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho-examples.png"/>
 
 ## Live Examples
 
@@ -109,7 +105,7 @@ let graph = new ElGrapho({
 });
 ```
 
-The ```Tree``` model takes in a nested tree structure and builds the nodes and edges for you.  In this example, the root node has two children, and each of those children have two children of their own.  In other words, this is a simple binary tree with two levels.  For more complex trees, you could have super complex trees with over one million nodes.
+The ```Tree``` model takes in a nested tree structure and builds the nodes and edges for you.  In this example, the root node has two children, and each of those children have two children of their own.  In other words, this is a simple binary tree with two levels.
 
 #### Cluster Model
 

@@ -2784,6 +2784,14 @@ let Cluster = function(config) {
 
   let key;
   let groupIndex = 0;
+
+  let maxGroupCount = 0;
+  for (key in groups) {
+    maxGroupCount = Math.max(maxGroupCount, groups[key].length);
+  }
+
+  let arcLength = 1 / Math.sqrt(maxGroupCount);
+
   for (key in groups) {
     let indices = groups[key];
     let centerAngle = -2*Math.PI*groupIndex/numGroups;
@@ -2798,11 +2806,9 @@ let Cluster = function(config) {
       clusterCenterX = Math.cos(centerAngle);
       clusterCenterY = Math.sin(centerAngle);
     }
-    
-    let ARC_LENGTH = 0.1;
 
-    let radius = ARC_LENGTH;
-    let angleStep = ARC_LENGTH / radius; // arc length = radius * angle -> angle = arc length / radius
+    let radius = arcLength;
+    let angleStep = arcLength / radius; // arc length = radius * angle -> angle = arc length / radius
     let angle = 0;
 
     indices.forEach(function(index) {
@@ -2812,8 +2818,8 @@ let Cluster = function(config) {
       model.nodes.xs[index] = clusterCenterX + x;
       model.nodes.ys[index] = clusterCenterY + y;
 
-      radius += ARC_LENGTH * angleStep / (2 * Math.PI);
-      angleStep = ARC_LENGTH / radius;
+      radius += arcLength * angleStep / (2 * Math.PI);
+      angleStep = arcLength / radius;
       angle -= angleStep;
     });
     
