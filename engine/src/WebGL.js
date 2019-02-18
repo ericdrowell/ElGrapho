@@ -213,6 +213,9 @@ WebGL.prototype = {
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
   drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {

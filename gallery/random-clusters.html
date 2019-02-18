@@ -12,39 +12,37 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      const WIDTH = 500;
-      const HEIGHT = 500;
-      const NUM_NODES = 10000;
+const NUM_NODES = 10000;
 
-      let modelConfig = {
-        nodes: {
-          colors: []
-        },
-        edges: []
-      };
+let modelConfig = {
+  nodes: {
+    colors: []
+  },
+  edges: []
+};
 
-      for (let n=0; n<NUM_NODES; n++) {
-        let color = Math.floor(Math.random() * 5);
-        let fromIndex = Math.floor(Math.random() * NUM_NODES);
-        let toIndex = Math.floor(Math.random() * NUM_NODES);
+for (let n=0; n<NUM_NODES; n++) {
+  let color = Math.floor(Math.random() * 5);
+  let fromIndex = Math.floor(Math.random() * NUM_NODES);
+  let toIndex = Math.floor(Math.random() * NUM_NODES);
 
-        if (color === 0 && Math.random() > 0.5) {
-          color = 1;
-        }
+  if (color === 0 && Math.random() > 0.5) {
+    color = 1;
+  }
 
-        modelConfig.nodes.colors.push(color);
-        modelConfig.edges.push(fromIndex);
-        modelConfig.edges.push(toIndex);
-      }
+  modelConfig.nodes.colors.push(color);
+  modelConfig.edges.push(fromIndex);
+  modelConfig.edges.push(toIndex);
+}
 
-      let graph = new ElGrapho({
-        container: document.getElementById('container'),
-        model: ElGrapho.models.Cluster(modelConfig),
-        width: WIDTH,
-        height: HEIGHT,
-        magicZoom: false,
-        nodeSize: 4
-      });
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.models.Cluster(modelConfig),
+  width: 1000,
+  height: 500,
+  magicZoom: false,
+  nodeSize: 4
+});
 
     </script>
   </body>

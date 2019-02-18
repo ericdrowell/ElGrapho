@@ -1,6 +1,6 @@
 {
   "name": "elgrapho",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "main": "engine/dist/elgrapho.min.js",
   "author": "Eric Rowell",
   "license": "SEE LICENSE IN <LICENSE.md>",
@@ -16,8 +16,10 @@
     "webgl",
     "force",
     "directed",
-    "network"
+    "network",
+    "cluster"
   ],
+  "homepage": "https://www.elgrapho.com/",
   "devDependencies": {
     "gl-matrix": "^2.6.1",
     "jshint": "^2.9.5",

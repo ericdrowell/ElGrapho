@@ -1,6 +1,10 @@
 # El Grapho
 
-<img width="300" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-logo-white.png"/>
+<img width="300" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-logo.png"/>
+
+## Website
+
+https://www.elgrapho.com/
 
 ## What is El Grapho?
 
@@ -17,6 +21,7 @@ If you need to build a graph visualization for the web of any kind, such as a tr
 ## Live Examples
 
 * https://codepen.io/ericdrowell/pen/qLYrEm
+* https://codepen.io/ericdrowell/pen/wNRyoZ
 
 ## Getting Started
 

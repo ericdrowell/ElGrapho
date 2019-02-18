@@ -1479,7 +1479,7 @@ ElGrapho.prototype = {
         BoxZoom.update(evt.pageX, evt.pageY);
 
       }
-    }));
+    }, 17));
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
@@ -1530,7 +1530,7 @@ ElGrapho.prototype = {
           }       
         }
       }      
-    }));
+    }, 17));
 
 
     document.addEventListener('mouseup', function(evt) {
@@ -2414,6 +2414,9 @@ WebGL.prototype = {
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
   drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
