@@ -1,6 +1,6 @@
 # El Grapho
 
-<img width="300" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/el-grapho-logo.png"/>
+<img width="300" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho.png"/>
 
 ## Website
 
