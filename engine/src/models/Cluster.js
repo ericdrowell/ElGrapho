@@ -1,4 +1,20 @@
 let Cluster = function(config) {
+  let width = config.width;
+  let height = config.height;
+
+  let xFactor, yFactor;
+
+  if (width > height) {
+    xFactor = height/width;
+    yFactor = 1;
+  }
+  else {
+    xFactor = 1;
+    yFactor = width/height;
+  }
+
+
+
   let model = {
     nodes: {
       xs: [],
@@ -46,8 +62,8 @@ let Cluster = function(config) {
       clusterCenterY = 0;
     }
     else {
-      clusterCenterX = Math.cos(centerAngle);
-      clusterCenterY = Math.sin(centerAngle);
+      clusterCenterX = Math.cos(centerAngle) * xFactor;
+      clusterCenterY = Math.sin(centerAngle) * yFactor;
     }
 
     let radius = arcLength;
@@ -55,8 +71,8 @@ let Cluster = function(config) {
     let angle = 0;
 
     indices.forEach(function(index) {
-      let x = Math.cos(angle) * radius;
-      let y = Math.sin(angle) * radius;
+      let x = Math.cos(angle) * radius * xFactor;
+      let y = Math.sin(angle) * radius * yFactor;
 
       model.nodes.xs[index] = clusterCenterX + x;
       model.nodes.ys[index] = clusterCenterY + y;

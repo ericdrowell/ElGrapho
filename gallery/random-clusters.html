@@ -14,11 +14,16 @@
     <script>
 const NUM_NODES = 10000;
 
+const WIDTH = 1000;
+const HEIGHT = 500;
+
 let modelConfig = {
   nodes: {
     colors: []
   },
-  edges: []
+  edges: [],
+  width: WIDTH,
+  height: HEIGHT
 };
 
 for (let n=0; n<NUM_NODES; n++) {
@@ -38,8 +43,8 @@ for (let n=0; n<NUM_NODES; n++) {
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.models.Cluster(modelConfig),
-  width: 1000,
-  height: 500,
+  width: WIDTH,
+  height: HEIGHT,
   magicZoom: false,
   nodeSize: 4
 });

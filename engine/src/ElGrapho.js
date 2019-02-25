@@ -160,7 +160,7 @@ ElGrapho.prototype = {
           y: mousePos.y
         };
 
-        BoxZoom.create(evt.pageX, evt.pageY);
+        BoxZoom.create(evt.clientX, evt.clientY);
       }
     });
     viewport.container.addEventListener('mousedown', function(evt) {
@@ -177,8 +177,7 @@ ElGrapho.prototype = {
 
     document.addEventListener('mousemove', _.throttle(function(evt) {
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
-        BoxZoom.update(evt.pageX, evt.pageY);
-
+        BoxZoom.update(evt.clientX, evt.clientY);
       }
     }, 17));
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
