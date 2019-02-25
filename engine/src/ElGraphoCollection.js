@@ -2,6 +2,8 @@ const EasingFunctions = require('./EasingFunctions');
 const styles = require('../dist/styles/ElGrapho.min.css.js');
 const Enums = require('./Enums');
 
+const MAX_NODE_SIZE = 16;
+
 let ElGraphoCollection = {
   graphs: [],
   initialized: false,
@@ -48,16 +50,31 @@ let ElGraphoCollection = {
         graph.dirty = true; 
       }
 
+      let magicZoom;
+      let nodeSize;
+
+      let zoom = Math.min(graph.zoomX, graph.zoomY);
+      
+
+      if (graph.nodeSize * zoom > MAX_NODE_SIZE) {
+        magicZoom = true;
+        nodeSize = MAX_NODE_SIZE;
+      }
+      else {
+        magicZoom = false;
+        nodeSize = graph.nodeSize;
+      }
+
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom, graph.nodeSize);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
         idle = false;
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom, graph.nodeSize);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.hitDirty = false; 
       }
 

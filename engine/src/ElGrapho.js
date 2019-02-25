@@ -34,7 +34,6 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.events = new Events();
   this.width = config.width;
   this.height = config.height;
-  this.magicZoom = config.magicZoom === undefined ? true : config.magicZoom;
   this.nodeSize = config.nodeSize || 16;
   this.animations = [];
   this.wrapper = document.createElement('div');
@@ -42,12 +41,11 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.wrapper.style.width = this.width + 'px';
   this.wrapper.style.height = this.height + 'px';
   this.container.appendChild(this.wrapper);
-  this.defaultComponents(config);
-  this.components = config.components;
-  this.animations = config.animations === undefined ? true : false;
+  this.animations = config.animations === undefined ? true : config.animations;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
   this.idle = true;
+  this.debug = config.debug === undefined ? false : config.debug;
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
     el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
@@ -84,7 +82,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.magicZoom, this.nodeSize);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
@@ -95,10 +93,12 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 
   webgl.initBuffers(vertices);
   
-  this.count = new Count({
-    container: this.wrapper,
-    vertices: vertices
-  });
+  if (this.debug) {
+    new Count({
+      container: this.wrapper,
+      vertices: vertices
+    });
+  }
 
   this.controls = new Controls({
     container: this.wrapper,
@@ -111,19 +111,6 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 });
 
 ElGrapho.prototype = {
-  defaultComponents: function(config) {
-    if (!config.components) {
-      config.components = {};
-    }
-    if (!config.components.tooltip) {
-      config.components.tooltip = {};
-    }
-    if (!config.components.tooltip.template) {
-      config.components.tooltip.template = Tooltip.DEFAULT_TEMPLATE;
-    }
-
-    return config;
-  },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
     let x = evt.clientX - boundingRect.left;

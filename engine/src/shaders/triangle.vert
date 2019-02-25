@@ -4,13 +4,28 @@ attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
+uniform float nodeSize;
+
+float MAX_NODE_SIZE = 16.0;
 
 varying vec4 vVertexColor;
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
   //gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + vec4(normal.xyz, 0.0));
+
+  vec4 newNormal = vec4(normal.xyz, 0.0);
+
+  if (magicZoom) {
+    gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
+  }
+  else {
+    newNormal.x = newNormal.x * length(uModelViewMatrix[0]) * nodeSize / MAX_NODE_SIZE;
+    newNormal.y = newNormal.y * length(uModelViewMatrix[1]) * nodeSize / MAX_NODE_SIZE;
+    gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
+  }
+  
 
   if (aVertexColor == 0.0) {
     vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC

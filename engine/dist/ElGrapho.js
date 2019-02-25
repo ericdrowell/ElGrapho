@@ -1123,13 +1123,28 @@ attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
+uniform float nodeSize;
+
+float MAX_NODE_SIZE = 16.0;
 
 varying vec4 vVertexColor;
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
   //gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + vec4(normal.xyz, 0.0));
+
+  vec4 newNormal = vec4(normal.xyz, 0.0);
+
+  if (magicZoom) {
+    gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
+  }
+  else {
+    newNormal.x = newNormal.x * length(uModelViewMatrix[0]) * nodeSize / MAX_NODE_SIZE;
+    newNormal.y = newNormal.y * length(uModelViewMatrix[1]) * nodeSize / MAX_NODE_SIZE;
+    gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
+  }
+  
 
   if (aVertexColor == 0.0) {
     vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
@@ -1166,7 +1181,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-box-zoom-component .el-grapho-vertical-bar{width:1px;height:100%;top:0;left:50%;background-color:#119fe0;position:absolute}.el-grapho-box-zoom-component .el-grapho-horizontal-bar{width:100%;height:1px;top:50%;left:0;background-color:#119fe0;position:absolute}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-box-zoom-component .el-grapho-vertical-bar{width:1px;height:100%;top:0;left:50%;background-color:#119fe0;position:absolute}.el-grapho-box-zoom-component .el-grapho-horizontal-bar{width:100%;height:1px;top:50%;left:0;background-color:#119fe0;position:absolute}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1320,7 +1335,6 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.events = new Events();
   this.width = config.width;
   this.height = config.height;
-  this.magicZoom = config.magicZoom === undefined ? true : config.magicZoom;
   this.nodeSize = config.nodeSize || 16;
   this.animations = [];
   this.wrapper = document.createElement('div');
@@ -1328,12 +1342,11 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.wrapper.style.width = this.width + 'px';
   this.wrapper.style.height = this.height + 'px';
   this.container.appendChild(this.wrapper);
-  this.defaultComponents(config);
-  this.components = config.components;
-  this.animations = config.animations === undefined ? true : false;
+  this.animations = config.animations === undefined ? true : config.animations;
   this.setInteractionMode(Enums.interactionMode.SELECT);
   this.panStart = null;
   this.idle = true;
+  this.debug = config.debug === undefined ? false : config.debug;
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
     el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
@@ -1370,7 +1383,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
 
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.magicZoom, this.nodeSize);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
@@ -1381,10 +1394,12 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 
   webgl.initBuffers(vertices);
   
-  this.count = new Count({
-    container: this.wrapper,
-    vertices: vertices
-  });
+  if (this.debug) {
+    new Count({
+      container: this.wrapper,
+      vertices: vertices
+    });
+  }
 
   this.controls = new Controls({
     container: this.wrapper,
@@ -1397,19 +1412,6 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 });
 
 ElGrapho.prototype = {
-  defaultComponents: function(config) {
-    if (!config.components) {
-      config.components = {};
-    }
-    if (!config.components.tooltip) {
-      config.components.tooltip = {};
-    }
-    if (!config.components.tooltip.template) {
-      config.components.tooltip.template = Tooltip.DEFAULT_TEMPLATE;
-    }
-
-    return config;
-  },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
     let x = evt.clientX - boundingRect.left;
@@ -1789,6 +1791,8 @@ const EasingFunctions = __webpack_require__(/*! ./EasingFunctions */ "./engine/s
 const styles = __webpack_require__(/*! ../dist/styles/ElGrapho.min.css.js */ "./engine/dist/styles/ElGrapho.min.css.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 
+const MAX_NODE_SIZE = 16;
+
 let ElGraphoCollection = {
   graphs: [],
   initialized: false,
@@ -1835,16 +1839,31 @@ let ElGraphoCollection = {
         graph.dirty = true; 
       }
 
+      let magicZoom;
+      let nodeSize;
+
+      let zoom = Math.min(graph.zoomX, graph.zoomY);
+      
+
+      if (graph.nodeSize * zoom > MAX_NODE_SIZE) {
+        magicZoom = true;
+        nodeSize = MAX_NODE_SIZE;
+      }
+      else {
+        magicZoom = false;
+        nodeSize = graph.nodeSize;
+      }
+
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom, graph.nodeSize);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
 
       if (graph.hitDirty) {
         idle = false;
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, graph.magicZoom, graph.nodeSize);
+        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.hitDirty = false; 
       }
 
@@ -2031,9 +2050,10 @@ module.exports = UUID;
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const vec2 = glMatrix.vec2;
+const MAX_NODE_SIZE = 16;
 
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, magicZoom, nodeSize) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.xs.length*2);
@@ -2069,8 +2089,8 @@ const VertexBridge = {
     for (let n=0; n<edges.length; n+=2) {
       let pointIndex0 = edges[n];
       let pointIndex1 = edges[n+1];
-      let normalDistance0 = nodeSize*0.1;
-      let normalDistance1 = nodeSize*0.1;
+      let normalDistance0 = MAX_NODE_SIZE*0.1;
+      let normalDistance1 = MAX_NODE_SIZE*0.1;
 
       let x0 = nodes.xs[pointIndex0];
       let x1 = nodes.xs[pointIndex1];
@@ -2088,86 +2108,86 @@ const VertexBridge = {
       let xOffset1 = -1 * offsetVector1[0];
       let yOffset1 = offsetVector1[1];
 
-      if (magicZoom) {
-        // first triangle
-        trianglePositions[trianglePositionsIndex++] = x0;
-        trianglePositions[trianglePositionsIndex++] = y0;
-        triangleNormals[triangleNormalsIndex++] = xOffset0 * -1;
-        triangleNormals[triangleNormalsIndex++] = yOffset0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      //if (magicZoom) {
+      // first triangle
+      trianglePositions[trianglePositionsIndex++] = x0;
+      trianglePositions[trianglePositionsIndex++] = y0;
+      triangleNormals[triangleNormalsIndex++] = xOffset0 * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset0;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-        trianglePositions[trianglePositionsIndex++] = x1;
-        trianglePositions[trianglePositionsIndex++] = y1;
-        triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
-        triangleNormals[triangleNormalsIndex++] = yOffset1;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      trianglePositions[trianglePositionsIndex++] = x1;
+      trianglePositions[trianglePositionsIndex++] = y1;
+      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset1;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-        trianglePositions[trianglePositionsIndex++] = x0;
-        trianglePositions[trianglePositionsIndex++] = y0;
-        triangleNormals[triangleNormalsIndex++] = xOffset0;
-        triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
-
-
-        // second triangle
-        trianglePositions[trianglePositionsIndex++] = x1;
-        trianglePositions[trianglePositionsIndex++] = y1;
-        triangleNormals[triangleNormalsIndex++] = xOffset1;
-        triangleNormals[triangleNormalsIndex++] = yOffset1 * -1;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
-        trianglePositions[trianglePositionsIndex++] = x0;
-        trianglePositions[trianglePositionsIndex++] = y0;
-        triangleNormals[triangleNormalsIndex++] = xOffset0;
-        triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
-
-        trianglePositions[trianglePositionsIndex++] = x1;
-        trianglePositions[trianglePositionsIndex++] = y1;
-        triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
-        triangleNormals[triangleNormalsIndex++] = yOffset1;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-      }
-      else {
-        // first triangle
-        trianglePositions[trianglePositionsIndex++] = x0 + xOffset0 * -1;
-        trianglePositions[trianglePositionsIndex++] = y0 + yOffset0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
-
-        trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
-        trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
-        trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
-        trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      trianglePositions[trianglePositionsIndex++] = x0;
+      trianglePositions[trianglePositionsIndex++] = y0;
+      triangleNormals[triangleNormalsIndex++] = xOffset0;
+      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
 
-        // second triangle
-        trianglePositions[trianglePositionsIndex++] = x1 + xOffset1;
-        trianglePositions[trianglePositionsIndex++] = y1 + yOffset1 * -1;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      // second triangle
+      trianglePositions[trianglePositionsIndex++] = x1;
+      trianglePositions[trianglePositionsIndex++] = y1;
+      triangleNormals[triangleNormalsIndex++] = xOffset1;
+      triangleNormals[triangleNormalsIndex++] = yOffset1 * -1;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-        trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
-        trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      trianglePositions[trianglePositionsIndex++] = x0;
+      trianglePositions[trianglePositionsIndex++] = y0;
+      triangleNormals[triangleNormalsIndex++] = xOffset0;
+      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
 
-        trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
-        trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-      }
+      trianglePositions[trianglePositionsIndex++] = x1;
+      trianglePositions[trianglePositionsIndex++] = y1;
+      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset1;
+      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      // }
+      // else {
+      //   // first triangle
+      //   trianglePositions[trianglePositionsIndex++] = x0 + xOffset0 * -1;
+      //   trianglePositions[trianglePositionsIndex++] = y0 + yOffset0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+      //   trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
+      //   trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+
+      //   trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
+      //   trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+
+      //   // second triangle
+      //   trianglePositions[trianglePositionsIndex++] = x1 + xOffset1;
+      //   trianglePositions[trianglePositionsIndex++] = y1 + yOffset1 * -1;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+
+      //   trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
+      //   trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+
+      //   trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
+      //   trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      // }
     }
 
     return {
