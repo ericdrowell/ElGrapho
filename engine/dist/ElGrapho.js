@@ -2889,6 +2889,7 @@ let incrementAncestorTotals = function(node, val) {
   }
 };
 
+// DFS
 let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) {
   targetNode.children = [];
   //targetNode.totalDescendants = 0;
@@ -2898,6 +2899,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
   targetNode.color = srcNode.color || 0;
+  targetNode.index = srcNode.index;
 
   callback(targetNode);
 
@@ -2922,7 +2924,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 
 };
 
-
+// BFS
 let getNestedTree = function(config) {
   let edges = config.edges;
   let colors = config.nodes.colors;
@@ -2963,6 +2965,7 @@ let getNestedTree = function(config) {
 
 const Tree = function(config) {
   let rootNode = getNestedTree(config);
+
   let newRootNode = {};
 
   let nodes = [];
@@ -2971,13 +2974,16 @@ const Tree = function(config) {
 
   // O(n)
   buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
-    node.index = n;
     nodes[n] = node;
     n++;
 
     if (node.level > maxLevel) {
       maxLevel = node.level;
     }
+  });
+
+  nodes.sort(function(a, b) {
+    return a.index - b.index;
   });
 
   //let numNodes = nodes.length;
