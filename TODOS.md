@@ -1,8 +1,5 @@
 # TODOS
 
-## P0
-* consider using same API for cluster and tree.  I think it will be hard for consumers to map index to node for current tree api.
-
 ## P1
 * back and forward buttons to go through state stack (pan and zoom)
 * setup test app that pulls in elgrapho and bundles it

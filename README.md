@@ -54,90 +54,90 @@ let graph = new ElGrapho({
       1, 4,
       2, 5,
       2, 6
-    ]
-  },
-
-  width: 800,
-  height: 400
+    ],
+    width: 800,
+    height: 400
+  }
 });
 ```
 
 * ```container``` - DOM element that will contain the El Grapho graph.
 
-* ```model.nodes``` - object that contains information about all of the nodes in the graph (graphs are made up of nodes and edges).  Each node is defined by a position (x and y), and also a color.  El Grapho x and y ranges are between -1 and 1.  For example, if x is -1, then the node position is on the very left of the viewport.  If x is 0 it is in the center.  And if x is 1 it is on the very right of the viewport.  Colors are integer values between 0 and 7.  These integer values map to the El Grapho color palette.  
+* ```model.nodes``` - object that contains information about all of the nodes in the graph (graphs are made up of nodes and edges).  Each node is defined by a position (x and y), and also a color.  El Grapho x and y ranges are between -1 and 1.  If x is -1, then the node position is on the very left of the viewport.  If x is 0 it is in the center.  And if x is 1 it is on the very right of the viewport.  Colors are integer values between 0 and 7.  These integer values map to the El Grapho color palette.  
 
 * ```model.edges``` - array that defines the edges between nodes based on their indices.  In the example above, the first edge begins at node ```0``` and ends at node ```1```.  For non directed graphs, or bi-directional graphs, the order of the first node and second node do not matter.  However, for directed graphs, the first index is the *from* node, and the second index is the *to* node.
 
-* ```width``` - number that defines the width of the El Grapho viewport in pixels.
+* ```model.width``` - number that defines the width of the El Grapho viewport in pixels.
 
-* ```height``` - number defines the height of the El Grapho viewport in pixels.
-
-* ```magicZoom``` - boolean that defines the zoom strategy.  When magicZoom is true, zooming does not affect the size of nodes and edges.  When magicZoom is false, zooming does affect the size of nodes and edges, i.e. equivalent to moving the camera in the z direction in real space.  The default is true.
+* ```model.height``` - number defines the height of the El Grapho viewport in pixels.
 
 * ```animations``` - boolean that defines animation strategy.  When animations is true, zoom and pan transitions will be animated.  Otherwise the transitions will be immediate.  Although animations utilize requestAnimationFrame for dynamic frame rates, in some situations you may prefer to set animations to false to improve transition performance for very high cardinality graphs with millions of nodes and edges.  The default is true.
 
+* ```debug``` - boolean that can be used to enable debug mode.  Debug mode will show the node and edge count in the bottom right corner of the visualization.  The default is false.
+
 ### Models
 
-Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph shapes, most El Grapho users will want to leverage the provided El Grapho models which will generate node positions and edge relationships for you.  Currently, ElGrapho supports ```Tree``` and ```Cluster```
+Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph shapes, most El Grapho users will want to leverage the provided El Grapho models which will generate node positions for you.  Currently, ElGrapho supports ```Tree``` and ```Cluster```
 
 #### Tree Model
 
 ```
-let rootNode = {
-  children: [
-    {
-      children: [
-        {},
-        {}
-      ]
-    },
-    {
-      children: [
-        {},
-        {}
-      ]
-    }
-  ]
+let modelConfig = {
+  nodes: {
+    colors: [0, 1, 1, 2, 2, 3, 3]
+  },
+  edges: [
+    0, 1,
+    0, 2,
+    1, 3,
+    1, 4,
+    2, 5, 
+    2, 6
+  ],
+  width: 800,
+  height: 400
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Tree({
-    rootNode: rootNode
-  }),
-  width: 800,
-  height: 400
+  model: ElGrapho.models.Tree(modelConfig)
 });
 ```
 
-The ```Tree``` model takes in a nested tree structure and builds the nodes and edges for you.  In this example, the root node has two children, and each of those children have two children of their own.  In other words, this is a simple binary tree with two levels.
+The ```Tree``` model takes in a nested tree structure and calculates the node positions for you by adding ```xs``` and ```ys``` to the ```nodes``` object.  In this example, the root node has two children, and each of those children have two children of their own.  In other words, this is a simple binary tree with two levels.
 
 #### Cluster Model
 
 ```
-let graph = new ElGrapho({
-  container: document.getElementById('container'),
-  model: ElGrapho.models.Cluster({
-    nodes: {
-      colors: [0, 1, 1, 2, 2, 2, 2, 2]
-    },
-    edges: [
-      0, 1,
-      0, 2, 
-      0, 3,
-      0, 4,
-      0, 5,
-      0, 6,
-      0, 7,
-      0, 8
-    ]
-  }),
+let modelConfig = {
+  nodes: {
+    colors: [0, 1, 1, 2, 2, 2, 2, 2]
+  },
+  edges: [
+    0, 1,
+    0, 2, 
+    0, 3,
+    0, 4,
+    0, 5,
+    0, 6,
+    0, 7,
+    0, 8
+  ],
   width: 800,
   height: 400
+};
+
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.models.Cluster(modelConfig)
 });
 ```
 
-The ```Cluster``` model takes in an array of colors, and an array of edges.  The config is identical to the raw ```model``` schema except that the ```xs``` and ```ys``` are generated for you.  If a single color is used for all of the nodes, ElGrapho will generate a single centered cluster.  If there are several colors used, ElGrapho will render distinct clusters.  Because Cluster models can be generated in ```O(n)``` time, i.e. linear time, they are very fast to construct compared to other models such as force directed graphs which are polynomial in time.
+The ```Cluster``` model takes in an array of colors, and an array of edges.  If a single color is used for all of the nodes, ElGrapho will generate a single centered cluster.  If there are several colors used, ElGrapho will render distinct clusters.  Because Cluster models can be generated in ```O(n)``` time, i.e. linear time, they are very fast to construct compared to other models such as force directed graphs which are polynomial in time.
+
+### Model Polymorphism
+
+You may have noticed that the model config schema is identical for ```Tree``` and ```Cluster```.  In fact, all El Grapho models have the exact same schema.  Thus, El Grapho visualizations are polymorphic, meaning you can pass the same data structure into different models and get different, but correct, graph visualizations.  Pretty cool!
 
 ## Server Side Model Generation
 
@@ -145,7 +145,7 @@ Because the El Grapho models are fully decoupled from the rendering engine itsel
 
 ## Controls
 
-El Grapho has controls in the upper right corner of the visualization that enable users to navigate large and complex graphs.  There are three modes:
+El Grapho has controls in the upper right corner of the visualization that enable users to navigate large and complex graphs.  These controls appear when you mouseover the visualizztion.  There are three modes:
 
 * __select__ - use this mode to select nodes
 * __zoom__ - use this mode to draw zoom boxes around areas of interest or to zoom into a particular region of the graph
