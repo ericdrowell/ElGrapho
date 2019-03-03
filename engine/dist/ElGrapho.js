@@ -1333,8 +1333,8 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
-  this.width = config.width;
-  this.height = config.height;
+  this.width = config.model.width;
+  this.height = config.model.height;
   this.nodeSize = config.nodeSize || 16;
   this.animations = [];
   this.wrapper = document.createElement('div');
@@ -1476,11 +1476,12 @@ ElGrapho.prototype = {
       }
     });
 
-    document.addEventListener('mousemove', _.throttle(function(evt) {
+    document.addEventListener('mousemove', function(evt) {
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
         BoxZoom.update(evt.clientX, evt.clientY);
       }
-    }, 17));
+    });
+    
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
@@ -2581,10 +2582,10 @@ let BoxZoom = {
       let width = x1 - x0;
       let height = y1 - y0;
 
-      BoxZoom.el.style.left = x0 + 'px';
-      BoxZoom.el.style.top = y0 + 'px';
-      BoxZoom.el.style.width = width + 'px';
-      BoxZoom.el.style.height = height + 'px';
+      BoxZoom.el.style.left = Math.floor(x0) + 'px';
+      BoxZoom.el.style.top = Math.floor(y0) + 'px';
+      BoxZoom.el.style.width = Math.floor(width) + 'px';
+      BoxZoom.el.style.height = Math.floor(height) + 'px';
     }
 
 
@@ -2800,7 +2801,9 @@ let Cluster = function(config) {
       ys: [],
       colors: config.nodes.colors.slice()
     },
-    edges: config.edges.slice()
+    edges: config.edges.slice(),
+    width: width,
+    height: height
   };
 
   // keys are color integers, values are arrays.  The arrays contain node indices
@@ -2919,8 +2922,47 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 
 };
 
+
+let getNestedTree = function(config) {
+  let edges = config.edges;
+  let colors = config.nodes.colors;
+  let nodes = {};
+  let edgeIndex = 0;
+
+  // build nodes
+  for (let n=0; n<colors.length; n++) {
+    nodes[n] = {
+      index: n,
+      color: colors[n],
+      children: [],
+      hasParent: false
+    };
+  }
+
+  while(edgeIndex < edges.length) {
+    let fromIndex = edges[edgeIndex++];
+    let toIndex = edges[edgeIndex++];
+
+    // parent child relationship
+    nodes[fromIndex].children.push(nodes[toIndex]);
+    nodes[toIndex].parent = nodes[fromIndex];
+    nodes[toIndex].hasParent = true;
+  }
+
+  // to find the root node, iterate through nodes and find the node that does not have a parent
+  for (var key in nodes) {
+    let node = nodes[key];
+    if (!node.hasParent) {
+      return node;
+    }
+  }
+
+  return null;
+};
+
+
 const Tree = function(config) {
-  let rootNode = config.rootNode;
+  let rootNode = getNestedTree(config);
   let newRootNode = {};
 
   let nodes = [];
@@ -2946,7 +2988,9 @@ const Tree = function(config) {
       ys:     [],
       colors: []
     },
-    edges: [] // num edges = num nodes - 1
+    edges: [], // num edges = num nodes - 1
+    width: config.width,
+    height: config.height
   };
 
   let edgeIndex = 0;

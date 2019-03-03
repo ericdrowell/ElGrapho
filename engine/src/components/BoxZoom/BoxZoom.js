@@ -51,10 +51,10 @@ let BoxZoom = {
       let width = x1 - x0;
       let height = y1 - y0;
 
-      BoxZoom.el.style.left = x0 + 'px';
-      BoxZoom.el.style.top = y0 + 'px';
-      BoxZoom.el.style.width = width + 'px';
-      BoxZoom.el.style.height = height + 'px';
+      BoxZoom.el.style.left = Math.floor(x0) + 'px';
+      BoxZoom.el.style.top = Math.floor(y0) + 'px';
+      BoxZoom.el.style.width = Math.floor(width) + 'px';
+      BoxZoom.el.style.height = Math.floor(height) + 'px';
     }
 
 

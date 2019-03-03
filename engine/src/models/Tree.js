@@ -39,8 +39,47 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 
 };
 
+
+let getNestedTree = function(config) {
+  let edges = config.edges;
+  let colors = config.nodes.colors;
+  let nodes = {};
+  let edgeIndex = 0;
+
+  // build nodes
+  for (let n=0; n<colors.length; n++) {
+    nodes[n] = {
+      index: n,
+      color: colors[n],
+      children: [],
+      hasParent: false
+    };
+  }
+
+  while(edgeIndex < edges.length) {
+    let fromIndex = edges[edgeIndex++];
+    let toIndex = edges[edgeIndex++];
+
+    // parent child relationship
+    nodes[fromIndex].children.push(nodes[toIndex]);
+    nodes[toIndex].parent = nodes[fromIndex];
+    nodes[toIndex].hasParent = true;
+  }
+
+  // to find the root node, iterate through nodes and find the node that does not have a parent
+  for (var key in nodes) {
+    let node = nodes[key];
+    if (!node.hasParent) {
+      return node;
+    }
+  }
+
+  return null;
+};
+
+
 const Tree = function(config) {
-  let rootNode = config.rootNode;
+  let rootNode = getNestedTree(config);
   let newRootNode = {};
 
   let nodes = [];
@@ -66,7 +105,9 @@ const Tree = function(config) {
       ys:     [],
       colors: []
     },
-    edges: [] // num edges = num nodes - 1
+    edges: [], // num edges = num nodes - 1
+    width: config.width,
+    height: config.height
   };
 
   let edgeIndex = 0;

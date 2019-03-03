@@ -21,7 +21,9 @@ let Cluster = function(config) {
       ys: [],
       colors: config.nodes.colors.slice()
     },
-    edges: config.edges.slice()
+    edges: config.edges.slice(),
+    width: width,
+    height: height
   };
 
   // keys are color integers, values are arrays.  The arrays contain node indices

@@ -12,14 +12,13 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      const WIDTH = 500;
-      const HEIGHT = 500;
-
       let modelConfig = {
         nodes: {
           colors: []
         },
-        edges: []
+        edges: [],
+        width: 500,
+        height: 500
       };
 
       for (let n=0; n<150; n++) {
@@ -30,9 +29,7 @@
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Cluster(modelConfig),
-        width: WIDTH,
-        height: HEIGHT
+        model: ElGrapho.models.Cluster(modelConfig)
       });
 
     </script>

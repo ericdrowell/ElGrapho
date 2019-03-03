@@ -32,8 +32,8 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
-  this.width = config.width;
-  this.height = config.height;
+  this.width = config.model.width;
+  this.height = config.model.height;
   this.nodeSize = config.nodeSize || 16;
   this.animations = [];
   this.wrapper = document.createElement('div');
@@ -175,11 +175,12 @@ ElGrapho.prototype = {
       }
     });
 
-    document.addEventListener('mousemove', _.throttle(function(evt) {
+    document.addEventListener('mousemove', function(evt) {
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
         BoxZoom.update(evt.clientX, evt.clientY);
       }
-    }, 17));
+    });
+    
     viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);

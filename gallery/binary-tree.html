@@ -12,9 +12,6 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      const WIDTH = 500;
-      const HEIGHT = 500;
-
       let graph = new ElGrapho({
         container: document.getElementById('container'),
 
@@ -31,11 +28,10 @@
             1, 4,
             2, 5,
             2, 6
-          ]
+          ],
+          width: 500,
+          height: 500
         },
-
-        width: WIDTH,
-        height: HEIGHT,
         magicZoom: false
       });
 

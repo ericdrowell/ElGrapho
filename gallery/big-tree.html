@@ -10,53 +10,78 @@
   <body>
     <h1>El Grapho Big Tree</h1>
     <div id="container"></div>
+
     <script src="../engine/dist/ElGrapho.min.js"></script>
     <script>
-      const WIDTH = 1000;
-      const HEIGHT = 500;
+      let NUM_LEVELS = 10;
+      let MAX_LEVEL_MULTIPLIER = 5;
 
-      let numLevels = 8;
-      let maxChildren = 5;
+      let modelConfig = {
+        nodes: {
+          colors: []
+        },
+        edges: [],
+        width: 1000,
+        height: 500
+      };
 
-      function addChildren(node, level, color) {
-        node.color = color;
+      let edgeIndex = 0;
+      let levels = [];
+      let n = 0;
+      let nodeColors = {};
+      let colorIndex = 1;
 
-        let numChildren = Math.ceil(Math.random() * maxChildren);
-        if (level < numLevels) {
-          node.children = [];
+      for (let j=0; j<NUM_LEVELS; j++) {
+        levels[j] = [];
 
-          for (let n=0; n<numChildren; n++) {
-            let childColor;
-            if (level === 0) {
-              childColor = n+1;
+        if (j === 0) {
+          let color = 0;
+          modelConfig.nodes.colors[n] = color;
+          nodeColors[n] = color;
+          levels[j].push(n);
+          n++;
+        }
+        else {
+          let lastLevel = levels[j-1];
+          let lastLevelLen = lastLevel.length;
+          let numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
+
+          for (let k=0; k<numNodes; k++) {
+            let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
+            modelConfig.edges[edgeIndex++] = parentIndex;
+            modelConfig.edges[edgeIndex++] = n;
+
+            if (j === 0) {
+              color = 0;
+            }
+            else if (j === 1) {
+              color = colorIndex++;
             }
             else {
-              childColor = color;
+              color = nodeColors[parentIndex];
             }
-            let child = {};
-            node.children.push(child);
-            addChildren(child, level+1, childColor);
+
+            modelConfig.nodes.colors[n] = color;
+            nodeColors[n] = color;
+            levels[j].push(n);
+            n++;
           }
+
+          
         }
+
+
+
+
       }
 
-      let rootNode = {};
-      addChildren(rootNode, 0, 0);
 
-
-
-      let graph = new ElGrapho({
+      new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Tree({
-          rootNode: rootNode
-        }),
-        width: WIDTH,
-        height: HEIGHT
+        model: ElGrapho.models.Tree(modelConfig),
+        debug: true
       });
 
-      graph.tooltipTemplate = function(index, el) {
-        el.innerHTML = 'my custom value: ' + ElGrapho.NumberFormatter.addCommas(index);;
-      };
 
     </script>
   </body>

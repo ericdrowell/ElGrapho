@@ -12,22 +12,21 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      const WIDTH = 1000;
-      const HEIGHT = 500;
-
       // for debugging
       //ElGrapho.Profiler.enabled = true;
 
-      const numNodes = 100;
+      const NUM_NODES = 100;
 
       let modelConfig = {
         nodes: {
           colors: []
         },
-        edges: []
+        edges: [],
+        width: 1000,
+        height: 500
       };
 
-      for (let n=0; n<numNodes; n++) {
+      for (let n=0; n<NUM_NODES; n++) {
         modelConfig.nodes.colors.push(0);
         modelConfig.edges.push(n);
         modelConfig.edges.push(n+1);
@@ -35,9 +34,7 @@
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Cluster(modelConfig),
-        width: WIDTH,
-        height: HEIGHT
+        model: ElGrapho.models.Cluster(modelConfig)
       });
 
     </script>
