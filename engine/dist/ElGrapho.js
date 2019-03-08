@@ -956,24 +956,6 @@ module.exports = `
 
 /***/ }),
 
-/***/ "./engine/dist/shaders/generic.frag.js":
-/*!*********************************************!*\
-  !*** ./engine/dist/shaders/generic.frag.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = `// use lowp for solid colors to improve perf
-// https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean
-precision lowp float;
-varying vec4 vVertexColor;
-
-void main(void) {
-  gl_FragColor = vVertexColor;
-}`;
-
-/***/ }),
-
 /***/ "./engine/dist/shaders/hitPoint.vert.js":
 /*!**********************************************!*\
   !*** ./engine/dist/shaders/hitPoint.vert.js ***!
@@ -1019,6 +1001,29 @@ void main() {
   }
 
   vVertexColor = vec4(unpackColor(aVertexIndex), 1.0);
+}`;
+
+/***/ }),
+
+/***/ "./engine/dist/shaders/point.frag.js":
+/*!*******************************************!*\
+  !*** ./engine/dist/shaders/point.frag.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+precision mediump float;
+varying vec4 vVertexColor;
+
+void main(void) {
+  float r = 0.0, delta = 0.0, alpha = 1.0;
+  vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+  r = dot(cxy, cxy);
+  if (r > 1.0) {
+    discard;
+  }
+  gl_FragColor = vVertexColor * (alpha);
 }`;
 
 /***/ }),
@@ -1106,6 +1111,24 @@ void main() {
     // pink for now
     vVertexColor = vec4(255.0/255.0, 105.0/255.0, 147.0/255.0, 1.0); 
   }
+}`;
+
+/***/ }),
+
+/***/ "./engine/dist/shaders/triangle.frag.js":
+/*!**********************************************!*\
+  !*** ./engine/dist/shaders/triangle.frag.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `// use lowp for solid colors to improve perf
+// https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean
+precision mediump float;
+varying vec4 vVertexColor;
+
+void main(void) {
+  gl_FragColor = vVertexColor;
 }`;
 
 /***/ }),
@@ -2225,8 +2248,8 @@ const Concrete = __webpack_require__(/*! ../../../../concrete/build/concrete.js 
 const pointVert = __webpack_require__(/*! ../dist/shaders/point.vert */ "./engine/dist/shaders/point.vert.js");
 const hitPointVert = __webpack_require__(/*! ../dist/shaders/hitPoint.vert */ "./engine/dist/shaders/hitPoint.vert.js");
 const triangleVert = __webpack_require__(/*! ../dist/shaders/triangle.vert */ "./engine/dist/shaders/triangle.vert.js");
-
-const genericFrag = __webpack_require__(/*! ../dist/shaders/generic.frag */ "./engine/dist/shaders/generic.frag.js");
+const triangleFrag = __webpack_require__(/*! ../dist/shaders/triangle.frag */ "./engine/dist/shaders/triangle.frag.js");
+const pointFrag = __webpack_require__(/*! ../dist/shaders/point.frag */ "./engine/dist/shaders/point.frag.js");
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 
 let WebGL = function(config) {
@@ -2259,7 +2282,7 @@ WebGL.prototype = {
   getPointShaderProgram: function() {
     let gl = this.layer.scene.context;
     let vertexShader = this.getShader('vertex', pointVert, gl);
-    let fragmentShader = this.getShader('fragment', genericFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -2293,7 +2316,7 @@ WebGL.prototype = {
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
-    let fragmentShader = this.getShader('fragment', genericFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -2325,7 +2348,7 @@ WebGL.prototype = {
   getTriangleShaderProgram: function() {
     let gl = this.layer.scene.context;
     let vertexShader = this.getShader('vertex', triangleVert, gl);
-    let fragmentShader = this.getShader('fragment', genericFrag, gl);
+    let fragmentShader = this.getShader('fragment', triangleFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);

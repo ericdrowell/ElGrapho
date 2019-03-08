@@ -4,8 +4,8 @@ const Concrete = require('../../../../concrete/build/concrete.js');
 const pointVert = require('../dist/shaders/point.vert');
 const hitPointVert = require('../dist/shaders/hitPoint.vert');
 const triangleVert = require('../dist/shaders/triangle.vert');
-
-const genericFrag = require('../dist/shaders/generic.frag');
+const triangleFrag = require('../dist/shaders/triangle.frag');
+const pointFrag = require('../dist/shaders/point.frag');
 const Profiler = require('./Profiler');
 
 let WebGL = function(config) {
@@ -38,7 +38,7 @@ WebGL.prototype = {
   getPointShaderProgram: function() {
     let gl = this.layer.scene.context;
     let vertexShader = this.getShader('vertex', pointVert, gl);
-    let fragmentShader = this.getShader('fragment', genericFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -72,7 +72,7 @@ WebGL.prototype = {
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
-    let fragmentShader = this.getShader('fragment', genericFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -104,7 +104,7 @@ WebGL.prototype = {
   getTriangleShaderProgram: function() {
     let gl = this.layer.scene.context;
     let vertexShader = this.getShader('vertex', triangleVert, gl);
-    let fragmentShader = this.getShader('fragment', genericFrag, gl);
+    let fragmentShader = this.getShader('fragment', triangleFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
