@@ -2,6 +2,7 @@ const glMatrix = require('gl-matrix');
 const mat4 = glMatrix.mat4;
 const Concrete = require('../../../../concrete/build/concrete.js');
 const pointVert = require('../dist/shaders/point.vert');
+const pointStrokeVert = require('../dist/shaders/pointStroke.vert');
 const hitPointVert = require('../dist/shaders/hitPoint.vert');
 const triangleVert = require('../dist/shaders/triangle.vert');
 const triangleFrag = require('../dist/shaders/triangle.frag');
@@ -88,6 +89,34 @@ WebGL.prototype = {
     // attribute variables per data point
     shaderProgram.vertexIndexAttribute = gl.getAttribLocation(shaderProgram, 'aVertexIndex');
     gl.enableVertexAttribArray(shaderProgram.vertexIndexAttribute);
+
+    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+    // uniform constants for all data points
+    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+
+    return shaderProgram;
+  },
+
+  getPointStrokeShaderProgram: function() {
+    let gl = this.layer.scene.context;
+    let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let shaderProgram = gl.createProgram();
+
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Could not initialise shaders');
+    }
+
+    gl.useProgram(shaderProgram);
 
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
@@ -198,6 +227,21 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+    let layer = this.layer;
+    let gl = layer.scene.context;
+    let shaderProgram = this.getPointStrokeShaderProgram();
+    let buffers = this.buffers.points;
+
+    gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
+    gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+
+    this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
+
+    gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
+  },
   drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
@@ -245,8 +289,12 @@ WebGL.prototype = {
 
     //console.log(modelViewMatrix);
 
+    // each draw instruction is layered beneath current bitmap, so have to do them in reverse
     if (this.buffers.points) {
       this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      
+      
     }
 
     if (this.buffers.triangles) {

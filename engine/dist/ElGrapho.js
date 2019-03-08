@@ -1115,6 +1115,41 @@ void main() {
 
 /***/ }),
 
+/***/ "./engine/dist/shaders/pointStroke.vert.js":
+/*!*************************************************!*\
+  !*** ./engine/dist/shaders/pointStroke.vert.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `attribute vec4 aVertexPosition;
+
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
+uniform float nodeSize;
+
+varying vec4 vVertexColor;
+
+const float POINT_STROKE_WIDTH_FACTOR = 1.5;
+
+void main() {
+  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+
+  if (magicZoom) {
+    gl_PointSize = nodeSize * POINT_STROKE_WIDTH_FACTOR; 
+  }
+  else {
+    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
+  }
+
+
+  vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+
+}`;
+
+/***/ }),
+
 /***/ "./engine/dist/shaders/triangle.frag.js":
 /*!**********************************************!*\
   !*** ./engine/dist/shaders/triangle.frag.js ***!
@@ -2246,6 +2281,7 @@ const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/
 const mat4 = glMatrix.mat4;
 const Concrete = __webpack_require__(/*! ../../../../concrete/build/concrete.js */ "../../concrete/build/concrete.js");
 const pointVert = __webpack_require__(/*! ../dist/shaders/point.vert */ "./engine/dist/shaders/point.vert.js");
+const pointStrokeVert = __webpack_require__(/*! ../dist/shaders/pointStroke.vert */ "./engine/dist/shaders/pointStroke.vert.js");
 const hitPointVert = __webpack_require__(/*! ../dist/shaders/hitPoint.vert */ "./engine/dist/shaders/hitPoint.vert.js");
 const triangleVert = __webpack_require__(/*! ../dist/shaders/triangle.vert */ "./engine/dist/shaders/triangle.vert.js");
 const triangleFrag = __webpack_require__(/*! ../dist/shaders/triangle.frag */ "./engine/dist/shaders/triangle.frag.js");
@@ -2332,6 +2368,34 @@ WebGL.prototype = {
     // attribute variables per data point
     shaderProgram.vertexIndexAttribute = gl.getAttribLocation(shaderProgram, 'aVertexIndex');
     gl.enableVertexAttribArray(shaderProgram.vertexIndexAttribute);
+
+    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+    // uniform constants for all data points
+    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+
+    return shaderProgram;
+  },
+
+  getPointStrokeShaderProgram: function() {
+    let gl = this.layer.scene.context;
+    let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let shaderProgram = gl.createProgram();
+
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Could not initialise shaders');
+    }
+
+    gl.useProgram(shaderProgram);
 
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
@@ -2442,6 +2506,21 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+    let layer = this.layer;
+    let gl = layer.scene.context;
+    let shaderProgram = this.getPointStrokeShaderProgram();
+    let buffers = this.buffers.points;
+
+    gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
+    gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+
+    this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
+
+    gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
+  },
   drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
@@ -2489,8 +2568,12 @@ WebGL.prototype = {
 
     //console.log(modelViewMatrix);
 
+    // each draw instruction is layered beneath current bitmap, so have to do them in reverse
     if (this.buffers.points) {
       this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      
+      
     }
 
     if (this.buffers.triangles) {
