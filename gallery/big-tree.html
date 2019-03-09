@@ -69,7 +69,7 @@ for (let j=0; j<NUM_LEVELS; j++) {
   }
 }
 
-new ElGrapho({
+let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.models.Tree(modelConfig),
   debug: true

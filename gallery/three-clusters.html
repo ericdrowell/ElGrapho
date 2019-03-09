@@ -12,69 +12,34 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      // for debugging
-      //ElGrapho.Profiler.enabled = true;
+      const NUM_NODES = 300;
+      const NUM_NODES_FIRST_GROUP = 50;
+      const NUM_NODES_SECOND_GROUP = 75;
 
       let modelConfig = {
         nodes: {
-          colors: [0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+          colors: []
         },
-        edges: [
-          0, 1,
-
-          0, 2, 
-          0, 3,
-          0, 4,
-          0, 5,
-          0, 6,
-          0, 7,
-          0, 8,
-
-          1, 9,
-          2, 10,
-          3, 11,
-          4, 12,
-          5, 13,
-          6, 14,
-          7, 15,
-          8, 16,
-          1, 17,
-          2, 18,
-          3, 19,
-          4, 20,
-          5, 21, 
-          6, 22,
-          7, 23,
-          8, 24,
-
-          0, 25, 
-          0, 26,
-          0, 27,
-          0, 28,
-
-          29, 30,
-          31, 32,
-          33, 34,
-          34, 35,
-          36, 37,
-          38, 39,
-          40, 41,
-          42, 43, 
-          44, 45,
-          46, 47,
-          48, 49,
-          50, 51,
-          52, 53,
-          53, 55, 
-          56, 57,
-
-          0, 58,
-          0, 59,
-          0, 60
-        ],
+        edges: [],
         width: 500,
         height: 500
       };
+
+      for (let n=0; n<NUM_NODES; n++) {
+        if (n < NUM_NODES_FIRST_GROUP) {
+          modelConfig.nodes.colors.push(0);
+        }
+        else if (n < NUM_NODES_FIRST_GROUP + NUM_NODES_SECOND_GROUP) {
+          modelConfig.nodes.colors.push(1);
+        }
+        else {
+          modelConfig.nodes.colors.push(2);
+        }
+        
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
+
+      }
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),

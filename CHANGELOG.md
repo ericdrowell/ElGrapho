@@ -1,5 +1,9 @@
 # Changlog
 
+## v1.4.1
+* circle nodes
+* node strokes
+
 ## v1.4.0
 * All models will now have the same schema.  This enables polymorphism.  Tree model schema has changed
 * width and height properties moved to model level

@@ -6,7 +6,7 @@ const Tooltip = {
   },
   initialized: false,
   init: function() {
-    Tooltip.wrapper = Dom.create('tooltip');
+    Tooltip.wrapper = Dom.create('el-grapho-tooltip');
     document.body.appendChild(this.wrapper);
     Tooltip.initialized = true;
   },

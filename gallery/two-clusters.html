@@ -12,6 +12,9 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
+      const NUM_NODES = 300;
+      const NUM_NODES_FIRST_GROUP = 100;
+
       let modelConfig = {
         nodes: {
           colors: []
@@ -21,10 +24,11 @@
         height: 500
       };
 
-      for (let n=0; n<150; n++) {
-        modelConfig.nodes.colors.push(n < 100 ? 0 : 1);
-        modelConfig.edges.push(n);
-        modelConfig.edges.push(n+1);
+      for (let n=0; n<NUM_NODES; n++) {
+        modelConfig.nodes.colors.push(n < NUM_NODES_FIRST_GROUP ? 0 : 1);
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES_FIRST_GROUP));
+        modelConfig.edges.push(Math.round(Math.random() * (NUM_NODES - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP));
+
       }
 
       let graph = new ElGrapho({

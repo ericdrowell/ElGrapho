@@ -28,8 +28,8 @@
 
       for (let n=0; n<NUM_NODES; n++) {
         modelConfig.nodes.colors.push(0);
-        modelConfig.edges.push(n);
-        modelConfig.edges.push(n+1);
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
       }
 
       let graph = new ElGrapho({

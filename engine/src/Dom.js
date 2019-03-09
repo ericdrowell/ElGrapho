@@ -1,7 +1,7 @@
 const Dom = {
-  create: function(classNameSuffix) {
+  create: function(className) {
     let el = document.createElement('div');
-    el.className = 'el-grapho-' + classNameSuffix;
+    el.className = className;
     return el;
   },
   closest: function(el, s) {

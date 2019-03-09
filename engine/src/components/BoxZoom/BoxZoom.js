@@ -12,13 +12,13 @@ let BoxZoom = {
 
     BoxZoom.destroy();
 
-    let el = Dom.create('box-zoom-component');
+    let el = Dom.create('el-grapho-box-zoom-component');
     document.body.appendChild(el);
 
-    let verticalBar = Dom.create('vertical-bar');
+    let verticalBar = Dom.create('el-grapho-vertical-bar');
     el.appendChild(verticalBar);
 
-    let horizontalBar = Dom.create('horizontal-bar');
+    let horizontalBar = Dom.create('el-grapho-horizontal-bar');
     el.appendChild(horizontalBar);
 
     BoxZoom.el = el;

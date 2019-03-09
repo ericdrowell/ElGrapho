@@ -17,3 +17,4 @@
 * can I use ints in glsl where appropriate? Right now using all floats
 * back and forward buttons to go through state stack (pan and zoom)
 * chord diagram
+* antialiased nodes - seems to require APIs in webgl2.  Currently using webgl1.

@@ -18,6 +18,7 @@ const BoxZoom = require('./components/BoxZoom/BoxZoom');
 const Tree = require('./models/Tree');
 const Cluster = require('./models/Cluster');
 const Dom = require('./Dom');
+const Loading = require('./components/Loading/Loading');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -100,10 +101,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
     });
   }
 
-  this.controls = new Controls({
-    container: this.wrapper,
-    graph: this
-  });
+  this.initComponents();
 
   this.listen();
 
@@ -111,6 +109,16 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 });
 
 ElGrapho.prototype = {
+  initComponents: function() {
+    this.controls = new Controls({
+      container: this.wrapper,
+      graph: this
+    });
+
+    this.loading = new Loading({
+      container: this.wrapper
+    });
+  },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
     let x = evt.clientX - boundingRect.left;
@@ -458,6 +466,12 @@ ElGrapho.prototype = {
   },
   fire: function(name, evt) {
     this.events.fire(name, evt);
+  },
+  showLoading: function() {
+    this.wrapper.classList.add('el-grapho-loading');
+  },
+  hideLoading: function() {
+    this.wrapper.classList.remove('el-grapho-loading');
   }
 };
 

@@ -55,7 +55,7 @@ let Cluster = function(config) {
 
   for (key in groups) {
     let indices = groups[key];
-    let centerAngle = -2*Math.PI*groupIndex/numGroups;
+    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI/2;
 
     let clusterCenterX, clusterCenterY;
 

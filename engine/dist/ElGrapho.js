@@ -1239,7 +1239,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #aaa;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-box-zoom-component .el-grapho-vertical-bar{width:1px;height:100%;top:0;left:50%;background-color:#119fe0;position:absolute}.el-grapho-box-zoom-component .el-grapho-horizontal-bar{width:100%;height:1px;top:50%;left:0;background-color:#119fe0;position:absolute}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;background:white;pointer-events:none;font-family:monospace}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-box-zoom-component .el-grapho-vertical-bar{width:1px;height:100%;top:0;left:50%;background-color:#119fe0;position:absolute}.el-grapho-box-zoom-component .el-grapho-horizontal-bar{width:100%;height:1px;top:50%;left:0;background-color:#119fe0;position:absolute}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1287,9 +1287,9 @@ module.exports = Color;
 /***/ (function(module, exports) {
 
 const Dom = {
-  create: function(classNameSuffix) {
+  create: function(className) {
     let el = document.createElement('div');
-    el.className = 'el-grapho-' + classNameSuffix;
+    el.className = className;
     return el;
   },
   closest: function(el, s) {
@@ -1377,6 +1377,7 @@ const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engin
 const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
 const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models/Cluster.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
+const Loading = __webpack_require__(/*! ./components/Loading/Loading */ "./engine/src/components/Loading/Loading.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -1459,10 +1460,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
     });
   }
 
-  this.controls = new Controls({
-    container: this.wrapper,
-    graph: this
-  });
+  this.initComponents();
 
   this.listen();
 
@@ -1470,6 +1468,16 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
 });
 
 ElGrapho.prototype = {
+  initComponents: function() {
+    this.controls = new Controls({
+      container: this.wrapper,
+      graph: this
+    });
+
+    this.loading = new Loading({
+      container: this.wrapper
+    });
+  },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
     let x = evt.clientX - boundingRect.left;
@@ -1817,6 +1825,12 @@ ElGrapho.prototype = {
   },
   fire: function(name, evt) {
     this.events.fire(name, evt);
+  },
+  showLoading: function() {
+    this.wrapper.classList.add('el-grapho-loading');
+  },
+  hideLoading: function() {
+    this.wrapper.classList.remove('el-grapho-loading');
   }
 };
 
@@ -2649,13 +2663,13 @@ let BoxZoom = {
 
     BoxZoom.destroy();
 
-    let el = Dom.create('box-zoom-component');
+    let el = Dom.create('el-grapho-box-zoom-component');
     document.body.appendChild(el);
 
-    let verticalBar = Dom.create('vertical-bar');
+    let verticalBar = Dom.create('el-grapho-vertical-bar');
     el.appendChild(verticalBar);
 
-    let horizontalBar = Dom.create('horizontal-bar');
+    let horizontalBar = Dom.create('el-grapho-horizontal-bar');
     el.appendChild(horizontalBar);
 
     BoxZoom.el = el;
@@ -2813,6 +2827,42 @@ module.exports = Count;
 
 /***/ }),
 
+/***/ "./engine/src/components/Loading/Loading.js":
+/*!**************************************************!*\
+  !*** ./engine/src/components/Loading/Loading.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const Dom = __webpack_require__(/*! ../../Dom */ "./engine/src/Dom.js");
+
+const Loading = function(config) {
+  this.container = config.container;
+  this.wrapper = Dom.create('el-grapho-loading-component'); 
+
+  //http://tobiasahlin.com/spinkit/
+  let markup = `
+  <div class="spinner">
+    <div class="bounce1"></div>
+    <div class="bounce2"></div>
+    <div class="bounce3"></div>
+  </div>
+  `;
+
+  this.wrapper.innerHTML = markup;
+  this.container.appendChild(this.wrapper);
+
+
+};
+
+Loading.prototype = {
+
+};
+
+module.exports = Loading;
+
+/***/ }),
+
 /***/ "./engine/src/components/Tooltip/Tooltip.js":
 /*!**************************************************!*\
   !*** ./engine/src/components/Tooltip/Tooltip.js ***!
@@ -2828,7 +2878,7 @@ const Tooltip = {
   },
   initialized: false,
   init: function() {
-    Tooltip.wrapper = Dom.create('tooltip');
+    Tooltip.wrapper = Dom.create('el-grapho-tooltip');
     document.body.appendChild(this.wrapper);
     Tooltip.initialized = true;
   },
@@ -2941,7 +2991,7 @@ let Cluster = function(config) {
 
   for (key in groups) {
     let indices = groups[key];
-    let centerAngle = -2*Math.PI*groupIndex/numGroups;
+    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI/2;
 
     let clusterCenterX, clusterCenterY;
 
