@@ -20,6 +20,7 @@ const Cluster = require('./models/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
 const Ring = require('./models/Ring');
+const ForceDirectedGraph = require('./models/ForceDirectedGraph');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -484,7 +485,8 @@ ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
   Tree: Tree,
   Cluster: Cluster,
-  Ring: Ring
+  Ring: Ring,
+  ForceDirectedGraph: ForceDirectedGraph
 };
 
 module.exports = ElGrapho;

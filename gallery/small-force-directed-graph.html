@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Force Directed Graph</h1>
+    <div id="container"></div>
+
+    <script src="../engine/dist/ElGrapho.min.js"></script>
+    <script>
+let NUM_LEVELS = 7;
+let MAX_LEVEL_MULTIPLIER = 5;
+
+let modelConfig = {
+  nodes: {
+    colors: []
+  },
+  edges: [],
+  width: 1000,
+  height: 500
+};
+
+let edgeIndex = 0;
+let levels = [];
+let n = 0;
+let nodeColors = {};
+let colorIndex = 1;
+
+for (let j=0; j<NUM_LEVELS; j++) {
+  levels[j] = [];
+
+  if (j === 0) {
+    let color = 0;
+    modelConfig.nodes.colors[n] = color;
+    nodeColors[n] = color;
+    levels[j].push(n);
+    n++;
+  }
+  else {
+    let lastLevel = levels[j-1];
+    let lastLevelLen = lastLevel.length;
+    let numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
+
+    for (let k=0; k<numNodes; k++) {
+      let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
+      modelConfig.edges[edgeIndex++] = parentIndex;
+      modelConfig.edges[edgeIndex++] = n;
+
+      if (j === 0) {
+        color = 0;
+      }
+      else if (j === 1) {
+        color = colorIndex++;
+      }
+      else {
+        color = nodeColors[parentIndex];
+      }
+
+      modelConfig.nodes.colors[n] = color;
+      nodeColors[n] = color;
+      levels[j].push(n);
+      n++;
+    }
+  }
+}
+
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
+  debug: true
+});
+    </script>
+  </body>
+</html>
