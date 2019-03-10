@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Simple Ring</h1>
+    <div id="container"></div>
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+      const NUM_NODES = 30;
+      const NUM_NODES_FIRST_GROUP = 10;
+
+      let modelConfig = {
+        nodes: {
+          colors: []
+        },
+        edges: [],
+        width: 500,
+        height: 500
+      };
+
+      for (let n=0; n<NUM_NODES; n++) {
+        modelConfig.nodes.colors.push(n < NUM_NODES_FIRST_GROUP ? 0 : 1);
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES_FIRST_GROUP));
+        modelConfig.edges.push(Math.round(Math.random() * (NUM_NODES - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP));
+
+      }
+
+      let graph = new ElGrapho({
+        container: document.getElementById('container'),
+        model: ElGrapho.models.Ring(modelConfig)
+      });
+
+    </script>
+  </body>
+</html>

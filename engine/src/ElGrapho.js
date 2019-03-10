@@ -19,6 +19,7 @@ const Tree = require('./models/Tree');
 const Cluster = require('./models/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
+const Ring = require('./models/Ring');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -482,7 +483,8 @@ ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.models = {
   Tree: Tree,
-  Cluster: Cluster
+  Cluster: Cluster,
+  Ring: Ring
 };
 
 module.exports = ElGrapho;

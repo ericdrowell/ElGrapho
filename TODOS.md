@@ -9,9 +9,7 @@
 * node events should include x,y mouse position, or at least mouse event object
 * tooltips are slow in big network graph.
 * labels
-* investigate circle node performance
-  * if this works out, could try dynamic node sizing
-* node white outlines
+* lines get fat sometimes when viz stretched.
 
 ## P2
 * can I use ints in glsl where appropriate? Right now using all floats
