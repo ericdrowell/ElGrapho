@@ -1,8 +1,10 @@
 # Changlog
 
 ## v1.4.1
+* new Ring model
 * circle nodes
 * node strokes
+* better Count aesthetics
 
 ## v1.4.0
 * All models will now have the same schema.  This enables polymorphism.  Tree model schema has changed

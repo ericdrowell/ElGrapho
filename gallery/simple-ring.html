@@ -26,7 +26,7 @@
 
       for (let n=0; n<NUM_NODES; n++) {
         modelConfig.nodes.colors.push(n < NUM_NODES_FIRST_GROUP ? 0 : 1);
-        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES_FIRST_GROUP));
+        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES_FIRST_GROUP-1));
         modelConfig.edges.push(Math.round(Math.random() * (NUM_NODES - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP));
 
       }

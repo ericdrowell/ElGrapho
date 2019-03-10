@@ -17,7 +17,7 @@ const Ring = function(config) {
   model.edges = config.edges;
 
   for (let n=0; n<numNodes; n++) {
-    let angle = Math.PI*2*n / numNodes;
+    let angle = (-1*Math.PI*2*n / numNodes) + Math.PI/2;
     model.nodes.xs.push(Math.cos(angle));
     model.nodes.ys.push(Math.sin(angle));
   }
