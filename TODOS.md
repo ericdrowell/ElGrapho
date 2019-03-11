@@ -15,6 +15,7 @@
 * Radial tree
 * consider rework clusters to cluster by edges, not colors.  The result should be less cross connections between clusters
 * new chart controls - expand/shrink along x or y
+* panning outside viewport messes it up
 
 ## P2
 * can I use ints in glsl where appropriate? Right now using all floats

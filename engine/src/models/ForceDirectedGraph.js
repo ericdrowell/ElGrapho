@@ -35,15 +35,15 @@ const ForceDirectedGraph = function(config) {
 
   // process steps
   for (let n=1; n<config.steps; n++) {
-    let xChanges = [];
-    let yChanges = [];
+    // let xChanges = [];
+    // let yChanges = [];
 
     console.log('=== step ' + n + '===');
 
     // repulsive forces for all nodes
     for (let a=0; a<numNodes; a++) {
-      xChanges[a] = 0;
-      yChanges[a] = 0;
+      // xChanges[a] = 0;
+      // yChanges[a] = 0;
 
       for (let b=0; b<numNodes; b++) {
         let ax = nodes.xs[a];
@@ -62,8 +62,8 @@ const ForceDirectedGraph = function(config) {
           let xChange = -1 * K * xDiff / (dist * dist);
           let yChange = -1 * K * yDiff / (dist * dist);
 
-          xChanges[a] += xChange;
-          yChanges[a] += yChange;
+          nodes.xs[a] += xChange;
+          nodes.ys[a] += yChange;
         }
       }
     }
@@ -92,12 +92,12 @@ const ForceDirectedGraph = function(config) {
         //let changeMagnitude = Math.sqrt(xChange * xChange * yChange * yChange);
 
         // move a closer to b
-        xChanges[a] += xChange;
-        yChanges[a] += yChange;
+        nodes.xs[a] += xChange;
+        nodes.ys[a] += yChange;
 
         // move b closer to a
-        xChanges[b] -= xChange;
-        yChanges[b] -= yChange;
+        nodes.xs[b] -= xChange;
+        nodes.ys[b] -= yChange;
       }
 
 
@@ -107,11 +107,11 @@ const ForceDirectedGraph = function(config) {
     //debugger;
 
     // update node positions
-    for (let i=0; i<numNodes; i++) {
-      //console.log('updating node ' + i + ': (' + nodes.xs[i] + ',' + nodes.ys[i] + ') + (' + xChanges[i] + ',' + yChanges[i] + ')');
-      nodes.xs[i] += xChanges[i];
-      nodes.ys[i] += yChanges[i];
-    }
+    // for (let i=0; i<numNodes; i++) {
+    //   //console.log('updating node ' + i + ': (' + nodes.xs[i] + ',' + nodes.ys[i] + ') + (' + xChanges[i] + ',' + yChanges[i] + ')');
+    //   nodes.xs[i] += xChanges[i];
+    //   nodes.ys[i] += yChanges[i];
+    // }
   }
 
 
