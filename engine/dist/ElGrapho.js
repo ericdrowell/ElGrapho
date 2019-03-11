@@ -3061,17 +3061,38 @@ const ForceDirectedGraph = function(config) {
   model.nodes.ys.length = numNodes;
   model.nodes.ys.fill(0);
 
-  // TODO: need to sort colors first and shuffle edges
-  model.nodes.colors = config.nodes.colors;
-  model.edges = config.edges;
+  model.nodes.colors = config.nodes.colors.slice();
+  model.edges = config.edges.slice();
 
   let nodes = model.nodes;
   let edges = model.edges;
-  
+
+  // find color counts
+  let colors = [];
+  for (let a=0; a<numNodes; a++) {
+    let color = nodes.colors[a];
+
+    if (colors[color] === undefined) {
+      colors[color] = {
+        count: 0
+      };
+    }
+
+    colors[color].count++;
+  }
+
+  let total = 0;
+  for (let n=0; n<colors.length; n++) {
+    colors[n].next = total;
+    total+=colors[n].count;
+  }
+
   // initialize positions
   for (let a=0; a<numNodes; a++) {
-    let angle = -2 * Math.PI * a / numNodes;
-    const K = 0.1;
+    let color = nodes.colors[a];
+    let angle = -2 * Math.PI * colors[color].next++ / numNodes;
+
+    const K = 0.3;
     nodes.xs[a] = K * Math.cos(angle);
     nodes.ys[a] = K * Math.sin(angle);
   }
@@ -3081,7 +3102,7 @@ const ForceDirectedGraph = function(config) {
     // let xChanges = [];
     // let yChanges = [];
 
-    console.log('=== step ' + n + '===');
+    console.log('--- step ' + n + ' ---');
 
     // repulsive forces for all nodes
     for (let a=0; a<numNodes; a++) {
@@ -3096,11 +3117,18 @@ const ForceDirectedGraph = function(config) {
         let xDiff = bx - ax;
         let yDiff = by - ay;
         let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        let aColor = nodes.colors[a];
+        let bColor = nodes.colors[b];
 
         if (dist > 0) {
           // move a away from b
           // for repelling forces, the force is stronger than the distance between the nodes is small
           let K = 1 / (numNodes * numNodes);
+
+          // make repel stronger for nodes that are in different groups
+          if (aColor !== bColor) {
+            K*=3;
+          }
 
           let xChange = -1 * K * xDiff / (dist * dist);
           let yChange = -1 * K * yDiff / (dist * dist);
