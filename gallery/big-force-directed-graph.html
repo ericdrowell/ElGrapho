@@ -13,68 +13,51 @@
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-let NUM_LEVELS = 7;
-let MAX_LEVEL_MULTIPLIER = 5;
+
+const NUM_LEVELS = 6;
+const NUM_CHILDREN = 4;
 
 let modelConfig = {
   nodes: {
     colors: []
   },
   edges: [],
-  width: 1000,
+  width: 500,
   height: 500,
-  steps: 2
+  steps: 14
 };
 
-let edgeIndex = 0;
-let levels = [];
-let n = 0;
-let nodeColors = {};
-let colorIndex = 1;
+// https://en.wikipedia.org/wiki/K-ary_tree
+let numNodes = (Math.pow(NUM_CHILDREN, NUM_LEVELS)-1) / (NUM_CHILDREN-1);
 
-for (let j=0; j<NUM_LEVELS; j++) {
-  levels[j] = [];
+//console.log(numNodes);
 
-  if (j === 0) {
-    let color = 0;
-    modelConfig.nodes.colors[n] = color;
-    nodeColors[n] = color;
-    levels[j].push(n);
-    n++;
-  }
-  else {
-    let lastLevel = levels[j-1];
-    let lastLevelLen = lastLevel.length;
-    let numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
+// set all nodes to blue
+modelConfig.nodes.colors.length = numNodes;
+modelConfig.nodes.colors.fill(0);
 
-    for (let k=0; k<numNodes; k++) {
-      let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
-      modelConfig.edges[edgeIndex++] = parentIndex;
-      modelConfig.edges[edgeIndex++] = n;
+let n = 1;
 
-      if (j === 0) {
-        color = 0;
-      }
-      else if (j === 1) {
-        color = colorIndex++;
-      }
-      else {
-        color = nodeColors[parentIndex];
-      }
-
-      modelConfig.nodes.colors[n] = color;
-      nodeColors[n] = color;
-      levels[j].push(n);
-      n++;
+function addChildren(parent, level) {
+  if (level < NUM_LEVELS-1) {
+    for (let i=0; i<NUM_CHILDREN; i++) {
+      modelConfig.edges.push(parent);
+      modelConfig.edges.push(n);
+      addChildren(n++, level+1);
     }
   }
 }
+
+addChildren(0, 0);
+
+
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.models.ForceDirectedGraph(modelConfig),
   debug: true
 });
+
     </script>
   </body>
 </html>

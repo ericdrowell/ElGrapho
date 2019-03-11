@@ -25,7 +25,16 @@ const ForceDirectedGraph = function(config) {
   let nodes = model.nodes;
   let edges = model.edges;
   
-  for (let n=0; n<config.steps; n++) {
+  // initialize positions
+  for (let a=0; a<numNodes; a++) {
+    let angle = -2 * Math.PI * a / numNodes;
+    const K = 0.1;
+    nodes.xs[a] = K * Math.cos(angle);
+    nodes.ys[a] = K * Math.sin(angle);
+  }
+
+  // process steps
+  for (let n=1; n<config.steps; n++) {
     let xChanges = [];
     let yChanges = [];
 
@@ -45,24 +54,17 @@ const ForceDirectedGraph = function(config) {
         let yDiff = by - ay;
         let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
-        let xChange, yChange;
-
-        if (dist === 0) {
-          let K = 0.1;
-          let angle = -2 * Math.PI * a / numNodes;
-          xChange = K * Math.cos(angle);
-          yChange = K * Math.sin(angle);
-        }
-        else {
+        if (dist > 0) {
+          // move a away from b
           // for repelling forces, the force is stronger than the distance between the nodes is small
-          let K = 0.01;
-          xChange = -1 * K * xDiff / (dist * dist);
-          yChange = -1 * K * yDiff / (dist * dist);
-        }
+          let K = 1 / (numNodes * numNodes);
 
-        // move a away from b
-        xChanges[a] += xChange;
-        yChanges[a] += yChange;
+          let xChange = -1 * K * xDiff / (dist * dist);
+          let yChange = -1 * K * yDiff / (dist * dist);
+
+          xChanges[a] += xChange;
+          yChanges[a] += yChange;
+        }
       }
     }
 
@@ -86,6 +88,8 @@ const ForceDirectedGraph = function(config) {
         let K = 0.3;
         xChange = K * xDiff;
         yChange = K * yDiff;
+
+        //let changeMagnitude = Math.sqrt(xChange * xChange * yChange * yChange);
 
         // move a closer to b
         xChanges[a] += xChange;
