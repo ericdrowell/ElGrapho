@@ -1239,7 +1239,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-box-zoom-component .el-grapho-vertical-bar{width:1px;height:100%;top:0;left:50%;background-color:#119fe0;position:absolute}.el-grapho-box-zoom-component .el-grapho-horizontal-bar{width:100%;height:1px;top:50%;left:0;background-color:#119fe0;position:absolute}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -2670,11 +2670,11 @@ let BoxZoom = {
     let el = Dom.create('el-grapho-box-zoom-component');
     document.body.appendChild(el);
 
-    let verticalBar = Dom.create('el-grapho-vertical-bar');
-    el.appendChild(verticalBar);
+    // let verticalBar = Dom.create('el-grapho-vertical-bar');
+    // el.appendChild(verticalBar);
 
-    let horizontalBar = Dom.create('el-grapho-horizontal-bar');
-    el.appendChild(horizontalBar);
+    // let horizontalBar = Dom.create('el-grapho-horizontal-bar');
+    // el.appendChild(horizontalBar);
 
     BoxZoom.el = el;
 
@@ -3044,8 +3044,6 @@ module.exports = Cluster;
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
 
-  //let iterations = config.iterations || 1;
-
   let model = {
     nodes: {
       xs:     [],
@@ -3057,105 +3055,103 @@ const ForceDirectedGraph = function(config) {
     height: config.height
   };
 
-  // model.nodes.xs.length = numNodes;
-  // model.nodes.xs.fill(0);
+  model.nodes.xs.length = numNodes;
+  model.nodes.xs.fill(0);
 
-  // model.nodes.ys.length = numNodes;
-  // model.nodes.ys.fill(0);
-
-  for (let n=0; n<numNodes; n++) {
-    model.nodes.xs[n] = Math.random()*2-1;
-    model.nodes.ys[n] = Math.random()*2-1;
-  }
+  model.nodes.ys.length = numNodes;
+  model.nodes.ys.fill(0);
 
   // TODO: need to sort colors first and shuffle edges
   model.nodes.colors = config.nodes.colors;
   model.edges = config.edges;
 
-  const DIST_CHANGE = 0.05;
-
-  for (let i=0; i<10; i++) {
+  let nodes = model.nodes;
+  let edges = model.edges;
+  
+  for (let n=0; n<config.steps; n++) {
     let xChanges = [];
     let yChanges = [];
 
-    // O(n^2)
+    console.log('=== step ' + n + '===');
+
+    // repulsive forces for all nodes
     for (let a=0; a<numNodes; a++) {
       xChanges[a] = 0;
       yChanges[a] = 0;
 
       for (let b=0; b<numNodes; b++) {
-        let aX = model.nodes.xs[a];
-        let aY = model.nodes.ys[a];
-        let bX = model.nodes.xs[b];
-        let bY = model.nodes.ys[b];
-        let aColor = model.nodes.colors[a];
-        let bColor = model.nodes.colors[b];
-        // let aWeight = config.nodes.weights[a];
-        // let bWeight = config.nodes.weights[b];
-        let xDiff = bX - aX;
-        let yDiff = bY - aY;
-        //let len = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        let ax = nodes.xs[a];
+        let ay = nodes.ys[a];
+        let bx = nodes.xs[b];
+        let by = nodes.ys[b];
+        let xDiff = bx - ax;
+        let yDiff = by - ay;
+        let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
-        if (xDiff !== 0 && yDiff !== 0) {
-          // let normalX = xDiff / len;
-          // let normalY = yDiff / len;
+        let xChange, yChange;
 
-
-          let angle = Math.atan(yDiff/xDiff);
-
-
-
-          // nodes of same color attract.  nodes of different color repel.
-          let forceDirection = aColor === bColor ? -1 : 1;
-
-          // d = 1/2 at^2
-          // a = F = k q1 * q2 / r^2
-
-          // let forceX = K * forceDirection * aWeight * bWeight / (xMagnitude * xMagnitude);
-          // let forceY = K * forceDirection * aWeight * bWeight / (yMagnitude * yMagnitude);
-
-          let xChange = DIST_CHANGE * Math.cos(angle);
-          let yChange = DIST_CHANGE * Math.sin(angle);
-
-          // have different signs
-          if (xChange * xDiff < 0) {
-            xChange *= -1;
-          }
-          if (yChange * yDiff < 0) {
-            yChange *= -1;
-          }
-
-          xChange *= forceDirection;
-          yChange *= forceDirection;
-
-          
-
-          xChanges[a] += xChange;
-          yChanges[a] += yChange;
-
-
+        if (dist === 0) {
+          let K = 0.1;
+          let angle = -2 * Math.PI * a / numNodes;
+          xChange = K * Math.cos(angle);
+          yChange = K * Math.sin(angle);
         }
-        
-        
-      
+        else {
+          // for repelling forces, the force is stronger than the distance between the nodes is small
+          let K = 0.01;
+          xChange = -1 * K * xDiff / (dist * dist);
+          yChange = -1 * K * yDiff / (dist * dist);
+        }
+
+        // move a away from b
+        xChanges[a] += xChange;
+        yChanges[a] += yChange;
+      }
+    }
+
+    // attractive forces between nodes sharing an edge
+    for (let i=0; i<edges.length; i+=2) {
+      let a = edges[i];
+      let b = edges[i+1];
+
+      let ax = nodes.xs[a];
+      let ay = nodes.ys[a];
+      let bx = nodes.xs[b];
+      let by = nodes.ys[b];
+      let xDiff = bx - ax;
+      let yDiff = by - ay;
+      let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+      let xChange, yChange;
+
+      if (dist > 0) {
+        // for attractive forces, the force is stronger when the nodes are farther apart
+        let K = 0.3;
+        xChange = K * xDiff;
+        yChange = K * yDiff;
+
+        // move a closer to b
+        xChanges[a] += xChange;
+        yChanges[a] += yChange;
+
+        // move b closer to a
+        xChanges[b] -= xChange;
+        yChanges[b] -= yChange;
       }
 
-      
-      
+
+
     }
 
-    // console.log(xChanges);
-    // console.log(yChanges);
+    //debugger;
 
-    // now update
-    for (let n=0; n<numNodes; n++) {
-      model.nodes.xs[n] += xChanges[n];
-      model.nodes.ys[n] += yChanges[n];
+    // update node positions
+    for (let i=0; i<numNodes; i++) {
+      //console.log('updating node ' + i + ': (' + nodes.xs[i] + ',' + nodes.ys[i] + ') + (' + xChanges[i] + ',' + yChanges[i] + ')');
+      nodes.xs[i] += xChanges[i];
+      nodes.ys[i] += yChanges[i];
     }
   }
-
-
-
 
 
   console.log(model);

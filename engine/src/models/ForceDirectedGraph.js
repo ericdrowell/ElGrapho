@@ -1,8 +1,6 @@
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
 
-  //let iterations = config.iterations || 1;
-
   let model = {
     nodes: {
       xs:     [],
@@ -14,105 +12,103 @@ const ForceDirectedGraph = function(config) {
     height: config.height
   };
 
-  // model.nodes.xs.length = numNodes;
-  // model.nodes.xs.fill(0);
+  model.nodes.xs.length = numNodes;
+  model.nodes.xs.fill(0);
 
-  // model.nodes.ys.length = numNodes;
-  // model.nodes.ys.fill(0);
-
-  for (let n=0; n<numNodes; n++) {
-    model.nodes.xs[n] = Math.random()*2-1;
-    model.nodes.ys[n] = Math.random()*2-1;
-  }
+  model.nodes.ys.length = numNodes;
+  model.nodes.ys.fill(0);
 
   // TODO: need to sort colors first and shuffle edges
   model.nodes.colors = config.nodes.colors;
   model.edges = config.edges;
 
-  const DIST_CHANGE = 0.05;
-
-  for (let i=0; i<10; i++) {
+  let nodes = model.nodes;
+  let edges = model.edges;
+  
+  for (let n=0; n<config.steps; n++) {
     let xChanges = [];
     let yChanges = [];
 
-    // O(n^2)
+    console.log('=== step ' + n + '===');
+
+    // repulsive forces for all nodes
     for (let a=0; a<numNodes; a++) {
       xChanges[a] = 0;
       yChanges[a] = 0;
 
       for (let b=0; b<numNodes; b++) {
-        let aX = model.nodes.xs[a];
-        let aY = model.nodes.ys[a];
-        let bX = model.nodes.xs[b];
-        let bY = model.nodes.ys[b];
-        let aColor = model.nodes.colors[a];
-        let bColor = model.nodes.colors[b];
-        // let aWeight = config.nodes.weights[a];
-        // let bWeight = config.nodes.weights[b];
-        let xDiff = bX - aX;
-        let yDiff = bY - aY;
-        //let len = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        let ax = nodes.xs[a];
+        let ay = nodes.ys[a];
+        let bx = nodes.xs[b];
+        let by = nodes.ys[b];
+        let xDiff = bx - ax;
+        let yDiff = by - ay;
+        let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
-        if (xDiff !== 0 && yDiff !== 0) {
-          // let normalX = xDiff / len;
-          // let normalY = yDiff / len;
+        let xChange, yChange;
 
-
-          let angle = Math.atan(yDiff/xDiff);
-
-
-
-          // nodes of same color attract.  nodes of different color repel.
-          let forceDirection = aColor === bColor ? -1 : 1;
-
-          // d = 1/2 at^2
-          // a = F = k q1 * q2 / r^2
-
-          // let forceX = K * forceDirection * aWeight * bWeight / (xMagnitude * xMagnitude);
-          // let forceY = K * forceDirection * aWeight * bWeight / (yMagnitude * yMagnitude);
-
-          let xChange = DIST_CHANGE * Math.cos(angle);
-          let yChange = DIST_CHANGE * Math.sin(angle);
-
-          // have different signs
-          if (xChange * xDiff < 0) {
-            xChange *= -1;
-          }
-          if (yChange * yDiff < 0) {
-            yChange *= -1;
-          }
-
-          xChange *= forceDirection;
-          yChange *= forceDirection;
-
-          
-
-          xChanges[a] += xChange;
-          yChanges[a] += yChange;
-
-
+        if (dist === 0) {
+          let K = 0.1;
+          let angle = -2 * Math.PI * a / numNodes;
+          xChange = K * Math.cos(angle);
+          yChange = K * Math.sin(angle);
         }
-        
-        
-      
+        else {
+          // for repelling forces, the force is stronger than the distance between the nodes is small
+          let K = 0.01;
+          xChange = -1 * K * xDiff / (dist * dist);
+          yChange = -1 * K * yDiff / (dist * dist);
+        }
+
+        // move a away from b
+        xChanges[a] += xChange;
+        yChanges[a] += yChange;
+      }
+    }
+
+    // attractive forces between nodes sharing an edge
+    for (let i=0; i<edges.length; i+=2) {
+      let a = edges[i];
+      let b = edges[i+1];
+
+      let ax = nodes.xs[a];
+      let ay = nodes.ys[a];
+      let bx = nodes.xs[b];
+      let by = nodes.ys[b];
+      let xDiff = bx - ax;
+      let yDiff = by - ay;
+      let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+      let xChange, yChange;
+
+      if (dist > 0) {
+        // for attractive forces, the force is stronger when the nodes are farther apart
+        let K = 0.3;
+        xChange = K * xDiff;
+        yChange = K * yDiff;
+
+        // move a closer to b
+        xChanges[a] += xChange;
+        yChanges[a] += yChange;
+
+        // move b closer to a
+        xChanges[b] -= xChange;
+        yChanges[b] -= yChange;
       }
 
-      
-      
+
+
     }
 
-    // console.log(xChanges);
-    // console.log(yChanges);
+    //debugger;
 
-    // now update
-    for (let n=0; n<numNodes; n++) {
-      model.nodes.xs[n] += xChanges[n];
-      model.nodes.ys[n] += yChanges[n];
+    // update node positions
+    for (let i=0; i<numNodes; i++) {
+      //console.log('updating node ' + i + ': (' + nodes.xs[i] + ',' + nodes.ys[i] + ') + (' + xChanges[i] + ',' + yChanges[i] + ')');
+      nodes.xs[i] += xChanges[i];
+      nodes.ys[i] += yChanges[i];
     }
   }
-
-
-
 
 
   console.log(model);

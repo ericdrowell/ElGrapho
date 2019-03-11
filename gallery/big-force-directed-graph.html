@@ -8,7 +8,7 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Big Tree</h1>
+    <h1>El Grapho Big Force Directed Graph</h1>
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
@@ -22,7 +22,8 @@ let modelConfig = {
   },
   edges: [],
   width: 1000,
-  height: 500
+  height: 500,
+  steps: 2
 };
 
 let edgeIndex = 0;
@@ -71,7 +72,7 @@ for (let j=0; j<NUM_LEVELS; j++) {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Tree(modelConfig),
+  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
   debug: true
 });
     </script>

@@ -15,11 +15,11 @@ let BoxZoom = {
     let el = Dom.create('el-grapho-box-zoom-component');
     document.body.appendChild(el);
 
-    let verticalBar = Dom.create('el-grapho-vertical-bar');
-    el.appendChild(verticalBar);
+    // let verticalBar = Dom.create('el-grapho-vertical-bar');
+    // el.appendChild(verticalBar);
 
-    let horizontalBar = Dom.create('el-grapho-horizontal-bar');
-    el.appendChild(horizontalBar);
+    // let horizontalBar = Dom.create('el-grapho-horizontal-bar');
+    // el.appendChild(horizontalBar);
 
     BoxZoom.el = el;
 
