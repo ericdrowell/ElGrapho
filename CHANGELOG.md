@@ -1,6 +1,7 @@
 # Changlog
 
-## v1.4.1
+## v1.5.0
+* new ForceDirectedGraph model
 * new Ring model
 * circle nodes
 * node strokes
