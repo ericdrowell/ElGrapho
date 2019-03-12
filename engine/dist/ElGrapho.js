@@ -1,5 +1,14 @@
-var ElGrapho =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ElGrapho"] = factory();
+	else
+		root["ElGrapho"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -28213,4 +28222,5 @@ module.exports = function(module) {
 /***/ })
 
 /******/ });
+});
 //# sourceMappingURL=ElGrapho.js.map

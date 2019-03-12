@@ -3,7 +3,9 @@ module.exports = {
   output: {
     path: __dirname + '/engine/dist',
     filename: 'ElGrapho.js',
-    library: 'ElGrapho'
+    library: 'ElGrapho',
+    libraryTarget: 'umd',
+    globalObject: 'this'
   },
   devtool: 'source-map',
   mode: 'development' // development or production
