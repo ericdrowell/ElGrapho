@@ -1,5 +1,8 @@
 # Changlog
 
+## v1.5.1
+* fix npm export
+
 ## v1.5.0
 * new ForceDirectedGraph model
 * new Ring model
