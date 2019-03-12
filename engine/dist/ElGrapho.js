@@ -1384,7 +1384,7 @@ const ForceDirectedGraph = __webpack_require__(/*! ./models/ForceDirectedGraph *
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
 
-let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
+let ElGrapho = function(config) {
   this.container = config.container || document.createElement('div');
   this.id = UUID.generate();
   this.dirty = true;
@@ -1467,7 +1467,7 @@ let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
   this.listen();
 
   ElGraphoCollection.graphs.push(this);
-});
+};
 
 ElGrapho.prototype = {
   initComponents: function() {
