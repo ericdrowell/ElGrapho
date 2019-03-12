@@ -1,5 +1,8 @@
 # Changlog
 
+## v1.5.2
+* fix npm export again
+
 ## v1.5.1
 * fix npm export
 

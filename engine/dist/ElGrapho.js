@@ -1357,7 +1357,7 @@ module.exports = EasingFunctions;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_RESULT__;const UUID = __webpack_require__(/*! ./UUID */ "./engine/src/UUID.js");
+const UUID = __webpack_require__(/*! ./UUID */ "./engine/src/UUID.js");
 const WebGL = __webpack_require__(/*! ./WebGL */ "./engine/src/WebGL.js");
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 const ElGraphoCollection = __webpack_require__(/*! ./ElGraphoCollection */ "./engine/src/ElGraphoCollection.js");
@@ -1848,22 +1848,11 @@ ElGrapho.models = {
   ForceDirectedGraph: ForceDirectedGraph
 };
 
-// if including ElGrapho from an html page
+exports = module.exports = ElGrapho;
+
 if (window) {
   window.ElGrapho = ElGrapho;
 }
-
-// export
-(function (global) {
-  'use strict';
-
-  // AMD support
-  if (true) {
-    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () { return ElGrapho; }).call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  // CommonJS and Node.js module support.
-  } else {}
-})(this);
 
 /***/ }),
 
