@@ -1,3 +1,4 @@
+var ElGrapho =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1848,11 +1849,8 @@ ElGrapho.models = {
   ForceDirectedGraph: ForceDirectedGraph
 };
 
-exports = module.exports = ElGrapho;
-
-if (window) {
-  window.ElGrapho = ElGrapho;
-}
+// node.js export
+module.exports = ElGrapho;
 
 /***/ }),
 

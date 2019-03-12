@@ -489,10 +489,5 @@ ElGrapho.models = {
   ForceDirectedGraph: ForceDirectedGraph
 };
 
-// export to window if build file is included directly in html page
-if (window) {
-  window.ElGrapho = ElGrapho;
-}
-
 // node.js export
-exports = module.exports = ElGrapho;
+module.exports = ElGrapho;

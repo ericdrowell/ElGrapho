@@ -1,6 +1,6 @@
 {
   "name": "elgrapho",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "main": "engine/dist/ElGrapho.min.js",
   "author": "Eric Rowell",
   "license": "SEE LICENSE IN <LICENSE.md>",
