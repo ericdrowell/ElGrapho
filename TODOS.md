@@ -1,7 +1,9 @@
 # TODOS
 
 ## P0
-* force directed graph model
+* arrows
+* refactor edges api
+* labels
 
 ## P1
 * setup test app that pulls in elgrapho and bundles it

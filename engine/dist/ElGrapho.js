@@ -1390,6 +1390,7 @@ const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 const Loading = __webpack_require__(/*! ./components/Loading/Loading */ "./engine/src/components/Loading/Loading.js");
 const Ring = __webpack_require__(/*! ./models/Ring */ "./engine/src/models/Ring.js");
 const ForceDirectedGraph = __webpack_require__(/*! ./models/ForceDirectedGraph */ "./engine/src/models/ForceDirectedGraph.js");
+const Labels = __webpack_require__(/*! ./Labels */ "./engine/src/Labels.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -1434,7 +1435,12 @@ let ElGrapho = function(config) {
     contextType: 'webgl'
   });
 
+  let labelsLayer = this.labelsLayer = new Concrete.Layer({
+    contextType: '2d'
+  });
+
   viewport.add(mainLayer);
+  viewport.add(labelsLayer);
 
 
   let webgl = this.webgl = new WebGL({
@@ -1453,6 +1459,7 @@ let ElGrapho = function(config) {
   // mainLayer.hit.canvas.style.marginLeft = '10px';
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
+  //this.model = config.model;
 
   let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
 
@@ -1474,6 +1481,9 @@ let ElGrapho = function(config) {
 
   this.initComponents();
 
+  this.labelStrs = config.labels || [];
+  this.labels = new Labels();
+
   this.listen();
 
   ElGraphoCollection.graphs.push(this);
@@ -1489,6 +1499,45 @@ ElGrapho.prototype = {
     this.loading = new Loading({
       container: this.wrapper
     });
+  },
+  renderLabels: function() {
+    let that = this;
+
+    // build labels view model
+    this.labels.clear();
+    let positions = this.vertices.points.positions;
+    this.labelStrs.forEach(function(str, n) {
+      let index = n * 2;
+      that.labels.addLabel(str, positions[index], positions[index+1]);
+    });
+    
+    // render
+    let labelsScene = this.labelsLayer.scene;
+    let labelsContext = labelsScene.context;
+
+    labelsScene.clear();
+
+    labelsContext.save();
+    
+    labelsContext.translate(this.width/2, this.height/2);
+    //labelsContext.scale(this.zoomX, this.zoomY);
+    labelsContext.textAlign = 'center'; 
+    
+
+    
+    labelsContext.fillStyle = 'black';
+    labelsContext.strokeStyle = 'white';
+    labelsContext.lineWidth = 4;
+
+    this.labels.labelsAdded.forEach(function(label) {
+      let x = label.x * that.zoomX + that.panX;
+      let y = label.y * -1 * that.zoomY - that.panY - 10;
+      labelsContext.strokeText(label.str, x, y);
+      labelsContext.fillText(label.str, x, y);
+    });
+
+
+    labelsContext.restore();
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
@@ -1940,6 +1989,7 @@ let ElGraphoCollection = {
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+        graph.renderLabels();
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
@@ -2026,6 +2076,37 @@ Events.prototype = {
 };
 
 module.exports = Events;
+
+/***/ }),
+
+/***/ "./engine/src/Labels.js":
+/*!******************************!*\
+  !*** ./engine/src/Labels.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+let Labels = function() {
+  this.labelsAdded = [];
+};
+
+Labels.prototype = {
+  clear: function() {
+    this.labelsAdded = [];
+  },
+  addLabel: function(str, x, y) {
+    // TODO: add logic to filter out overlapped labels
+    this.labelsAdded.push({ 
+      str: str,
+      x: x,
+      y: y,
+      width: 100,
+      height: 10
+    });
+  }
+};
+
+module.exports = Labels;
 
 /***/ }),
 
@@ -3109,7 +3190,7 @@ const ForceDirectedGraph = function(config) {
     // let xChanges = [];
     // let yChanges = [];
 
-    console.log('--- step ' + n + ' ---');
+    //console.log('--- step ' + n + ' ---');
 
     // repulsive forces for all nodes
     for (let a=0; a<numNodes; a++) {
@@ -3193,7 +3274,7 @@ const ForceDirectedGraph = function(config) {
   }
 
 
-  console.log(model);
+  //console.log(model);
 
   return model;
 };

@@ -68,6 +68,7 @@ let ElGraphoCollection = {
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+        graph.renderLabels();
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }

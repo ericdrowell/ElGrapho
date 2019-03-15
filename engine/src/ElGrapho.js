@@ -21,6 +21,7 @@ const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
 const Ring = require('./models/Ring');
 const ForceDirectedGraph = require('./models/ForceDirectedGraph');
+const Labels = require('./Labels');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -65,7 +66,12 @@ let ElGrapho = function(config) {
     contextType: 'webgl'
   });
 
+  let labelsLayer = this.labelsLayer = new Concrete.Layer({
+    contextType: '2d'
+  });
+
   viewport.add(mainLayer);
+  viewport.add(labelsLayer);
 
 
   let webgl = this.webgl = new WebGL({
@@ -84,6 +90,7 @@ let ElGrapho = function(config) {
   // mainLayer.hit.canvas.style.marginLeft = '10px';
   // this.wrapper.appendChild(mainLayer.hit.canvas);
 
+  //this.model = config.model;
 
   let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
 
@@ -105,6 +112,9 @@ let ElGrapho = function(config) {
 
   this.initComponents();
 
+  this.labelStrs = config.labels || [];
+  this.labels = new Labels();
+
   this.listen();
 
   ElGraphoCollection.graphs.push(this);
@@ -120,6 +130,45 @@ ElGrapho.prototype = {
     this.loading = new Loading({
       container: this.wrapper
     });
+  },
+  renderLabels: function() {
+    let that = this;
+
+    // build labels view model
+    this.labels.clear();
+    let positions = this.vertices.points.positions;
+    this.labelStrs.forEach(function(str, n) {
+      let index = n * 2;
+      that.labels.addLabel(str, positions[index], positions[index+1]);
+    });
+    
+    // render
+    let labelsScene = this.labelsLayer.scene;
+    let labelsContext = labelsScene.context;
+
+    labelsScene.clear();
+
+    labelsContext.save();
+    
+    labelsContext.translate(this.width/2, this.height/2);
+    //labelsContext.scale(this.zoomX, this.zoomY);
+    labelsContext.textAlign = 'center'; 
+    
+
+    
+    labelsContext.fillStyle = 'black';
+    labelsContext.strokeStyle = 'white';
+    labelsContext.lineWidth = 4;
+
+    this.labels.labelsAdded.forEach(function(label) {
+      let x = label.x * that.zoomX + that.panX;
+      let y = label.y * -1 * that.zoomY - that.panY - 10;
+      labelsContext.strokeText(label.str, x, y);
+      labelsContext.fillText(label.str, x, y);
+    });
+
+
+    labelsContext.restore();
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();

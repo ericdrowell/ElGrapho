@@ -59,7 +59,7 @@ const ForceDirectedGraph = function(config) {
     // let xChanges = [];
     // let yChanges = [];
 
-    console.log('--- step ' + n + ' ---');
+    //console.log('--- step ' + n + ' ---');
 
     // repulsive forces for all nodes
     for (let a=0; a<numNodes; a++) {
@@ -143,7 +143,7 @@ const ForceDirectedGraph = function(config) {
   }
 
 
-  console.log(model);
+  //console.log(model);
 
   return model;
 };
