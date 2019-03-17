@@ -1,5 +1,8 @@
 # Changlog
 
+## v1.6.0
+* labels for nodes
+
 ## v1.5.4
 * fix npm export
 

@@ -146,8 +146,6 @@ ElGrapho.prototype = {
     let labelsScene = this.labelsLayer.scene;
     let labelsContext = labelsScene.context;
 
-    labelsScene.clear();
-
     labelsContext.save();
     
     labelsContext.translate(this.width/2, this.height/2);
