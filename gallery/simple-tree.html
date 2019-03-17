@@ -38,7 +38,9 @@
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Tree(modelConfig)
+        model: ElGrapho.models.Tree(modelConfig),
+        arrows: false,
+        debug: true
       });
 
       graph.on('idle', function() {

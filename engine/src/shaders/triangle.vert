@@ -8,21 +8,37 @@ uniform bool magicZoom;
 uniform float nodeSize;
 
 float MAX_NODE_SIZE = 16.0;
+const float PI = 3.1415926535897932384626433832795;
 
 varying vec4 vVertexColor;
+
+vec2 rotate(vec2 v, float a) {
+	float s = sin(a);
+	float c = cos(a);
+	mat2 m = mat2(c, -s, s, c);
+	return m * v;
+}
+
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
-  //gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  float zoomX = length(uModelViewMatrix[0]);
+  float zoomY = length(uModelViewMatrix[1]);
+  // vec2 standardZoomVector = normalize(vec2(1.0, 0.0));
+  // vec2 zoomVector = normalize(vec2(zoomX, zoomY));
+  // float zoomAngle = dot(standardZoomVector, zoomVector);
+  // vec2 vec2Normal = vec2(normal.xy);
+  // vec2 rotatedNormal = rotate(vec2Normal, zoomAngle);
+  // vec4 newNormal = vec4(rotatedNormal.x, rotatedNormal.y, 0.0, 0.0);
 
-  vec4 newNormal = vec4(normal.xyz, 0.0);
+  vec4 newNormal = vec4(normal.x, normal.y, 0.0, 0.0);
 
   if (magicZoom) {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * length(uModelViewMatrix[0]) * nodeSize / MAX_NODE_SIZE;
-    newNormal.y = newNormal.y * length(uModelViewMatrix[1]) * nodeSize / MAX_NODE_SIZE;
+    newNormal.x = newNormal.x * zoomX * nodeSize / MAX_NODE_SIZE;
+    newNormal.y = newNormal.y * zoomY * nodeSize / MAX_NODE_SIZE;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   

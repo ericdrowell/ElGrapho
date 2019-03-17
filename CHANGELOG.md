@@ -2,6 +2,7 @@
 
 ## v1.6.0
 * labels for nodes
+* edge arrows for directed graphs
 
 ## v1.5.4
 * fix npm export

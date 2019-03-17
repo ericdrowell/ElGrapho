@@ -1,5 +1,6 @@
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
+  let steps = config.steps || 10;
 
   let model = {
     nodes: {
@@ -55,7 +56,7 @@ const ForceDirectedGraph = function(config) {
   }
 
   // process steps
-  for (let n=1; n<config.steps; n++) {
+  for (let n=1; n<steps; n++) {
     // let xChanges = [];
     // let yChanges = [];
 
@@ -74,18 +75,18 @@ const ForceDirectedGraph = function(config) {
         let xDiff = bx - ax;
         let yDiff = by - ay;
         let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-        let aColor = nodes.colors[a];
-        let bColor = nodes.colors[b];
+        //let aColor = nodes.colors[a];
+        //let bColor = nodes.colors[b];
 
         if (dist > 0) {
           // move a away from b
           // for repelling forces, the force is stronger than the distance between the nodes is small
-          let K = 1 / (numNodes * numNodes);
+          let K = 10 / (numNodes * numNodes);
 
           // make repel stronger for nodes that are in different groups
-          if (aColor !== bColor) {
-            K*=3;
-          }
+          // if (aColor !== bColor) {
+          //   K*=1.2;
+          // }
 
           let xChange = -1 * K * xDiff / (dist * dist);
           let yChange = -1 * K * yDiff / (dist * dist);
@@ -113,7 +114,7 @@ const ForceDirectedGraph = function(config) {
 
       if (dist > 0) {
         // for attractive forces, the force is stronger when the nodes are farther apart
-        let K = 0.3;
+        let K = 0.1;
         xChange = K * xDiff;
         yChange = K * yDiff;
 

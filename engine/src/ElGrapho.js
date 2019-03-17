@@ -50,6 +50,9 @@ let ElGrapho = function(config) {
   this.panStart = null;
   this.idle = true;
   this.debug = config.debug === undefined ? false : config.debug;
+  
+  let showArrows = config.arrows === undefined ? true : config.arrows;
+
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
     el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
@@ -92,7 +95,7 @@ let ElGrapho = function(config) {
 
   //this.model = config.model;
 
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, showArrows);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers

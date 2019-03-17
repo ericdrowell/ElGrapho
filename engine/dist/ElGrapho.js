@@ -1195,21 +1195,37 @@ uniform bool magicZoom;
 uniform float nodeSize;
 
 float MAX_NODE_SIZE = 16.0;
+const float PI = 3.1415926535897932384626433832795;
 
 varying vec4 vVertexColor;
+
+vec2 rotate(vec2 v, float a) {
+	float s = sin(a);
+	float c = cos(a);
+	mat2 m = mat2(c, -s, s, c);
+	return m * v;
+}
+
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
-  //gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  float zoomX = length(uModelViewMatrix[0]);
+  float zoomY = length(uModelViewMatrix[1]);
+  // vec2 standardZoomVector = normalize(vec2(1.0, 0.0));
+  // vec2 zoomVector = normalize(vec2(zoomX, zoomY));
+  // float zoomAngle = dot(standardZoomVector, zoomVector);
+  // vec2 vec2Normal = vec2(normal.xy);
+  // vec2 rotatedNormal = rotate(vec2Normal, zoomAngle);
+  // vec4 newNormal = vec4(rotatedNormal.x, rotatedNormal.y, 0.0, 0.0);
 
-  vec4 newNormal = vec4(normal.xyz, 0.0);
+  vec4 newNormal = vec4(normal.x, normal.y, 0.0, 0.0);
 
   if (magicZoom) {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * length(uModelViewMatrix[0]) * nodeSize / MAX_NODE_SIZE;
-    newNormal.y = newNormal.y * length(uModelViewMatrix[1]) * nodeSize / MAX_NODE_SIZE;
+    newNormal.x = newNormal.x * zoomX * nodeSize / MAX_NODE_SIZE;
+    newNormal.y = newNormal.y * zoomY * nodeSize / MAX_NODE_SIZE;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   
@@ -1419,6 +1435,9 @@ let ElGrapho = function(config) {
   this.panStart = null;
   this.idle = true;
   this.debug = config.debug === undefined ? false : config.debug;
+  
+  let showArrows = config.arrows === undefined ? true : config.arrows;
+
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
     el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
@@ -1461,7 +1480,7 @@ let ElGrapho = function(config) {
 
   //this.model = config.model;
 
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, showArrows);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
@@ -2220,7 +2239,7 @@ const MAX_NODE_SIZE = 16;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
 
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.xs.length*2);
@@ -2245,7 +2264,7 @@ const VertexBridge = {
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
     let numEdges = edges.length / 2;
-    let numArrows = numEdges;
+    let numArrows = showArrows ? numEdges : 0;
 
     let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
     let triangleNormals = new Float32Array(numEdges * 12 + numArrows * 6);
@@ -2316,26 +2335,26 @@ const VertexBridge = {
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
 
+      if (showArrows) {
+        // triangle for arrow
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      // triangle for arrow
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = 0;
-      triangleNormals[triangleNormalsIndex++] = 0;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      }
 
     }
 
@@ -2888,9 +2907,9 @@ const Count = function(config) {
   let container = config.container;
   let vertices = config.vertices;
   let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
-  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/12 : 0;
+  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/6 : 0;
 
-  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' nodes + ' + NumberFormatter.addCommas(triangleCount) + ' edges';
+  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' points + ' + NumberFormatter.addCommas(triangleCount) + ' triangles';
   wrapper.className = 'el-grapho-count';
 
   container.appendChild(wrapper);
@@ -3116,6 +3135,7 @@ module.exports = Cluster;
 
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
+  let steps = config.steps || 10;
 
   let model = {
     nodes: {
@@ -3171,7 +3191,7 @@ const ForceDirectedGraph = function(config) {
   }
 
   // process steps
-  for (let n=1; n<config.steps; n++) {
+  for (let n=1; n<steps; n++) {
     // let xChanges = [];
     // let yChanges = [];
 
@@ -3190,18 +3210,18 @@ const ForceDirectedGraph = function(config) {
         let xDiff = bx - ax;
         let yDiff = by - ay;
         let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-        let aColor = nodes.colors[a];
-        let bColor = nodes.colors[b];
+        //let aColor = nodes.colors[a];
+        //let bColor = nodes.colors[b];
 
         if (dist > 0) {
           // move a away from b
           // for repelling forces, the force is stronger than the distance between the nodes is small
-          let K = 1 / (numNodes * numNodes);
+          let K = 10 / (numNodes * numNodes);
 
           // make repel stronger for nodes that are in different groups
-          if (aColor !== bColor) {
-            K*=3;
-          }
+          // if (aColor !== bColor) {
+          //   K*=1.2;
+          // }
 
           let xChange = -1 * K * xDiff / (dist * dist);
           let yChange = -1 * K * yDiff / (dist * dist);
@@ -3229,7 +3249,7 @@ const ForceDirectedGraph = function(config) {
 
       if (dist > 0) {
         // for attractive forces, the force is stronger when the nodes are farther apart
-        let K = 0.3;
+        let K = 0.1;
         xChange = K * xDiff;
         yChange = K * yDiff;
 

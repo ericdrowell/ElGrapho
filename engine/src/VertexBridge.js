@@ -5,7 +5,7 @@ const MAX_NODE_SIZE = 16;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
 
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.xs.length*2);
@@ -30,7 +30,7 @@ const VertexBridge = {
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
     let numEdges = edges.length / 2;
-    let numArrows = numEdges;
+    let numArrows = showArrows ? numEdges : 0;
 
     let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
     let triangleNormals = new Float32Array(numEdges * 12 + numArrows * 6);
@@ -101,26 +101,26 @@ const VertexBridge = {
       triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
 
+      if (showArrows) {
+        // triangle for arrow
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      // triangle for arrow
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = 0;
-      triangleNormals[triangleNormalsIndex++] = 0;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
 
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-      triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
+        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      }
 
     }
 
