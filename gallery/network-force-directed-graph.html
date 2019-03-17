@@ -19,7 +19,10 @@ let modelConfig = {
   nodes: {
     colors: []
   },
-  edges: [],
+  edges: {
+    from: [],
+    to: []
+  },
   width: 1000,
   height: 500,
   steps: 3
@@ -28,8 +31,8 @@ let modelConfig = {
 
 for (let n=0; n<NUM_NODES; n++) {
   modelConfig.nodes.colors.push(Math.round(Math.random() * 7));
-  modelConfig.edges.push(n);
-  modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
+  modelConfig.edges.from.push(n);
+  modelConfig.edges.to.push(Math.round(Math.random() * NUM_NODES));
 }
 
 

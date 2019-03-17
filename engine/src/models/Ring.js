@@ -3,18 +3,17 @@ const Ring = function(config) {
 
   let model = {
     nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
+      xs: [],
+      ys: [],
+      colors: config.nodes.colors.slice()
     },
-    edges: [], 
+    edges: {
+      from: config.edges.from.slice(),
+      to: config.edges.to.slice()
+    },
     width: config.width,
     height: config.height
   };
-
-  // TODO: need to sort colors first and shuffle edges
-  model.nodes.colors = config.nodes.colors;
-  model.edges = config.edges;
 
   for (let n=0; n<numNodes; n++) {
     let angle = (-1*Math.PI*2*n / numNodes) + Math.PI/2;

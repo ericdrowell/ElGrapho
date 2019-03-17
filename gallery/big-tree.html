@@ -20,7 +20,10 @@ let modelConfig = {
   nodes: {
     colors: []
   },
-  edges: [],
+  edges: {
+    from: [],
+    to: []
+  },
   width: 1000,
   height: 500
 };
@@ -48,8 +51,9 @@ for (let j=0; j<NUM_LEVELS; j++) {
 
     for (let k=0; k<numNodes; k++) {
       let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
-      modelConfig.edges[edgeIndex++] = parentIndex;
-      modelConfig.edges[edgeIndex++] = n;
+      modelConfig.edges.from[edgeIndex] = parentIndex;
+      modelConfig.edges.to[edgeIndex] = n;
+      edgeIndex++;
 
       if (j === 0) {
         color = 0;

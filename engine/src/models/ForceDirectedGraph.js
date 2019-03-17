@@ -4,11 +4,14 @@ const ForceDirectedGraph = function(config) {
 
   let model = {
     nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
+      xs: [],
+      ys: [],
+      colors: config.nodes.colors.slice()
     },
-    edges: [], 
+    edges: {
+      from: config.edges.from.slice(),
+      to: config.edges.to.slice()
+    },
     width: config.width,
     height: config.height
   };
@@ -19,11 +22,9 @@ const ForceDirectedGraph = function(config) {
   model.nodes.ys.length = numNodes;
   model.nodes.ys.fill(0);
 
-  model.nodes.colors = config.nodes.colors.slice();
-  model.edges = config.edges.slice();
-
   let nodes = model.nodes;
   let edges = model.edges;
+  let numEdges = edges.from.length;
 
   // find color counts
   let colors = [];
@@ -98,9 +99,9 @@ const ForceDirectedGraph = function(config) {
     }
 
     // attractive forces between nodes sharing an edge
-    for (let i=0; i<edges.length; i+=2) {
-      let a = edges[i];
-      let b = edges[i+1];
+    for (let i=0; i<numEdges; i++) {
+      let a = edges.from[i];
+      let b = edges.to[i];
 
       let ax = nodes.xs[a];
       let ay = nodes.ys[a];

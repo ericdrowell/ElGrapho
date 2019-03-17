@@ -1,6 +1,7 @@
 # Changlog
 
 ## v1.6.0
+* new edges API (see docs)
 * labels for nodes
 * edge arrows for directed graphs
 

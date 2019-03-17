@@ -21,7 +21,10 @@ let modelConfig = {
   nodes: {
     colors: []
   },
-  edges: [],
+  edges: {
+    from: [],
+    to:   []
+  },
   width: 500,
   height: 500,
   steps: 10
@@ -41,8 +44,8 @@ let n = 1;
 function addChildren(parent, level) {
   if (level < NUM_LEVELS-1) {
     for (let i=0; i<NUM_CHILDREN; i++) {
-      modelConfig.edges.push(parent);
-      modelConfig.edges.push(n);
+      modelConfig.edges.from.push(parent);
+      modelConfig.edges.to.push(n);
       addChildren(n++, level+1);
     }
   }

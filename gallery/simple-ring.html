@@ -19,15 +19,18 @@
         nodes: {
           colors: []
         },
-        edges: [],
+        edges: {
+          from: [],
+          to:   []
+        },
         width: 500,
         height: 500
       };
 
       for (let n=0; n<NUM_NODES; n++) {
         modelConfig.nodes.colors.push(n < NUM_NODES_FIRST_GROUP ? 0 : 1);
-        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES_FIRST_GROUP-1));
-        modelConfig.edges.push(Math.round(Math.random() * (NUM_NODES - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP));
+        modelConfig.edges.from[n] = (Math.round(Math.random() * NUM_NODES_FIRST_GROUP-1));
+        modelConfig.edges.to[n] = (Math.round(Math.random() * (NUM_NODES - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP));
 
       }
 

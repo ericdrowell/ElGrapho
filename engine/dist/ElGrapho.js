@@ -2263,7 +2263,7 @@ const VertexBridge = {
     let colors = new Float32Array(nodes.colors);
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
-    let numEdges = edges.length / 2;
+    let numEdges = edges.from.length;
     let numArrows = showArrows ? numEdges : 0;
 
     let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
@@ -2274,9 +2274,9 @@ const VertexBridge = {
     let triangleNormalsIndex = 0;
     let triangleColorsIndex = 0;
 
-    for (let n=0; n<edges.length; n+=2) {
-      let pointIndex0 = edges[n];
-      let pointIndex1 = edges[n+1];
+    for (let n=0; n<numEdges; n++) {
+      let pointIndex0 = edges.from[n];
+      let pointIndex1 = edges.to[n];
       let normalDistance = MAX_NODE_SIZE*0.1;
 
       let x0 = nodes.xs[pointIndex0];
@@ -3053,9 +3053,12 @@ let Cluster = function(config) {
       ys: [],
       colors: config.nodes.colors.slice()
     },
-    edges: config.edges.slice(),
-    width: width,
-    height: height
+    edges: {
+      from: config.edges.from.slice(),
+      to: config.edges.to.slice()
+    },
+    width: config.width,
+    height: config.height
   };
 
   // keys are color integers, values are arrays.  The arrays contain node indices
@@ -3139,11 +3142,14 @@ const ForceDirectedGraph = function(config) {
 
   let model = {
     nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
+      xs: [],
+      ys: [],
+      colors: config.nodes.colors.slice()
     },
-    edges: [], 
+    edges: {
+      from: config.edges.from.slice(),
+      to: config.edges.to.slice()
+    },
     width: config.width,
     height: config.height
   };
@@ -3154,11 +3160,9 @@ const ForceDirectedGraph = function(config) {
   model.nodes.ys.length = numNodes;
   model.nodes.ys.fill(0);
 
-  model.nodes.colors = config.nodes.colors.slice();
-  model.edges = config.edges.slice();
-
   let nodes = model.nodes;
   let edges = model.edges;
+  let numEdges = edges.from.length;
 
   // find color counts
   let colors = [];
@@ -3233,9 +3237,9 @@ const ForceDirectedGraph = function(config) {
     }
 
     // attractive forces between nodes sharing an edge
-    for (let i=0; i<edges.length; i+=2) {
-      let a = edges[i];
-      let b = edges[i+1];
+    for (let i=0; i<numEdges; i++) {
+      let a = edges.from[i];
+      let b = edges.to[i];
 
       let ax = nodes.xs[a];
       let ay = nodes.ys[a];
@@ -3300,18 +3304,17 @@ const Ring = function(config) {
 
   let model = {
     nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
+      xs: [],
+      ys: [],
+      colors: config.nodes.colors.slice()
     },
-    edges: [], 
+    edges: {
+      from: config.edges.from.slice(),
+      to: config.edges.to.slice()
+    },
     width: config.width,
     height: config.height
   };
-
-  // TODO: need to sort colors first and shuffle edges
-  model.nodes.colors = config.nodes.colors;
-  model.edges = config.edges;
 
   for (let n=0; n<numNodes; n++) {
     let angle = (-1*Math.PI*2*n / numNodes) + Math.PI/2;
@@ -3381,7 +3384,6 @@ let getNestedTree = function(config) {
   let edges = config.edges;
   let colors = config.nodes.colors;
   let nodes = {};
-  let edgeIndex = 0;
 
   // build nodes
   for (let n=0; n<colors.length; n++) {
@@ -3393,9 +3395,9 @@ let getNestedTree = function(config) {
     };
   }
 
-  while(edgeIndex < edges.length) {
-    let fromIndex = edges[edgeIndex++];
-    let toIndex = edges[edgeIndex++];
+  for (let n=0; n<edges.from.length; n++) {
+    let fromIndex = edges.from[n];
+    let toIndex = edges.to[n];
 
     // parent child relationship
     nodes[fromIndex].children.push(nodes[toIndex]);
@@ -3446,12 +3448,13 @@ const Tree = function(config) {
       ys:     [],
       colors: []
     },
-    edges: [], // num edges = num nodes - 1
+    edges: {
+      from: [],
+      to: []
+    },
     width: config.width,
     height: config.height
   };
-
-  let edgeIndex = 0;
 
   // O(n)
   nodes.forEach(function(node, n) {
@@ -3460,8 +3463,8 @@ const Tree = function(config) {
     model.nodes.colors[n] = node.color;
 
     if (node.parent) {
-      model.edges[edgeIndex++] = node.parent.index;
-      model.edges[edgeIndex++] = node.index;
+      model.edges.from[n] = node.parent.index;
+      model.edges.to[n] = node.index;
     }
   });
 

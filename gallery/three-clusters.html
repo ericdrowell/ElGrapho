@@ -20,7 +20,10 @@
         nodes: {
           colors: []
         },
-        edges: [],
+        edges: {
+          from: [],
+          to:   []
+        },
         width: 500,
         height: 500
       };
@@ -36,8 +39,8 @@
           modelConfig.nodes.colors.push(2);
         }
         
-        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
-        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
+        modelConfig.edges.from[n] = (Math.round(Math.random() * NUM_NODES));
+        modelConfig.edges.to[n] = (Math.round(Math.random() * NUM_NODES));
 
       }
 

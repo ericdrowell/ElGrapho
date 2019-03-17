@@ -18,7 +18,10 @@ let modelConfig = {
   nodes: {
     colors: []
   },
-  edges: [],
+  edges: {
+    from: [],
+    to: []
+  },
   width: 1000,
   height: 500
 };
@@ -33,8 +36,8 @@ for (let n=0; n<NUM_NODES; n++) {
   }
 
   modelConfig.nodes.colors.push(color);
-  modelConfig.edges.push(fromIndex);
-  modelConfig.edges.push(toIndex);
+  modelConfig.edges.from[n] = (fromIndex);
+  modelConfig.edges.to[n] = (toIndex);
 }
 
 let graph = new ElGrapho({

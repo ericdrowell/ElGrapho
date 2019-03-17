@@ -29,7 +29,7 @@ const VertexBridge = {
     let colors = new Float32Array(nodes.colors);
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
-    let numEdges = edges.length / 2;
+    let numEdges = edges.from.length;
     let numArrows = showArrows ? numEdges : 0;
 
     let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
@@ -40,9 +40,9 @@ const VertexBridge = {
     let triangleNormalsIndex = 0;
     let triangleColorsIndex = 0;
 
-    for (let n=0; n<edges.length; n+=2) {
-      let pointIndex0 = edges[n];
-      let pointIndex1 = edges[n+1];
+    for (let n=0; n<numEdges; n++) {
+      let pointIndex0 = edges.from[n];
+      let pointIndex1 = edges.to[n];
       let normalDistance = MAX_NODE_SIZE*0.1;
 
       let x0 = nodes.xs[pointIndex0];

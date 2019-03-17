@@ -21,7 +21,10 @@
         sizes: []
       };
 
-      let edges = new Float32Array(NUM_NODES*2);
+      let edges = {
+        from: [],
+        to:   []
+      };
 
       for (let n=0; n<NUM_NODES; n++) {
         nodes.xs[n] = Math.random() * 2 - 1; // between -1 and 1
@@ -30,10 +33,10 @@
         nodes.sizes[n] = 0.01;
       }
 
-      let edgeIndex = 0;
+
       for (let n=0; n<NUM_NODES; n++) {
-        edges[edgeIndex++] = n;
-        edges[edgeIndex++] = n+1;
+        edges.from[n] = n;
+        edges.to[n] = n+1;
 
 
       }
