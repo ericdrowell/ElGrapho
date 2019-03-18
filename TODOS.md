@@ -1,23 +1,17 @@
 # TODOS
 
 ## P0
-* arrows
-* refactor edges api
-* labels
+* when creating lots of el grapho graphs, concrete throws error about too many webgl contexts
+* lines get fat sometimes when viz stretched.  arrows don't point in right direction when viz is stretched.  this is the same problem
+* controls button that live updates step count
 
 ## P1
-* setup test app that pulls in elgrapho and bundles it
 * tests and github CI
 * node events should include x,y mouse position, or at least mouse event object
 * tooltips are slow in big network graph.
-* labels
-* lines get fat sometimes when viz stretched.
-
-## P1
-* config option for arrows
-* look into circle anti aliasing again
+* antialiased nodes - seems to require APIs in webgl2.  Currently using webgl1.
 * ability to anchor node in force directed graph, and configure a flow diretion (for example to the right)
-* look into Licensing again.  May try dual license. 
+* look into Licensing again.  May try dual license. maybe MIT.
 
 ## P2
 * Radial tree
@@ -27,4 +21,3 @@
 * can I use ints in glsl where appropriate? Right now using all floats
 * back and forward buttons to go through state stack (pan and zoom)
 * chord diagram
-* antialiased nodes - seems to require APIs in webgl2.  Currently using webgl1.

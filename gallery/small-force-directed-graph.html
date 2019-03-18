@@ -9,10 +9,12 @@
   </head>
   <body>
     <h1>El Grapho Small Force Directed Graph</h1>
+
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
+
 
 let modelConfig = {
   nodes: {
@@ -21,18 +23,19 @@ let modelConfig = {
   edges:{
     from: [0, 0, 1, 1, 2],
     to:   [1, 2, 3, 4, 5]
-
   },
   width: 500,
   height: 500,
-  steps: 20
+  steps: 5
 };
 
-let graph = new ElGrapho({
+graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.models.ForceDirectedGraph(modelConfig),
   debug: true
 });
+
+
     </script>
   </body>
 </html>

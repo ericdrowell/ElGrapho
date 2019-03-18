@@ -676,6 +676,24 @@ Concrete.Hit.prototype = {
 
 /***/ }),
 
+/***/ "./engine/dist/icons/arrowUpIcon.svg.js":
+/*!**********************************************!*\
+  !*** ./engine/dist/icons/arrowUpIcon.svg.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg width="20" version="1.1" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 64 64" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 64 64">
+  <g>
+    <path fill="#1D1D1B" d="M3.352,48.296l28.56-28.328l28.58,28.347c0.397,0.394,0.917,0.59,1.436,0.59c0.52,0,1.04-0.196,1.436-0.59   c0.793-0.787,0.793-2.062,0-2.849l-29.98-29.735c-0.2-0.2-0.494-0.375-0.757-0.475c-0.75-0.282-1.597-0.107-2.166,0.456   L0.479,45.447c-0.793,0.787-0.793,2.062,0,2.849C1.273,49.082,2.558,49.082,3.352,48.296z"/>
+  </g>
+</svg>`;
+
+/***/ }),
+
 /***/ "./engine/dist/icons/boxZoomIcon.svg.js":
 /*!**********************************************!*\
   !*** ./engine/dist/icons/boxZoomIcon.svg.js ***!
@@ -1265,7 +1283,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-controls .el-grapho-step-down-control{transform:scale(1,-1)}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1429,6 +1447,8 @@ let ElGrapho = function(config) {
   this.wrapper.className = 'el-grapho-wrapper';
   this.wrapper.style.width = this.width + 'px';
   this.wrapper.style.height = this.height + 'px';
+  // clear container
+  this.container.innerHTML = '';
   this.container.appendChild(this.wrapper);
   this.animations = config.animations === undefined ? true : config.animations;
   this.setInteractionMode(Enums.interactionMode.SELECT);
@@ -1480,6 +1500,7 @@ let ElGrapho = function(config) {
 
   //this.model = config.model;
 
+  this.model = config.model;
   let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, showArrows);
 
   // need to add focused array to the vertices object here because we need to be able to
@@ -1491,12 +1512,6 @@ let ElGrapho = function(config) {
 
   webgl.initBuffers(vertices);
   
-  if (this.debug) {
-    new Count({
-      container: this.wrapper,
-      vertices: vertices
-    });
-  }
 
   this.initComponents();
 
@@ -1512,12 +1527,20 @@ ElGrapho.prototype = {
   initComponents: function() {
     this.controls = new Controls({
       container: this.wrapper,
-      graph: this
+      graph: this,
+      showStepControls: true
     });
 
     this.loading = new Loading({
       container: this.wrapper
     });
+
+    if (this.debug) {
+      this.count = new Count({
+        container: this.wrapper
+      });
+      this.count.update(this.model);
+    }
   },
   renderLabels: function() {
     let that = this;
@@ -1909,6 +1932,20 @@ ElGrapho.prototype = {
   },
   hideLoading: function() {
     this.wrapper.classList.remove('el-grapho-loading');
+  },
+  destroy: function() {
+    // viewport
+    this.viewport.destroy();
+
+    // remove from collection
+    let graphs = ElGraphoCollection.graphs;
+    let len = graphs.length;
+    for (let n=0; n<len; n++) {
+      if (graphs[n].id === this.id) {
+        graphs.splice(n, 1);
+        break;
+      }
+    }  
   }
 };
 
@@ -2834,6 +2871,7 @@ const moveIcon = __webpack_require__(/*! ../../../dist/icons/moveIcon.svg */ "./
 const selectIcon = __webpack_require__(/*! ../../../dist/icons/selectIcon.svg */ "./engine/dist/icons/selectIcon.svg.js");
 const boxZoomIcon = __webpack_require__(/*! ../../../dist/icons/boxZoomIcon.svg */ "./engine/dist/icons/boxZoomIcon.svg.js");
 const resetIcon = __webpack_require__(/*! ../../../dist/icons/resetIcon.svg */ "./engine/dist/icons/resetIcon.svg.js");
+const arrowUpIcon = __webpack_require__(/*! ../../../dist/icons/arrowUpIcon.svg */ "./engine/dist/icons/arrowUpIcon.svg.js");
 
 const Controls = function(config) {
   this.graph = config.graph;
@@ -2859,14 +2897,26 @@ const Controls = function(config) {
     icon: resetIcon,
     evtName: 'reset'
   });
-  this.zoomInButton = this.addButton({
-    icon: zoomInIcon,
-    evtName: 'zoom-in'
-  });
   this.zoomOutButton = this.addButton({
     icon: zoomOutIcon,
     evtName: 'zoom-out'
   });
+  this.zoomInButton = this.addButton({
+    icon: zoomInIcon,
+    evtName: 'zoom-in'
+  });
+
+  if (config.showStepControls) {
+    this.stepDownButton = this.addButton({
+      icon: arrowUpIcon,
+      evtName: 'step-down'
+    });
+    this.stepUpButton = this.addButton({
+      icon: arrowUpIcon,
+      evtName: 'step-up'
+    });
+
+  }
 
 
 };
@@ -2905,18 +2955,19 @@ const NumberFormatter = __webpack_require__(/*! ../../formatters/NumberFormatter
 const Count = function(config) {
   let wrapper = this.wrapper = document.createElement('span');
   let container = config.container;
-  let vertices = config.vertices;
-  let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
-  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/6 : 0;
-
-  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' points + ' + NumberFormatter.addCommas(triangleCount) + ' triangles';
-  wrapper.className = 'el-grapho-count';
 
   container.appendChild(wrapper);
 };
 
 Count.prototype = {
-
+  update: function(model) {
+    let pointCount = model.nodes.xs.length;
+    let edgeCount = model.edges.from.length;
+    let steps = model.steps;
+  
+    this.wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' points + ' + NumberFormatter.addCommas(edgeCount) + ' edges' + ' x ' + steps + ' steps';
+    this.wrapper.className = 'el-grapho-count';
+  }
 };
 
 module.exports = Count;
@@ -3138,7 +3189,7 @@ module.exports = Cluster;
 
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
-  let steps = config.steps || 10;
+  let steps = config.steps === undefined ? 10 : config.steps;
 
   let model = {
     nodes: {
@@ -3151,7 +3202,8 @@ const ForceDirectedGraph = function(config) {
       to: config.edges.to.slice()
     },
     width: config.width,
-    height: config.height
+    height: config.height,
+    steps: steps
   };
 
   model.nodes.xs.length = numNodes;
@@ -3196,15 +3248,17 @@ const ForceDirectedGraph = function(config) {
 
   // process steps
   for (let n=1; n<steps; n++) {
-    // let xChanges = [];
-    // let yChanges = [];
+
+    let xChanges = [];
+    let yChanges = [];
 
     //console.log('--- step ' + n + ' ---');
 
     // repulsive forces for all nodes
+    // Coulomb's Law -> F = q1 * q2 / d^2
     for (let a=0; a<numNodes; a++) {
-      // xChanges[a] = 0;
-      // yChanges[a] = 0;
+      xChanges[a] = 0;
+      yChanges[a] = 0;
 
       for (let b=0; b<numNodes; b++) {
         let ax = nodes.xs[a];
@@ -3220,23 +3274,26 @@ const ForceDirectedGraph = function(config) {
         if (dist > 0) {
           // move a away from b
           // for repelling forces, the force is stronger than the distance between the nodes is small
-          let K = 10 / (numNodes * numNodes);
-
-          // make repel stronger for nodes that are in different groups
-          // if (aColor !== bColor) {
-          //   K*=1.2;
-          // }
+          //let K = 10 / (numNodes * numNodes);
+          let K = 0.015;
 
           let xChange = -1 * K * xDiff / (dist * dist);
           let yChange = -1 * K * yDiff / (dist * dist);
 
-          nodes.xs[a] += xChange;
-          nodes.ys[a] += yChange;
+          xChanges[a] += xChange;
+          yChanges[a] += yChange;
+
+          // nodes.xs[a] += xChange;
+          // nodes.ys[a] += yChange;
         }
       }
     }
 
+
+
+
     // attractive forces between nodes sharing an edge
+    // Hooke's Law -> F = kx
     for (let i=0; i<numEdges; i++) {
       let a = edges.from[i];
       let b = edges.to[i];
@@ -3253,33 +3310,51 @@ const ForceDirectedGraph = function(config) {
 
       if (dist > 0) {
         // for attractive forces, the force is stronger when the nodes are farther apart
-        let K = 0.1;
+        let K = 0.5;
         xChange = K * xDiff;
         yChange = K * yDiff;
 
         //let changeMagnitude = Math.sqrt(xChange * xChange * yChange * yChange);
 
         // move a closer to b
-        nodes.xs[a] += xChange;
-        nodes.ys[a] += yChange;
+        // nodes.xs[a] += xChange;
+        // nodes.ys[a] += yChange;
+
+        xChanges[a] += xChange;
+        yChanges[a] += yChange;
 
         // move b closer to a
-        nodes.xs[b] -= xChange;
-        nodes.ys[b] -= yChange;
+        // nodes.xs[b] -= xChange;
+        // nodes.ys[b] -= yChange;
+
+        xChanges[b] -= xChange;
+        yChanges[b] -= yChange;   
       }
 
 
 
     }
 
+
+
+
+
+
+
+
+
+
     //debugger;
 
-    // update node positions
-    // for (let i=0; i<numNodes; i++) {
-    //   //console.log('updating node ' + i + ': (' + nodes.xs[i] + ',' + nodes.ys[i] + ') + (' + xChanges[i] + ',' + yChanges[i] + ')');
-    //   nodes.xs[i] += xChanges[i];
-    //   nodes.ys[i] += yChanges[i];
-    // }
+    //update node positions
+
+    //let DAMPER = 0.2; // good for about 10 nodes
+    let DAMPER = 0.01;
+
+    for (let i=0; i<numNodes; i++) {
+      nodes.xs[i] += xChanges[i] * DAMPER;
+      nodes.ys[i] += yChanges[i] * DAMPER;
+    }
   }
 
 

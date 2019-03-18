@@ -44,6 +44,8 @@ let ElGrapho = function(config) {
   this.wrapper.className = 'el-grapho-wrapper';
   this.wrapper.style.width = this.width + 'px';
   this.wrapper.style.height = this.height + 'px';
+  // clear container
+  this.container.innerHTML = '';
   this.container.appendChild(this.wrapper);
   this.animations = config.animations === undefined ? true : config.animations;
   this.setInteractionMode(Enums.interactionMode.SELECT);
@@ -95,6 +97,7 @@ let ElGrapho = function(config) {
 
   //this.model = config.model;
 
+  this.model = config.model;
   let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, showArrows);
 
   // need to add focused array to the vertices object here because we need to be able to
@@ -106,12 +109,6 @@ let ElGrapho = function(config) {
 
   webgl.initBuffers(vertices);
   
-  if (this.debug) {
-    new Count({
-      container: this.wrapper,
-      vertices: vertices
-    });
-  }
 
   this.initComponents();
 
@@ -127,12 +124,20 @@ ElGrapho.prototype = {
   initComponents: function() {
     this.controls = new Controls({
       container: this.wrapper,
-      graph: this
+      graph: this,
+      showStepControls: true
     });
 
     this.loading = new Loading({
       container: this.wrapper
     });
+
+    if (this.debug) {
+      this.count = new Count({
+        container: this.wrapper
+      });
+      this.count.update(this.model);
+    }
   },
   renderLabels: function() {
     let that = this;
@@ -524,6 +529,20 @@ ElGrapho.prototype = {
   },
   hideLoading: function() {
     this.wrapper.classList.remove('el-grapho-loading');
+  },
+  destroy: function() {
+    // viewport
+    this.viewport.destroy();
+
+    // remove from collection
+    let graphs = ElGraphoCollection.graphs;
+    let len = graphs.length;
+    for (let n=0; n<len; n++) {
+      if (graphs[n].id === this.id) {
+        graphs.splice(n, 1);
+        break;
+      }
+    }  
   }
 };
 
