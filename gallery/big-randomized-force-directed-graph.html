@@ -15,12 +15,9 @@
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-let NUM_LEVELS = 5;
-let MAX_LEVEL_MULTIPLIER = 7;
+let NUM_LEVELS = 12;
+let MAX_LEVEL_MULTIPLIER = 4;
 
-var url = new URL(window.location.href);
-var steps = parseInt(url.searchParams.get('steps')) || 1;
-console.log('steps=' + steps);
 
 let modelConfig = {
   nodes: {
@@ -32,7 +29,7 @@ let modelConfig = {
   },
   width: 1000,
   height: 500,
-  steps: steps
+  steps: 100
 };
 
 let edgeIndex = 0;
@@ -54,7 +51,14 @@ for (let j=0; j<NUM_LEVELS; j++) {
   else {
     let lastLevel = levels[j-1];
     let lastLevelLen = lastLevel.length;
-    let numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
+    let numNodes;
+    
+    if (j === 1) {
+      numNodes = MAX_LEVEL_MULTIPLIER;
+    }
+    else {
+      numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
+    }
 
     for (let k=0; k<numNodes; k++) {
       let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
@@ -87,22 +91,6 @@ let graph = new ElGrapho({
 });
     </script>
 
-    <button id="stepDown">Step Down</button>
-    <button id="stepUp">Step Up</button>
-    
-
-    <script>
-      document.getElementById('stepDown').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps-1);
-        window.open(url, '_self');
-      });
-
-      document.getElementById('stepUp').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps+1);
-        window.open(url, '_self');
-      });
-
-    </script>
 
   </body>
 </html>

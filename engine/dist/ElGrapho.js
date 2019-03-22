@@ -3077,9 +3077,11 @@ module.exports = NumberFormatter;
   !*** ./engine/src/models/Cluster.js ***!
   \**************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-let Cluster = function(config) {
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+
+const Cluster = function(config) {
   let width = config.width;
   let height = config.height;
 
@@ -3139,7 +3141,7 @@ let Cluster = function(config) {
 
   for (key in groups) {
     let indices = groups[key];
-    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI/2;
+    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI;
 
     let clusterCenterX, clusterCenterY;
 
@@ -3171,6 +3173,8 @@ let Cluster = function(config) {
     groupIndex++;
   }
 
+  fitToViewport(model.nodes);
+
   return model;
 };
 
@@ -3183,11 +3187,15 @@ module.exports = Cluster;
   !*** ./engine/src/models/ForceDirectedGraph.js ***!
   \*************************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-// good for 6 nodes
+// const glMatrix = require('gl-matrix');
+// const vec2 = glMatrix.vec2;
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const DEFAULT_STEPS = 20;
 const POSITION_FACTOR = 0.3;
-const REPEL_FACTOR = 0.01;
+//const REPEL_FACTOR = 0.01;
+//const REPEL_FROM_CENTER_FACTOR = 0;
 const ATTRACT_FACTOR = 0.1;
 
 const initNodePositions = function(nodes) {
@@ -3225,40 +3233,64 @@ const initNodePositions = function(nodes) {
 
 // repulsive forces for all nodes
 // Coulomb's Law -> F = q1 * q2 / d^2
-const repelNodes = function(nodes) {
-  let numNodes = nodes.colors.length;
-  let xChanges = [];
-  let yChanges = [];
+// const repelNodesFromEachother = function(nodes) {
+//   let numNodes = nodes.colors.length;
+//   let xChanges = [];
+//   let yChanges = [];
 
-  for (let a=0; a<numNodes; a++) {
-    xChanges[a] = 0;
-    yChanges[a] = 0;
+//   for (let a=0; a<numNodes; a++) {
+//     xChanges[a] = 0;
+//     yChanges[a] = 0;
 
-    for (let b=0; b<numNodes; b++) {
-      let ax = nodes.xs[a];
-      let ay = nodes.ys[a];
-      let bx = nodes.xs[b];
-      let by = nodes.ys[b];
-      let xDiff = bx - ax;
-      let yDiff = by - ay;
-      let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+//     for (let b=0; b<numNodes; b++) {
+//       let ax = nodes.xs[a];
+//       let ay = nodes.ys[a];
+//       let bx = nodes.xs[b];
+//       let by = nodes.ys[b];
+//       let xDiff = bx - ax;
+//       let yDiff = by - ay;
+//       let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
-      if (dist > 0) {
-        // move a away from b
-        let xChange = -1 * REPEL_FACTOR * xDiff / (dist * dist);
-        let yChange = -1 * REPEL_FACTOR * yDiff / (dist * dist);
+//       if (dist > 0) {
+//         // move a away from b
+//         let xChange = -1 * REPEL_FACTOR * xDiff / (dist * dist);
+//         let yChange = -1 * REPEL_FACTOR * yDiff / (dist * dist);
 
-        xChanges[a] += xChange;
-        yChanges[a] += yChange;
-      }
-    }
-  }
-  //update node positions for repulsive forces
-  for (let i=0; i<numNodes; i++) {
-    nodes.xs[i] += xChanges[i];
-    nodes.ys[i] += yChanges[i];
-  }
-};
+//         xChanges[a] += xChange;
+//         yChanges[a] += yChange;
+//       }
+//     }
+//   }
+//   //update node positions for repulsive forces
+//   for (let i=0; i<numNodes; i++) {
+//     nodes.xs[i] += xChanges[i];
+//     nodes.ys[i] += yChanges[i];
+//   }
+// };
+
+// const repelNodesFromCenter = function(nodes) {
+//   let numNodes = nodes.colors.length;
+
+//   let ax = 0;
+//   let ay = 0;
+
+//   for (let b=0; b<numNodes; b++) {
+//     let bx = nodes.xs[b];
+//     let by = nodes.ys[b];
+//     let xDiff = bx - ax;
+//     let yDiff = by - ay;
+
+//     let vector = vec2.fromValues(xDiff, yDiff);
+//     let normalizedVector = vec2.normalize(vec2.create(), vector);
+//     let changeVector = vec2.scale(vec2.create(), normalizedVector, REPEL_FROM_CENTER_FACTOR);
+
+
+//     nodes.xs[b] += changeVector[0];
+//     nodes.ys[b] += changeVector[1];
+    
+    
+//   }
+// };
 
 // attractive forces between nodes sharing an edge
 // Hooke's Law -> F = kx
@@ -3273,6 +3305,8 @@ const attractNodes = function(nodes, edges) {
     let ay = nodes.ys[a];
     let bx = nodes.xs[b];
     let by = nodes.ys[b];
+    // let aColor = nodes.colors[a];
+    // let bColor = nodes.colors[b];
     let xDiff = bx - ax;
     let yDiff = by - ay;
     let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
@@ -3294,45 +3328,9 @@ const attractNodes = function(nodes, edges) {
   }
 };
 
-const fitToViewport = function(nodes) {
-  let numNodes = nodes.colors.length;
-
-  let minX = Number.POSITIVE_INFINITY;
-  let minY = Number.POSITIVE_INFINITY;
-  let maxX = Number.NEGATIVE_INFINITY;
-  let maxY = Number.NEGATIVE_INFINITY;
-
-  for (let n=0; n<numNodes; n++) {
-    let nodeX = nodes.xs[n];
-    let nodeY = nodes.ys[n];
-
-    minX = Math.min(minX, nodeX);
-    minY = Math.min(minY, nodeY);
-    maxX = Math.max(maxX, nodeX);
-    maxY = Math.max(maxY, nodeY);
-  }
-
-  console.log(minX, minY, maxX, maxY);
-
-  let xFactor = 2 / (maxX - minX);
-  let yFactor = 2 / (maxY - minY);
-
-  // we want to adjust the x and y equally to preserve ratio
-  let factor = Math.min(xFactor, yFactor);
-
-  console.log(xFactor, yFactor);
-
-  for (let n=0; n<numNodes; n++) {
-    nodes.xs[n] *= factor;
-    nodes.ys[n] *= factor;
-
-
-  }
-};
-
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
-  let steps = config.steps === undefined ? 20 : config.steps;
+  let steps = config.steps === undefined ? DEFAULT_STEPS : config.steps;
 
   let model = {
     nodes: {
@@ -3362,7 +3360,8 @@ const ForceDirectedGraph = function(config) {
 
   // process steps
   for (let n=1; n<steps; n++) {
-    repelNodes(nodes);
+    //repelNodesFromEachother(nodes);
+    //repelNodesFromCenter(nodes);
     attractNodes(nodes, edges);
   }
 
@@ -3555,6 +3554,56 @@ const Tree = function(config) {
 };
 
 module.exports = Tree;
+
+/***/ }),
+
+/***/ "./engine/src/models/utils/fitToViewport.js":
+/*!**************************************************!*\
+  !*** ./engine/src/models/utils/fitToViewport.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(nodes) {
+  let numNodes = nodes.colors.length;
+
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+
+  for (let n=0; n<numNodes; n++) {
+    let nodeX = nodes.xs[n];
+    let nodeY = nodes.ys[n];
+
+    minX = Math.min(minX, nodeX);
+    minY = Math.min(minY, nodeY);
+    maxX = Math.max(maxX, nodeX);
+    maxY = Math.max(maxY, nodeY);
+  }
+
+  console.log(minX, minY, maxX, maxY);
+
+  // normalized width is 2 and height is 2.  Thus, to give a little padding,
+  // using 1.9
+
+  let diffX = maxX - minX;
+  let diffY = maxY - minY;
+  let xOffset = minX + diffX / 2;
+  let yOffset = minY + diffY / 2;
+  let xFactor = 1.9 / diffX;
+  let yFactor = 1.9 / diffY;
+
+  // we want to adjust the x and y equally to preserve ratio
+  let factor = Math.min(xFactor, yFactor);
+
+  //console.log(xFactor, yFactor);
+
+  for (let n=0; n<numNodes; n++) {
+    nodes.xs[n] = nodes.xs[n] * factor - xOffset;
+    nodes.ys[n] = nodes.ys[n] * factor - yOffset;
+  }
+};
 
 /***/ }),
 

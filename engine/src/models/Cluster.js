@@ -1,4 +1,6 @@
-let Cluster = function(config) {
+const fitToViewport = require('./utils/fitToViewport');
+
+const Cluster = function(config) {
   let width = config.width;
   let height = config.height;
 
@@ -58,7 +60,7 @@ let Cluster = function(config) {
 
   for (key in groups) {
     let indices = groups[key];
-    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI/2;
+    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI;
 
     let clusterCenterX, clusterCenterY;
 
@@ -89,6 +91,8 @@ let Cluster = function(config) {
     
     groupIndex++;
   }
+
+  fitToViewport(model.nodes);
 
   return model;
 };
