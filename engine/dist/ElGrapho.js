@@ -3294,6 +3294,42 @@ const attractNodes = function(nodes, edges) {
   }
 };
 
+const fitToViewport = function(nodes) {
+  let numNodes = nodes.colors.length;
+
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+
+  for (let n=0; n<numNodes; n++) {
+    let nodeX = nodes.xs[n];
+    let nodeY = nodes.ys[n];
+
+    minX = Math.min(minX, nodeX);
+    minY = Math.min(minY, nodeY);
+    maxX = Math.max(maxX, nodeX);
+    maxY = Math.max(maxY, nodeY);
+  }
+
+  console.log(minX, minY, maxX, maxY);
+
+  let xFactor = 2 / (maxX - minX);
+  let yFactor = 2 / (maxY - minY);
+
+  // we want to adjust the x and y equally to preserve ratio
+  let factor = Math.min(xFactor, yFactor);
+
+  console.log(xFactor, yFactor);
+
+  for (let n=0; n<numNodes; n++) {
+    nodes.xs[n] *= factor;
+    nodes.ys[n] *= factor;
+
+
+  }
+};
+
 const ForceDirectedGraph = function(config) {
   let numNodes = config.nodes.colors.length;
   let steps = config.steps === undefined ? 20 : config.steps;
@@ -3329,6 +3365,8 @@ const ForceDirectedGraph = function(config) {
     repelNodes(nodes);
     attractNodes(nodes, edges);
   }
+
+  fitToViewport(nodes);
 
   return model;
 };

@@ -8,7 +8,7 @@ https://www.elgrapho.com/
 
 ## What is El Grapho?
 
-El Grapho is a high performance graph data visualization engine that leverages WebGL and streaming technologies.  El Grapho can support millions of interactive nodes and edges in any modern browser.
+El Grapho is a high performance WebGL graph data visualization engine.  El Grapho can support millions of interactive nodes and edges in any modern browser.
 
 ## Why Would I Use This?
 

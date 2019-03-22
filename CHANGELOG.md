@@ -1,5 +1,8 @@
 # Changlog
 
+## v1.7.0
+* License is now MIT!
+
 ## v1.6.0
 * new edges API (see docs)
 * labels for nodes

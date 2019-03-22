@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <style>
       html, body {
         background-color: #f8f8f8;
@@ -14,6 +16,10 @@
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
 
+var url = new URL(window.location.href);
+var steps = parseInt(url.searchParams.get('steps')) || 1;
+console.log('steps=' + steps);
+
 let modelConfig = {
   nodes: {
     //      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19]
@@ -25,7 +31,7 @@ let modelConfig = {
   },
   width: 500,
   height: 500,
-  steps: 50
+  steps: steps
 };
 
 let graph = new ElGrapho({
@@ -35,5 +41,23 @@ let graph = new ElGrapho({
   debug: true
 });
     </script>
+
+    <button id="stepDown">Step Down</button>
+    <button id="stepUp">Step Up</button>
+    
+
+    <script>
+      document.getElementById('stepDown').addEventListener('click', function(evt) {
+        url.searchParams.set('steps', steps-1);
+        window.open(url, '_self');
+      });
+
+      document.getElementById('stepUp').addEventListener('click', function(evt) {
+        url.searchParams.set('steps', steps+1);
+        window.open(url, '_self');
+      });
+
+    </script>
+
   </body>
 </html>

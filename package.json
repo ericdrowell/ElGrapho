@@ -3,7 +3,7 @@
   "version": "1.6.0",
   "main": "engine/dist/ElGrapho.min.js",
   "author": "Eric Rowell",
-  "license": "SEE LICENSE IN <LICENSE.md>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ericdrowell/ElGrapho.git"
