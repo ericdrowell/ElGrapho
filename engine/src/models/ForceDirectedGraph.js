@@ -42,7 +42,7 @@ const initNodePositions = function(nodes) {
 
 // repulsive forces for all nodes
 // Coulomb's Law -> F = q1 * q2 / d^2
-// const repelNodesFromEachother = function(nodes) {
+// const repelNodesFromEachOther = function(nodes) {
 //   let numNodes = nodes.colors.length;
 //   let xChanges = [];
 //   let yChanges = [];
@@ -169,7 +169,7 @@ const ForceDirectedGraph = function(config) {
 
   // process steps
   for (let n=1; n<steps; n++) {
-    //repelNodesFromEachother(nodes);
+    //repelNodesFromEachOther(nodes);
     //repelNodesFromCenter(nodes);
     attractNodes(nodes, edges);
   }

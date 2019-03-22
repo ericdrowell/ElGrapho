@@ -16,7 +16,7 @@ module.exports = function(nodes) {
     maxY = Math.max(maxY, nodeY);
   }
 
-  console.log(minX, minY, maxX, maxY);
+  //console.log(minX, minY, maxX, maxY);
 
   // normalized width is 2 and height is 2.  Thus, to give a little padding,
   // using 1.9
@@ -34,7 +34,7 @@ module.exports = function(nodes) {
   //console.log(xFactor, yFactor);
 
   for (let n=0; n<numNodes; n++) {
-    nodes.xs[n] = nodes.xs[n] * factor - xOffset;
-    nodes.ys[n] = nodes.ys[n] * factor - yOffset;
+    nodes.xs[n] = (nodes.xs[n] - xOffset) * factor;
+    nodes.ys[n] = (nodes.ys[n] - yOffset) * factor;
   }
 };

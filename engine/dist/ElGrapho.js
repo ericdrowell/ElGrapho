@@ -1089,30 +1089,32 @@ void main() {
     gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
   }
 
+  float validColor = mod(aVertexColor, 8.0);
+
   // normal color
   if (aVertexFocused == 0.0) {
-    if (aVertexColor == 0.0) {
+    if (validColor == 0.0) {
       vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
     }
-    else if (aVertexColor == 1.0) {
+    else if (validColor == 1.0) {
       vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
     }
-    else if (aVertexColor == 2.0) {
+    else if (validColor == 2.0) {
       vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
     }
-    else if (aVertexColor == 3.0) {
+    else if (validColor == 3.0) {
       vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
     }
-    else if (aVertexColor == 4.0) {
+    else if (validColor == 4.0) {
       vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
     }
-    else if (aVertexColor == 5.0) {
+    else if (validColor == 5.0) {
       vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
     }
-    else if (aVertexColor == 6.0) {
+    else if (validColor == 6.0) {
       vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
     }
-    else if (aVertexColor == 7.0) {
+    else if (validColor == 7.0) {
       vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
     }
   }
@@ -1229,29 +1231,30 @@ void main() {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   
+  float validColor = mod(aVertexColor, 8.0);
 
-  if (aVertexColor == 0.0) {
+  if (validColor == 0.0) {
     vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
   }
-  else if (aVertexColor == 1.0) {
+  else if (validColor == 1.0) {
     vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
   }
-  else if (aVertexColor == 2.0) {
+  else if (validColor == 2.0) {
     vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
   }
-  else if (aVertexColor == 3.0) {
+  else if (validColor == 3.0) {
     vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
   }
-  else if (aVertexColor == 4.0) {
+  else if (validColor == 4.0) {
     vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
   }
-  else if (aVertexColor == 5.0) {
+  else if (validColor == 5.0) {
     vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
   }
-  else if (aVertexColor == 6.0) {
+  else if (validColor == 6.0) {
     vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
   }
-  else if (aVertexColor == 7.0) {
+  else if (validColor == 7.0) {
     vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
   }
 }`;
@@ -3233,7 +3236,7 @@ const initNodePositions = function(nodes) {
 
 // repulsive forces for all nodes
 // Coulomb's Law -> F = q1 * q2 / d^2
-// const repelNodesFromEachother = function(nodes) {
+// const repelNodesFromEachOther = function(nodes) {
 //   let numNodes = nodes.colors.length;
 //   let xChanges = [];
 //   let yChanges = [];
@@ -3360,7 +3363,7 @@ const ForceDirectedGraph = function(config) {
 
   // process steps
   for (let n=1; n<steps; n++) {
-    //repelNodesFromEachother(nodes);
+    //repelNodesFromEachOther(nodes);
     //repelNodesFromCenter(nodes);
     attractNodes(nodes, edges);
   }
@@ -3582,7 +3585,7 @@ module.exports = function(nodes) {
     maxY = Math.max(maxY, nodeY);
   }
 
-  console.log(minX, minY, maxX, maxY);
+  //console.log(minX, minY, maxX, maxY);
 
   // normalized width is 2 and height is 2.  Thus, to give a little padding,
   // using 1.9
@@ -3600,8 +3603,8 @@ module.exports = function(nodes) {
   //console.log(xFactor, yFactor);
 
   for (let n=0; n<numNodes; n++) {
-    nodes.xs[n] = nodes.xs[n] * factor - xOffset;
-    nodes.ys[n] = nodes.ys[n] * factor - yOffset;
+    nodes.xs[n] = (nodes.xs[n] - xOffset) * factor;
+    nodes.ys[n] = (nodes.ys[n] - yOffset) * factor;
   }
 };
 
