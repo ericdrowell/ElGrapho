@@ -38,6 +38,7 @@ let ElGrapho = function(config) {
   this.events = new Events();
   this.width = config.model.width;
   this.height = config.model.height;
+  this.steps = config.model.steps;
   this.nodeSize = config.nodeSize || 16;
   this.animations = [];
   this.wrapper = document.createElement('div');
@@ -53,7 +54,7 @@ let ElGrapho = function(config) {
   this.idle = true;
   this.debug = config.debug === undefined ? false : config.debug;
   
-  let showArrows = config.arrows === undefined ? true : config.arrows;
+  this.showArrows = config.arrows === undefined ? true : config.arrows;
 
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
@@ -79,7 +80,7 @@ let ElGrapho = function(config) {
   viewport.add(labelsLayer);
 
 
-  let webgl = this.webgl = new WebGL({
+  this.webgl = new WebGL({
     layer: mainLayer
   });
 
@@ -97,20 +98,19 @@ let ElGrapho = function(config) {
 
   //this.model = config.model;
 
-  this.model = config.model;
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, showArrows);
+  //this.model = config.model;
+
+  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
 
   // need to add focused array to the vertices object here because we need to be able to
   // modify the focused array by reference, which is passed into webgl buffers
   let numPoints = vertices.points.positions.length/2;
   vertices.points.focused = new Float32Array(numPoints);
 
-
-
-  webgl.initBuffers(vertices);
+  this.webgl.initBuffers(vertices);
   
 
-  this.initComponents();
+  this.initComponents(config.model);
 
   this.labelStrs = config.labels || [];
   this.labels = new Labels();
@@ -121,7 +121,8 @@ let ElGrapho = function(config) {
 };
 
 ElGrapho.prototype = {
-  initComponents: function() {
+
+  initComponents: function(model) {
     this.controls = new Controls({
       container: this.wrapper,
       graph: this,
@@ -136,7 +137,8 @@ ElGrapho.prototype = {
       this.count = new Count({
         container: this.wrapper
       });
-      this.count.update(this.model);
+
+      this.count.update(model.nodes.xs.length, model.edges.from.length, model.steps);
     }
   },
   renderLabels: function() {
@@ -212,6 +214,14 @@ ElGrapho.prototype = {
 
     this.on('box-zoom', function() {
       that.setInteractionMode(Enums.interactionMode.BOX_ZOOM);
+    });
+
+    this.on('step-up', function() {
+      that.stepUp();
+    });
+
+    this.on('step-down', function() {
+      that.stepDown();
     });
 
     document.addEventListener('mousedown', function(evt) {
@@ -412,11 +422,19 @@ ElGrapho.prototype = {
       }
     });
 
-
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
   },
+  // stepUp: function() {
+  //   console.log('step up');
+
+  //   this.model.step++;
+  //   //this.updateVertices();
+  // },
+  // stepDown: function() {
+  //   console.log('step down');
+  // },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';

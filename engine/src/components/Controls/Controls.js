@@ -4,7 +4,7 @@ const moveIcon = require('../../../dist/icons/moveIcon.svg');
 const selectIcon = require('../../../dist/icons/selectIcon.svg');
 const boxZoomIcon = require('../../../dist/icons/boxZoomIcon.svg');
 const resetIcon = require('../../../dist/icons/resetIcon.svg');
-const arrowUpIcon = require('../../../dist/icons/arrowUpIcon.svg');
+//const arrowUpIcon = require('../../../dist/icons/arrowUpIcon.svg');
 
 const Controls = function(config) {
   this.graph = config.graph;
@@ -30,26 +30,28 @@ const Controls = function(config) {
     icon: resetIcon,
     evtName: 'reset'
   });
-  this.zoomOutButton = this.addButton({
-    icon: zoomOutIcon,
-    evtName: 'zoom-out'
-  });
   this.zoomInButton = this.addButton({
     icon: zoomInIcon,
     evtName: 'zoom-in'
   });
+  this.zoomOutButton = this.addButton({
+    icon: zoomOutIcon,
+    evtName: 'zoom-out'
+  });
 
-  if (config.showStepControls) {
-    this.stepDownButton = this.addButton({
-      icon: arrowUpIcon,
-      evtName: 'step-down'
-    });
-    this.stepUpButton = this.addButton({
-      icon: arrowUpIcon,
-      evtName: 'step-up'
-    });
 
-  }
+  // if (config.showStepControls) {
+  //   this.stepUpButton = this.addButton({
+  //     icon: arrowUpIcon,
+  //     evtName: 'step-up'
+  //   });
+  //   this.stepDownButton = this.addButton({
+  //     icon: arrowUpIcon,
+  //     evtName: 'step-down'
+  //   });
+
+
+  // }
 
 
 };

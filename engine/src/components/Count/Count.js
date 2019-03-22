@@ -8,12 +8,8 @@ const Count = function(config) {
 };
 
 Count.prototype = {
-  update: function(model) {
-    let pointCount = model.nodes.xs.length;
-    let edgeCount = model.edges.from.length;
-    let steps = model.steps;
-  
-    this.wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' points + ' + NumberFormatter.addCommas(edgeCount) + ' edges' + ' x ' + steps + ' steps';
+  update: function(nodeCount, edgeCount, steps) {
+    this.wrapper.innerHTML = NumberFormatter.addCommas(nodeCount) + ' nodes + ' + NumberFormatter.addCommas(edgeCount) + ' edges' + ' x ' + steps + ' steps';
     this.wrapper.className = 'el-grapho-count';
   }
 };
