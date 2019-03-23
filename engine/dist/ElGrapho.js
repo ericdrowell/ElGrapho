@@ -1424,6 +1424,7 @@ let ElGrapho = function(config) {
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
+  this.model = config.model;
   this.width = config.model.width;
   this.height = config.model.height;
   this.steps = config.model.steps;
@@ -1498,9 +1499,8 @@ let ElGrapho = function(config) {
   this.webgl.initBuffers(vertices);
   
 
-  this.initComponents(config.model);
+  this.initComponents();
 
-  this.labelStrs = config.labels || [];
   this.labels = new Labels();
 
   this.listen();
@@ -1510,7 +1510,9 @@ let ElGrapho = function(config) {
 
 ElGrapho.prototype = {
 
-  initComponents: function(model) {
+  initComponents: function() {
+    let model = this.model;
+
     this.controls = new Controls({
       container: this.wrapper,
       graph: this,
@@ -1526,7 +1528,7 @@ ElGrapho.prototype = {
         container: this.wrapper
       });
 
-      this.count.update(model.nodes.x.length, model.edges.from.length, model.steps);
+      this.count.update(model.nodes.length, model.edges.length, model.steps);
     }
   },
   renderLabels: function() {
@@ -1535,9 +1537,9 @@ ElGrapho.prototype = {
     // build labels view model
     this.labels.clear();
     let positions = this.vertices.points.positions;
-    this.labelStrs.forEach(function(str, n) {
+    this.model.nodes.forEach(function(node, n) {
       let index = n * 2;
-      that.labels.addLabel(str, positions[index], positions[index+1]);
+      that.labels.addLabel(node.label, positions[index], positions[index+1]);
     });
     
     // render
@@ -2048,7 +2050,10 @@ let ElGraphoCollection = {
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
 
         graph.labelsLayer.scene.clear();
-        if (magicZoom) {
+
+        let hasLabels = graph.model.nodes[0].label !== undefined;
+        
+        if (hasLabels && magicZoom) {
           graph.renderLabels();
         }
         graph.viewport.render(); // render composite
@@ -2282,28 +2287,27 @@ const VertexBridge = {
   modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
-    let positions = new Float32Array(nodes.x.length*2);
+    let positions = new Float32Array(nodes.length*2);
     let halfWidth = width/2;
     let halfHeight = height/2;
+    let colors = new Float32Array(nodes.length);
 
-    // convert normalized x and y to pixel values
-    nodes.x = nodes.x.map(function(el) {
-      return el * halfWidth;
-    });
-    nodes.y = nodes.y.map(function(el) {
-      return el * halfHeight;
-    });
-
+    
     let positionCounter = 0;
-    for (let n=0; n<nodes.x.length; n++) {
-      positions[positionCounter++] = nodes.x[n];
-      positions[positionCounter++] = nodes.y[n];
-    }
+    nodes.forEach(function(node, n) {
+      // convert normalized x and y to pixel values
+      node.x *= halfWidth;
+      node.y *= halfHeight;
 
-    let colors = new Float32Array(nodes.color);
+      positions[positionCounter++] = node.x;
+      positions[positionCounter++] = node.y;
+
+      colors[n] = node.group;
+    });
+
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
-    let numEdges = edges.from.length;
+    let numEdges = edges.length;
     let numArrows = showArrows ? numEdges : 0;
 
     let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
@@ -2315,14 +2319,14 @@ const VertexBridge = {
     let triangleColorsIndex = 0;
 
     for (let n=0; n<numEdges; n++) {
-      let pointIndex0 = edges.from[n];
-      let pointIndex1 = edges.to[n];
+      let pointIndex0 = edges[n].from;
+      let pointIndex1 = edges[n].to;
       let normalDistance = MAX_NODE_SIZE*0.1;
 
-      let x0 = nodes.x[pointIndex0];
-      let x1 = nodes.x[pointIndex1];
-      let y0 = nodes.y[pointIndex0];
-      let y1 = nodes.y[pointIndex1];
+      let x0 = nodes[pointIndex0].x;
+      let x1 = nodes[pointIndex1].x;
+      let y0 = nodes[pointIndex0].y;
+      let y1 = nodes[pointIndex1].y;
       let vectorX = x1 - x0;
       let vectorY = y1 - y0;
       let vector = vec2.fromValues(vectorX, vectorY);
@@ -2335,44 +2339,47 @@ const VertexBridge = {
       let arrowVector = vec2.scale(vec2.create(), normalizedVector, 16);
       let arrowOffsetX = arrowVector[0];
       let arrowOffsetY = arrowVector[1];
+
+      let color0 = colors[pointIndex0];
+      let color1 = colors[pointIndex1];
  
       // first triangle of line
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
+      triangleColors[triangleColorsIndex++] = color0;
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
+      triangleColors[triangleColorsIndex++] = color1;
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
+      triangleColors[triangleColorsIndex++] = color0;
 
       // second triangle of line
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
+      triangleColors[triangleColorsIndex++] = color1;
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
+      triangleColors[triangleColorsIndex++] = color0;
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
+      triangleColors[triangleColorsIndex++] = color1;
 
 
       if (showArrows) {
@@ -2381,21 +2388,20 @@ const VertexBridge = {
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = 0;
         triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
+        triangleColors[triangleColorsIndex++] = color1;
 
         trianglePositions[trianglePositionsIndex++] = x1;
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
+        triangleColors[triangleColorsIndex++] = color1;
 
         trianglePositions[trianglePositionsIndex++] = x1;
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
+        triangleColors[triangleColorsIndex++] = color1;
       }
-
     }
 
     return {
@@ -2966,7 +2972,9 @@ const Count = function(config) {
 
 Count.prototype = {
   update: function(nodeCount, edgeCount, steps) {
-    this.wrapper.innerHTML = NumberFormatter.addCommas(nodeCount) + ' nodes + ' + NumberFormatter.addCommas(edgeCount) + ' edges' + ' x ' + steps + ' steps';
+    let nodesAndEdgesStr = NumberFormatter.addCommas(nodeCount) + ' nodes + ' + NumberFormatter.addCommas(edgeCount) + ' edges';
+    let stepsStr = steps === undefined ? '' : ' x ' + steps + ' steps';
+    this.wrapper.innerHTML = nodesAndEdgesStr + stepsStr;
     this.wrapper.className = 'el-grapho-count';
   }
 };
@@ -3084,9 +3092,9 @@ module.exports = NumberFormatter;
 
 const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
 
-const Cluster = function(config) {
-  let width = config.width;
-  let height = config.height;
+const Cluster = function(model) {
+  let width = model.width;
+  let height = model.height;
 
   let xFactor, yFactor;
 
@@ -3099,39 +3107,19 @@ const Cluster = function(config) {
     yFactor = width/height;
   }
 
-
-
-  let model = {
-    nodes: {
-      xs: [],
-      ys: [],
-      colors: config.nodes.colors.slice()
-    },
-    edges: {
-      from: config.edges.from.slice(),
-      to: config.edges.to.slice()
-    },
-    width: config.width,
-    height: config.height
-  };
-
   // keys are color integers, values are arrays.  The arrays contain node indices
   let groups = {};
 
-  config.nodes.colors.forEach(function(color, n) {
-    if (groups[color] === undefined) {
-      groups[color] = [];
+  model.nodes.forEach(function(node, n) {
+    let group = node.group;
+    if (groups[group] === undefined) {
+      groups[group] = [];
     }
-
-    groups[color].push(n);
+    groups[group].push(n);
   });
-
-  //console.log(groups);
 
   let keys = Object.keys(groups);
   let numGroups = keys.length;
-  //let clusterRadius = 0.2;
-
   let key;
   let groupIndex = 0;
 
@@ -3165,9 +3153,8 @@ const Cluster = function(config) {
       let x = Math.cos(angle) * radius * xFactor;
       let y = Math.sin(angle) * radius * yFactor;
 
-      model.nodes.xs[index] = clusterCenterX + x;
-      model.nodes.ys[index] = clusterCenterY + y;
-
+      model.nodes[index].x = clusterCenterX + x;
+      model.nodes[index].y = clusterCenterY + y;
       radius += arcLength * angleStep / (2 * Math.PI);
       angleStep = arcLength / radius;
       angle -= angleStep;
@@ -3577,28 +3564,23 @@ module.exports = Tree;
 /***/ (function(module, exports) {
 
 module.exports = function(nodes) {
-  let numNodes = nodes.color.length;
-
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
   let maxX = Number.NEGATIVE_INFINITY;
   let maxY = Number.NEGATIVE_INFINITY;
 
-  for (let n=0; n<numNodes; n++) {
-    let nodeX = nodes.x[n];
-    let nodeY = nodes.y[n];
+  nodes.forEach(function(node) {
+    let nodeX = node.x;
+    let nodeY = node.y;
 
     minX = Math.min(minX, nodeX);
     minY = Math.min(minY, nodeY);
     maxX = Math.max(maxX, nodeX);
     maxY = Math.max(maxY, nodeY);
-  }
-
-  //console.log(minX, minY, maxX, maxY);
+  });
 
   // normalized width is 2 and height is 2.  Thus, to give a little padding,
   // using 1.9
-
   let diffX = maxX - minX;
   let diffY = maxY - minY;
   let xOffset = minX + diffX / 2;
@@ -3609,12 +3591,10 @@ module.exports = function(nodes) {
   // we want to adjust the x and y equally to preserve ratio
   let factor = Math.min(xFactor, yFactor);
 
-  //console.log(xFactor, yFactor);
-
-  for (let n=0; n<numNodes; n++) {
-    nodes.x[n] = (nodes.x[n] - xOffset) * factor;
-    nodes.y[n] = (nodes.y[n] - yOffset) * factor;
-  }
+  nodes.forEach(function(node) {
+    node.x = (node.x - xOffset) * factor;
+    node.y = (node.y - yOffset) * factor;
+  });
 };
 
 /***/ }),

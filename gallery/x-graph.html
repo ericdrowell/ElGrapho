@@ -16,23 +16,23 @@
     <script>
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-
         model: {
-          nodes: {
-            x:     [-0.9,  0.9, 0.9, -0.9, 0],
-            y:     [-0.9, -0.9, 0.9,  0.9, 0],
-            color: [   0,    1,   2,    3, 4]
-          },
-          edges: {
-            from: [4, 4, 4, 4],
-            to:   [0, 1, 2, 3]
-          },
+          nodes: [
+            {x: -0.9, y: -0.9, group: 0},
+            {x: 0.9,  y: -0.9, group: 1},
+            {x: 0.9,  y: 0.9,  group: 2},
+            {x: -0.9, y: 0.9,  group: 3},
+            {x: 0,    y: 0,    group: 4}
+          ],
+          edges: [
+            {from: 4, to: 0},
+            {from: 4, to: 1},
+            {from: 4, to: 2},
+            {from: 4, to: 3}
+          ],
           width: 500,
           height: 500
         },
-
-        magicZoom: false,
-        nodeSize: 100,
         animations: false
       });
 

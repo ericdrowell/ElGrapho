@@ -70,7 +70,10 @@ let ElGraphoCollection = {
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
 
         graph.labelsLayer.scene.clear();
-        if (magicZoom) {
+
+        let hasLabels = graph.model.nodes[0].label !== undefined;
+        
+        if (hasLabels && magicZoom) {
           graph.renderLabels();
         }
         graph.viewport.render(); // render composite

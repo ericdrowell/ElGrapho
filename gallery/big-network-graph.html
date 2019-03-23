@@ -16,37 +16,31 @@
     <script>
       const NUM_NODES = 100000;
 
-      let nodes = {
-        x: [],
-        y: [],
-        color: []
-      };
-
-      let edges = {
-        from: [],
-        to:   []
-      };
-
-      for (let n=0; n<NUM_NODES; n++) {
-        nodes.x[n] = Math.random() * 2 - 1; // between -1 and 1
-        nodes.y[n] = Math.random() * 2 - 1; // between -1 and 1
-        nodes.color[n] = Math.floor(Math.random() * 3);
+      let model = {
+        nodes: [],
+        edges: [],
+        width: 1000,
+        height: 500
       }
 
-
       for (let n=0; n<NUM_NODES; n++) {
-        edges.from[n] = n;
-        edges.to[n] = n+1;
+        model.nodes[n] = {
+          x: Math.random() * 2 - 1, // between -1 and 1,
+          y: Math.random() * 2 - 1, // between -1 and 1,
+          group: Math.floor(Math.random() * 3)
+        }; 
+
+        if (n<NUM_NODES-1) {
+          model.edges[n] = {
+            from: n,
+            to: n+1
+          }
+        }
       }
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: {
-          nodes: nodes,
-          edges: edges,
-          width: 1000,
-          height: 500
-        },
+        model: model,
         nodeSize: 0.01,
         debug: true
       });

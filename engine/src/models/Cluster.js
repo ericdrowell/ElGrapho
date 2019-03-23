@@ -1,8 +1,8 @@
 const fitToViewport = require('./utils/fitToViewport');
 
-const Cluster = function(config) {
-  let width = config.width;
-  let height = config.height;
+const Cluster = function(model) {
+  let width = model.width;
+  let height = model.height;
 
   let xFactor, yFactor;
 
@@ -15,39 +15,19 @@ const Cluster = function(config) {
     yFactor = width/height;
   }
 
-
-
-  let model = {
-    nodes: {
-      xs: [],
-      ys: [],
-      colors: config.nodes.colors.slice()
-    },
-    edges: {
-      from: config.edges.from.slice(),
-      to: config.edges.to.slice()
-    },
-    width: config.width,
-    height: config.height
-  };
-
   // keys are color integers, values are arrays.  The arrays contain node indices
   let groups = {};
 
-  config.nodes.colors.forEach(function(color, n) {
-    if (groups[color] === undefined) {
-      groups[color] = [];
+  model.nodes.forEach(function(node, n) {
+    let group = node.group;
+    if (groups[group] === undefined) {
+      groups[group] = [];
     }
-
-    groups[color].push(n);
+    groups[group].push(n);
   });
-
-  //console.log(groups);
 
   let keys = Object.keys(groups);
   let numGroups = keys.length;
-  //let clusterRadius = 0.2;
-
   let key;
   let groupIndex = 0;
 
@@ -81,9 +61,8 @@ const Cluster = function(config) {
       let x = Math.cos(angle) * radius * xFactor;
       let y = Math.sin(angle) * radius * yFactor;
 
-      model.nodes.xs[index] = clusterCenterX + x;
-      model.nodes.ys[index] = clusterCenterY + y;
-
+      model.nodes[index].x = clusterCenterX + x;
+      model.nodes[index].y = clusterCenterY + y;
       radius += arcLength * angleStep / (2 * Math.PI);
       angleStep = arcLength / radius;
       angle -= angleStep;

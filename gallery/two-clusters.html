@@ -17,28 +17,27 @@
       const NUM_NODES = 300;
       const NUM_NODES_FIRST_GROUP = 100;
 
-      let modelConfig = {
-        nodes: {
-          colors: []
-        },
-        edges: {
-          from: [],
-          to: []
-        },
+      let model = {
+        nodes: [],
+        edges: [],
         width: 500,
         height: 500
       };
 
       for (let n=0; n<NUM_NODES; n++) {
-        modelConfig.nodes.colors.push(n < NUM_NODES_FIRST_GROUP ? 0 : 1);
-        modelConfig.edges.from[n] = (Math.round(Math.random() * NUM_NODES_FIRST_GROUP));
-        modelConfig.edges.to[n] = (Math.round(Math.random() * (NUM_NODES - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP));
+        model.nodes.push({
+          group: n < NUM_NODES_FIRST_GROUP ? 0 : 1
+        });
 
+        model.edges.push({
+          from: Math.floor(Math.random() * NUM_NODES_FIRST_GROUP),
+          to: Math.floor(Math.random() * (NUM_NODES-1 - NUM_NODES_FIRST_GROUP) + NUM_NODES_FIRST_GROUP)
+        });
       }
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Cluster(modelConfig)
+        model: ElGrapho.models.Cluster(model)
       });
 
     </script>

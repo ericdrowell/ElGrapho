@@ -36,6 +36,7 @@ let ElGrapho = function(config) {
   this.panX = 0;
   this.panY = 0;
   this.events = new Events();
+  this.model = config.model;
   this.width = config.model.width;
   this.height = config.model.height;
   this.steps = config.model.steps;
@@ -110,9 +111,8 @@ let ElGrapho = function(config) {
   this.webgl.initBuffers(vertices);
   
 
-  this.initComponents(config.model);
+  this.initComponents();
 
-  this.labelStrs = config.labels || [];
   this.labels = new Labels();
 
   this.listen();
@@ -122,7 +122,9 @@ let ElGrapho = function(config) {
 
 ElGrapho.prototype = {
 
-  initComponents: function(model) {
+  initComponents: function() {
+    let model = this.model;
+
     this.controls = new Controls({
       container: this.wrapper,
       graph: this,
@@ -138,7 +140,7 @@ ElGrapho.prototype = {
         container: this.wrapper
       });
 
-      this.count.update(model.nodes.x.length, model.edges.from.length, model.steps);
+      this.count.update(model.nodes.length, model.edges.length, model.steps);
     }
   },
   renderLabels: function() {
@@ -147,9 +149,9 @@ ElGrapho.prototype = {
     // build labels view model
     this.labels.clear();
     let positions = this.vertices.points.positions;
-    this.labelStrs.forEach(function(str, n) {
+    this.model.nodes.forEach(function(node, n) {
       let index = n * 2;
-      that.labels.addLabel(str, positions[index], positions[index+1]);
+      that.labels.addLabel(node.label, positions[index], positions[index+1]);
     });
     
     // render
