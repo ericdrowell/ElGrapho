@@ -1,3 +1,5 @@
+const fitToViewport = require('./utils/fitToViewport');
+
 const Ring = function(config) {
   let numNodes = config.nodes.colors.length;
 
@@ -20,6 +22,8 @@ const Ring = function(config) {
     model.nodes.xs.push(Math.cos(angle));
     model.nodes.ys.push(Math.sin(angle));
   }
+
+  fitToViewport(model.nodes);
 
   return model;
 };

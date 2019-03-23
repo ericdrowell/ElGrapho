@@ -1,3 +1,5 @@
+const fitToViewport = require('./utils/fitToViewport');
+
 let incrementAncestorTotals = function(node, val) {
   node.totalDescendants+=val;
 
@@ -44,7 +46,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 // BFS
 let getNestedTree = function(config) {
   let edges = config.edges;
-  let colors = config.nodes.colors;
+  let colors = config.nodes.color;
   let nodes = {};
 
   // build nodes
@@ -106,9 +108,9 @@ const Tree = function(config) {
 
   let model = {
     nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
+      x:     [],
+      y:     [],
+      color: []
     },
     edges: {
       from: [],
@@ -120,15 +122,17 @@ const Tree = function(config) {
 
   // O(n)
   nodes.forEach(function(node, n) {
-    model.nodes.xs[n] = node.x;
-    model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
-    model.nodes.colors[n] = node.color;
+    model.nodes.x[n] = node.x;
+    model.nodes.y[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
+    model.nodes.color[n] = node.color;
 
     if (node.parent) {
       model.edges.from[n] = node.parent.index;
       model.edges.to[n] = node.index;
     }
   });
+
+  fitToViewport(model.nodes);
 
   return model;
 };

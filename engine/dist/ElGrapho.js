@@ -1442,7 +1442,7 @@ let ElGrapho = function(config) {
   this.idle = true;
   this.debug = config.debug === undefined ? false : config.debug;
   
-  this.showArrows = config.arrows === undefined ? true : config.arrows;
+  this.showArrows = config.arrows === undefined ? false : config.arrows;
 
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
@@ -1526,7 +1526,7 @@ ElGrapho.prototype = {
         container: this.wrapper
       });
 
-      this.count.update(model.nodes.xs.length, model.edges.from.length, model.steps);
+      this.count.update(model.nodes.x.length, model.edges.from.length, model.steps);
     }
   },
   renderLabels: function() {
@@ -2277,30 +2277,30 @@ const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/
 const vec2 = glMatrix.vec2;
 const MAX_NODE_SIZE = 16;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
-
+ 
 const VertexBridge = {
   modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
-    let positions = new Float32Array(nodes.xs.length*2);
+    let positions = new Float32Array(nodes.x.length*2);
     let halfWidth = width/2;
     let halfHeight = height/2;
 
-    // convert normalized xs and ys to pixel values
-    nodes.xs = nodes.xs.map(function(el) {
+    // convert normalized x and y to pixel values
+    nodes.x = nodes.x.map(function(el) {
       return el * halfWidth;
     });
-    nodes.ys = nodes.ys.map(function(el) {
+    nodes.y = nodes.y.map(function(el) {
       return el * halfHeight;
     });
 
     let positionCounter = 0;
-    for (let n=0; n<nodes.xs.length; n++) {
-      positions[positionCounter++] = nodes.xs[n];
-      positions[positionCounter++] = nodes.ys[n];
+    for (let n=0; n<nodes.x.length; n++) {
+      positions[positionCounter++] = nodes.x[n];
+      positions[positionCounter++] = nodes.y[n];
     }
 
-    let colors = new Float32Array(nodes.colors);
+    let colors = new Float32Array(nodes.color);
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
     let numEdges = edges.from.length;
@@ -2319,10 +2319,10 @@ const VertexBridge = {
       let pointIndex1 = edges.to[n];
       let normalDistance = MAX_NODE_SIZE*0.1;
 
-      let x0 = nodes.xs[pointIndex0];
-      let x1 = nodes.xs[pointIndex1];
-      let y0 = nodes.ys[pointIndex0];
-      let y1 = nodes.ys[pointIndex1];
+      let x0 = nodes.x[pointIndex0];
+      let x1 = nodes.x[pointIndex1];
+      let y0 = nodes.y[pointIndex0];
+      let y1 = nodes.y[pointIndex1];
       let vectorX = x1 - x0;
       let vectorY = y1 - y0;
       let vector = vec2.fromValues(vectorX, vectorY);
@@ -2341,38 +2341,38 @@ const VertexBridge = {
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
 
       // second triangle of line
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
 
       if (showArrows) {
@@ -2381,19 +2381,19 @@ const VertexBridge = {
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = 0;
         triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
         trianglePositions[trianglePositionsIndex++] = x1;
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
         trianglePositions[trianglePositionsIndex++] = x1;
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
       }
 
     }
@@ -3195,7 +3195,7 @@ module.exports = Cluster;
 // const glMatrix = require('gl-matrix');
 // const vec2 = glMatrix.vec2;
 const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
-const DEFAULT_STEPS = 20;
+const DEFAULT_STEPS = 10;
 const POSITION_FACTOR = 0.3;
 //const REPEL_FACTOR = 0.01;
 //const REPEL_FROM_CENTER_FACTOR = 0;
@@ -3228,6 +3228,7 @@ const initNodePositions = function(nodes) {
   for (let a=0; a<numNodes; a++) {
     let color = nodes.colors[a];
     let angle = -2 * Math.PI * colors[color].next++ / numNodes;
+    //let angle = -2 * Math.PI * a / numNodes;
 
     nodes.xs[a] = POSITION_FACTOR * Math.cos(angle);
     nodes.ys[a] = POSITION_FACTOR * Math.sin(angle);
@@ -3382,7 +3383,9 @@ module.exports = ForceDirectedGraph;
   !*** ./engine/src/models/Ring.js ***!
   \***********************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
 
 const Ring = function(config) {
   let numNodes = config.nodes.colors.length;
@@ -3407,6 +3410,8 @@ const Ring = function(config) {
     model.nodes.ys.push(Math.sin(angle));
   }
 
+  fitToViewport(model.nodes);
+
   return model;
 };
 
@@ -3419,7 +3424,9 @@ module.exports = Ring;
   !*** ./engine/src/models/Tree.js ***!
   \***********************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
 
 let incrementAncestorTotals = function(node, val) {
   node.totalDescendants+=val;
@@ -3467,7 +3474,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 // BFS
 let getNestedTree = function(config) {
   let edges = config.edges;
-  let colors = config.nodes.colors;
+  let colors = config.nodes.color;
   let nodes = {};
 
   // build nodes
@@ -3529,9 +3536,9 @@ const Tree = function(config) {
 
   let model = {
     nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
+      x:     [],
+      y:     [],
+      color: []
     },
     edges: {
       from: [],
@@ -3543,15 +3550,17 @@ const Tree = function(config) {
 
   // O(n)
   nodes.forEach(function(node, n) {
-    model.nodes.xs[n] = node.x;
-    model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
-    model.nodes.colors[n] = node.color;
+    model.nodes.x[n] = node.x;
+    model.nodes.y[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
+    model.nodes.color[n] = node.color;
 
     if (node.parent) {
       model.edges.from[n] = node.parent.index;
       model.edges.to[n] = node.index;
     }
   });
+
+  fitToViewport(model.nodes);
 
   return model;
 };
@@ -3568,7 +3577,7 @@ module.exports = Tree;
 /***/ (function(module, exports) {
 
 module.exports = function(nodes) {
-  let numNodes = nodes.colors.length;
+  let numNodes = nodes.color.length;
 
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
@@ -3576,8 +3585,8 @@ module.exports = function(nodes) {
   let maxY = Number.NEGATIVE_INFINITY;
 
   for (let n=0; n<numNodes; n++) {
-    let nodeX = nodes.xs[n];
-    let nodeY = nodes.ys[n];
+    let nodeX = nodes.x[n];
+    let nodeY = nodes.y[n];
 
     minX = Math.min(minX, nodeX);
     minY = Math.min(minY, nodeY);
@@ -3603,8 +3612,8 @@ module.exports = function(nodes) {
   //console.log(xFactor, yFactor);
 
   for (let n=0; n<numNodes; n++) {
-    nodes.xs[n] = (nodes.xs[n] - xOffset) * factor;
-    nodes.ys[n] = (nodes.ys[n] - yOffset) * factor;
+    nodes.x[n] = (nodes.x[n] - xOffset) * factor;
+    nodes.y[n] = (nodes.y[n] - yOffset) * factor;
   }
 };
 

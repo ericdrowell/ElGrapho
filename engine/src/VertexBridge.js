@@ -3,30 +3,30 @@ const glMatrix = require('gl-matrix');
 const vec2 = glMatrix.vec2;
 const MAX_NODE_SIZE = 16;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
-
+ 
 const VertexBridge = {
   modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
-    let positions = new Float32Array(nodes.xs.length*2);
+    let positions = new Float32Array(nodes.x.length*2);
     let halfWidth = width/2;
     let halfHeight = height/2;
 
-    // convert normalized xs and ys to pixel values
-    nodes.xs = nodes.xs.map(function(el) {
+    // convert normalized x and y to pixel values
+    nodes.x = nodes.x.map(function(el) {
       return el * halfWidth;
     });
-    nodes.ys = nodes.ys.map(function(el) {
+    nodes.y = nodes.y.map(function(el) {
       return el * halfHeight;
     });
 
     let positionCounter = 0;
-    for (let n=0; n<nodes.xs.length; n++) {
-      positions[positionCounter++] = nodes.xs[n];
-      positions[positionCounter++] = nodes.ys[n];
+    for (let n=0; n<nodes.x.length; n++) {
+      positions[positionCounter++] = nodes.x[n];
+      positions[positionCounter++] = nodes.y[n];
     }
 
-    let colors = new Float32Array(nodes.colors);
+    let colors = new Float32Array(nodes.color);
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
     let numEdges = edges.from.length;
@@ -45,10 +45,10 @@ const VertexBridge = {
       let pointIndex1 = edges.to[n];
       let normalDistance = MAX_NODE_SIZE*0.1;
 
-      let x0 = nodes.xs[pointIndex0];
-      let x1 = nodes.xs[pointIndex1];
-      let y0 = nodes.ys[pointIndex0];
-      let y1 = nodes.ys[pointIndex1];
+      let x0 = nodes.x[pointIndex0];
+      let x1 = nodes.x[pointIndex1];
+      let y0 = nodes.y[pointIndex0];
+      let y1 = nodes.y[pointIndex1];
       let vectorX = x1 - x0;
       let vectorY = y1 - y0;
       let vector = vec2.fromValues(vectorX, vectorY);
@@ -67,38 +67,38 @@ const VertexBridge = {
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
 
       // second triangle of line
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
       triangleNormals[triangleNormalsIndex++] = xOffset;
       triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex0];
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
       triangleNormals[triangleNormalsIndex++] = xOffset * -1;
       triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
 
       if (showArrows) {
@@ -107,19 +107,19 @@ const VertexBridge = {
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = 0;
         triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
         trianglePositions[trianglePositionsIndex++] = x1;
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
 
         trianglePositions[trianglePositionsIndex++] = x1;
         trianglePositions[trianglePositionsIndex++] = y1;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
         triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+        triangleColors[triangleColorsIndex++] = nodes.color[pointIndex1];
       }
 
     }

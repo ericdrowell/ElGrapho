@@ -1,5 +1,5 @@
 module.exports = function(nodes) {
-  let numNodes = nodes.colors.length;
+  let numNodes = nodes.color.length;
 
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
@@ -7,8 +7,8 @@ module.exports = function(nodes) {
   let maxY = Number.NEGATIVE_INFINITY;
 
   for (let n=0; n<numNodes; n++) {
-    let nodeX = nodes.xs[n];
-    let nodeY = nodes.ys[n];
+    let nodeX = nodes.x[n];
+    let nodeY = nodes.y[n];
 
     minX = Math.min(minX, nodeX);
     minY = Math.min(minY, nodeY);
@@ -34,7 +34,7 @@ module.exports = function(nodes) {
   //console.log(xFactor, yFactor);
 
   for (let n=0; n<numNodes; n++) {
-    nodes.xs[n] = (nodes.xs[n] - xOffset) * factor;
-    nodes.ys[n] = (nodes.ys[n] - yOffset) * factor;
+    nodes.x[n] = (nodes.x[n] - xOffset) * factor;
+    nodes.y[n] = (nodes.y[n] - yOffset) * factor;
   }
 };

@@ -54,7 +54,7 @@ let ElGrapho = function(config) {
   this.idle = true;
   this.debug = config.debug === undefined ? false : config.debug;
   
-  this.showArrows = config.arrows === undefined ? true : config.arrows;
+  this.showArrows = config.arrows === undefined ? false : config.arrows;
 
   // default tooltip template
   this.tooltipTemplate = function(index, el) {
@@ -138,7 +138,7 @@ ElGrapho.prototype = {
         container: this.wrapper
       });
 
-      this.count.update(model.nodes.xs.length, model.edges.from.length, model.steps);
+      this.count.update(model.nodes.x.length, model.edges.from.length, model.steps);
     }
   },
   renderLabels: function() {

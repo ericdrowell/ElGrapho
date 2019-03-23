@@ -20,7 +20,7 @@ let MAX_LEVEL_MULTIPLIER = 5;
 
 let modelConfig = {
   nodes: {
-    colors: []
+    color: []
   },
   edges: {
     from: [],
@@ -41,7 +41,7 @@ for (let j=0; j<NUM_LEVELS; j++) {
 
   if (j === 0) {
     let color = 0;
-    modelConfig.nodes.colors[n] = color;
+    modelConfig.nodes.color[n] = color;
     nodeColors[n] = color;
     levels[j].push(n);
     n++;
@@ -67,7 +67,7 @@ for (let j=0; j<NUM_LEVELS; j++) {
         color = nodeColors[parentIndex];
       }
 
-      modelConfig.nodes.colors[n] = color;
+      modelConfig.nodes.color[n] = color;
       nodeColors[n] = color;
       levels[j].push(n);
       n++;

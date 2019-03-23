@@ -1,7 +1,7 @@
 // const glMatrix = require('gl-matrix');
 // const vec2 = glMatrix.vec2;
 const fitToViewport = require('./utils/fitToViewport');
-const DEFAULT_STEPS = 20;
+const DEFAULT_STEPS = 10;
 const POSITION_FACTOR = 0.3;
 //const REPEL_FACTOR = 0.01;
 //const REPEL_FROM_CENTER_FACTOR = 0;
@@ -34,6 +34,7 @@ const initNodePositions = function(nodes) {
   for (let a=0; a<numNodes; a++) {
     let color = nodes.colors[a];
     let angle = -2 * Math.PI * colors[color].next++ / numNodes;
+    //let angle = -2 * Math.PI * a / numNodes;
 
     nodes.xs[a] = POSITION_FACTOR * Math.cos(angle);
     nodes.ys[a] = POSITION_FACTOR * Math.sin(angle);
