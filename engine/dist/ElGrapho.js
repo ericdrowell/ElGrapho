@@ -3374,28 +3374,13 @@ module.exports = ForceDirectedGraph;
 
 const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
 
-const Ring = function(config) {
-  let numNodes = config.nodes.colors.length;
-
-  let model = {
-    nodes: {
-      xs: [],
-      ys: [],
-      colors: config.nodes.colors.slice()
-    },
-    edges: {
-      from: config.edges.from.slice(),
-      to: config.edges.to.slice()
-    },
-    width: config.width,
-    height: config.height
-  };
-
-  for (let n=0; n<numNodes; n++) {
+const Ring = function(model) {
+  let numNodes = model.nodes.length;
+  model.nodes.forEach(function(node, n) {
     let angle = (-1*Math.PI*2*n / numNodes) + Math.PI/2;
-    model.nodes.xs.push(Math.cos(angle));
-    model.nodes.ys.push(Math.sin(angle));
-  }
+    node.x = Math.cos(angle);
+    node.y = Math.sin(angle);
+  });
 
   fitToViewport(model.nodes);
 
@@ -3432,7 +3417,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
-  targetNode.color = srcNode.color || 0;
+  targetNode.group = srcNode.group || 0;
   targetNode.index = srcNode.index;
 
   callback(targetNode);
@@ -3459,34 +3444,34 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 };
 
 // BFS
-let getNestedTree = function(config) {
-  let edges = config.edges;
-  let colors = config.nodes.color;
-  let nodes = {};
+let getNestedTree = function(model) {
+  let nodes = model.nodes;
+  let edges = model.edges;
+  let nestedNodes = {};
 
   // build nodes
-  for (let n=0; n<colors.length; n++) {
-    nodes[n] = {
+  nodes.forEach(function(node, n) {
+    nestedNodes[n] = {
       index: n,
-      color: colors[n],
+      group: node.group,
       children: [],
       hasParent: false
     };
-  }
+  });
 
-  for (let n=0; n<edges.from.length; n++) {
-    let fromIndex = edges.from[n];
-    let toIndex = edges.to[n];
+  edges.forEach(function(edge) {
+    let fromIndex = edge.from;
+    let toIndex = edge.to;
 
     // parent child relationship
-    nodes[fromIndex].children.push(nodes[toIndex]);
-    nodes[toIndex].parent = nodes[fromIndex];
-    nodes[toIndex].hasParent = true;
-  }
+    nestedNodes[fromIndex].children.push(nestedNodes[toIndex]);
+    nestedNodes[toIndex].parent = nestedNodes[fromIndex];
+    nestedNodes[toIndex].hasParent = true;
+  });
 
   // to find the root node, iterate through nodes and find the node that does not have a parent
-  for (var key in nodes) {
-    let node = nodes[key];
+  for (var key in nestedNodes) {
+    let node = nestedNodes[key];
     if (!node.hasParent) {
       return node;
     }
@@ -3496,11 +3481,9 @@ let getNestedTree = function(config) {
 };
 
 
-const Tree = function(config) {
-  let rootNode = getNestedTree(config);
-
+const Tree = function(model) {
+  let rootNode = getNestedTree(model);
   let newRootNode = {};
-
   let nodes = [];
   let n=0;
   let maxLevel = 0;
@@ -3519,32 +3502,11 @@ const Tree = function(config) {
     return a.index - b.index;
   });
 
-  //let numNodes = nodes.length;
-
-  let model = {
-    nodes: {
-      x:     [],
-      y:     [],
-      color: []
-    },
-    edges: {
-      from: [],
-      to: []
-    },
-    width: config.width,
-    height: config.height
-  };
-
   // O(n)
   nodes.forEach(function(node, n) {
-    model.nodes.x[n] = node.x;
-    model.nodes.y[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
-    model.nodes.color[n] = node.color;
+    model.nodes[n].x = node.x;
+    model.nodes[n].y = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
 
-    if (node.parent) {
-      model.edges.from[n] = node.parent.index;
-      model.edges.to[n] = node.index;
-    }
   });
 
   fitToViewport(model.nodes);

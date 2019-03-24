@@ -14,30 +14,37 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      const WIDTH = 500;
-      const HEIGHT = 500;
-
       // for debugging
       //ElGrapho.Profiler.enabled = true;
 
       let customData = ['0.0', 1.1, 2.2, 3.3, 4.4, 5.5, 6.6];
 
-      let modelConfig = {
-        nodes: {
-          color: [0, 1, 1, 2, 2, 3, 3]
-        },
-        edges: {
-          from: [0, 0, 1, 1, 2, 2],
-          to:   [1, 2, 3, 4, 5, 6]
-        },
-        width: WIDTH,
-        height: HEIGHT
+      let model = {
+        nodes: [
+          {group: 0},
+          {group: 1},
+          {group: 1},
+          {group: 2},
+          {group: 2},
+          {group: 3},
+          {group: 3}
+        ],
+        edges: [
+          {from: 0, to: 1},
+          {from: 0, to: 2},
+          {from: 1, to: 3},
+          {from: 1, to: 4},
+          {from: 2, to: 5},
+          {from: 2, to: 6}
+        ],
+        width: 500,
+        height: 500
       };
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Tree(modelConfig),
-        arrows: false,
+        model: ElGrapho.models.Tree(model),
+        arrows: true,
         debug: true
       });
 

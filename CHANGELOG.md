@@ -1,10 +1,11 @@
 # Changlog
 
-## v1.7.0
+## v2.0
 * License is now MIT!
+* simpler model API
 * color cycling
-* auto centering of visualization
-* improved ForceDirectedGraph algorithm
+* auto viewport fit of visualizations
+* improved ForceDirectedGraph algorithm and huge performance gains, now with a O(n) complexity
 
 ## v1.6.0
 * new edges API (see docs)
