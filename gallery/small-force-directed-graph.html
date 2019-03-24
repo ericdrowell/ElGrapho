@@ -23,14 +23,22 @@ var url = new URL(window.location.href);
 var steps = parseInt(url.searchParams.get('steps')) || 20;
 console.log('steps=' + steps);
 
-let modelConfig = {
-  nodes: {
-    colors: [0, 1, 1, 2, 2, 3]
-  },
-  edges:{
-    from: [0, 0, 1, 1, 2],
-    to:   [1, 2, 3, 4, 5]
-  },
+let model = {
+  nodes: [
+    {group: 0},
+    {group: 1},
+    {group: 1},
+    {group: 2},
+    {group: 2},
+    {group: 3}
+  ],
+  edges: [
+    {from: 0, to: 1},
+    {from: 0, to: 2},
+    {from: 1, to: 3},
+    {from: 1, to: 4},
+    {from: 2, to: 5},
+  ],
   width: 500,
   height: 500,
   steps: steps
@@ -38,7 +46,7 @@ let modelConfig = {
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
+  model: ElGrapho.models.ForceDirectedGraph(model),
   debug: true
 });
 

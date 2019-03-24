@@ -17,31 +17,28 @@
     <script>
 let NUM_NODES = 1000;
 
-let modelConfig = {
-  nodes: {
-    colors: []
-  },
-  edges: {
-    from: [],
-    to: []
-  },
+let model = {
+  nodes: [],
+  edges: [],
   width: 1000,
   height: 500,
   steps: 20
 };
 
-
 for (let n=0; n<NUM_NODES; n++) {
-  modelConfig.nodes.colors.push(Math.round(Math.random() * 7));
-  modelConfig.edges.from.push(n);
-  modelConfig.edges.to.push(Math.round(Math.random() * NUM_NODES));
+  model.nodes.push({
+    group: Math.round(Math.random() * 7)
+  });
+
+  model.edges.push({
+    from: n,
+    to: Math.floor(Math.random() * (NUM_NODES - 1))
+  });
 }
-
-
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
+  model: ElGrapho.models.ForceDirectedGraph(model),
   debug: true
 });
     </script>

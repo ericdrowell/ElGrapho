@@ -17,20 +17,15 @@
     <script>
 
 var url = new URL(window.location.href);
-var steps = parseInt(url.searchParams.get('steps')) || 1;
+var steps = parseInt(url.searchParams.get('steps')) || 5;
 console.log('steps=' + steps);
 
 const NUM_LEVELS = 6;
 const NUM_CHILDREN = 4;
 
-let modelConfig = {
-  nodes: {
-    colors: []
-  },
-  edges: {
-    from: [],
-    to:   []
-  },
+let model = {
+  nodes: [],
+  edges: [],
   width: 500,
   height: 500,
   steps: steps
@@ -39,19 +34,22 @@ let modelConfig = {
 // https://en.wikipedia.org/wiki/K-ary_tree
 let numNodes = (Math.pow(NUM_CHILDREN, NUM_LEVELS)-1) / (NUM_CHILDREN-1);
 
-//console.log(numNodes);
-
-// set all nodes to blue
-modelConfig.nodes.colors.length = numNodes;
-modelConfig.nodes.colors.fill(0);
+for (let n=0; n<numNodes; n++) {
+  model.nodes.push({
+    group: 0
+  })
+}
 
 let n = 1;
 
 function addChildren(parent, level) {
   if (level < NUM_LEVELS-1) {
     for (let i=0; i<NUM_CHILDREN; i++) {
-      modelConfig.edges.from.push(parent);
-      modelConfig.edges.to.push(n);
+      model.edges.push({
+        from: parent,
+        to: n
+      });
+
       addChildren(n++, level+1);
     }
   }
@@ -63,7 +61,7 @@ addChildren(0, 0);
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
+  model: ElGrapho.models.ForceDirectedGraph(model),
   debug: true
 });
 

@@ -25,14 +25,9 @@ console.log('steps=' + steps);
 
 // https://bl.ocks.org/mbostock/ad70335eeef6d167bc36fd3c04378048
 
-let modelConfig = {
-  nodes: {
-    colors: []
-  },
-  edges: {
-    from: [],
-    to: []
-  },
+let model = {
+  nodes: [],
+  edges: [],
   width: 500,
   height: 500,
   steps: steps
@@ -379,20 +374,25 @@ let data = {
 let nodeMap = {};
 
 data.nodes.forEach(function(node, n) {
-  modelConfig.nodes.colors.push(node.group);
+  model.nodes.push({
+    group: node.group
+  });
   nodeMap[node.id] = n;
 });
 
 data.links.forEach(function(link) {
   let fromIndex = nodeMap[link.source];
   let toIndex = nodeMap[link.target];
-  modelConfig.edges.from.push(fromIndex);
-  modelConfig.edges.to.push(toIndex);
+
+  model.edges.push({
+    from: fromIndex,
+    to: toIndex
+  });
 });
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
+  model: ElGrapho.models.ForceDirectedGraph(model),
   debug: true
 });
 

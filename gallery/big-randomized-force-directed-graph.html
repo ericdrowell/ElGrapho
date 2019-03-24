@@ -15,69 +15,62 @@
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-let NUM_LEVELS = 8;
-let MAX_LEVEL_MULTIPLIER = 4;
+let NUM_LEVELS = 7;
+let MAX_LEVEL_MULTIPLIER = 5;
 
-
-let modelConfig = {
-  nodes: {
-    colors: []
-  },
-  edges: {
-    from: [],
-    to: []
-  },
+let model = {
+  nodes: [],
+  edges: [],
   width: 1000,
-  height: 500,
-  steps: 100
+  height: 500
 };
 
 let edgeIndex = 0;
 let levels = [];
 let n = 0;
-let nodeColors = {};
-let colorIndex = 1;
+let nodeGroups = {};
+let groupIndex = 1;
 
 for (let j=0; j<NUM_LEVELS; j++) {
   levels[j] = [];
 
   if (j === 0) {
-    let color = 0;
-    modelConfig.nodes.colors[n] = color;
-    nodeColors[n] = color;
+    let group = 0;
+    model.nodes[n] = {
+      group: group
+    };
+    nodeGroups[n] = group;
     levels[j].push(n);
     n++;
   }
   else {
     let lastLevel = levels[j-1];
     let lastLevelLen = lastLevel.length;
-    let numNodes;
-    
-    if (j === 1) {
-      numNodes = MAX_LEVEL_MULTIPLIER;
-    }
-    else {
-      numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
-    }
+    let numNodes = lastLevelLen + lastLevelLen * Math.floor(Math.random() * MAX_LEVEL_MULTIPLIER);
 
     for (let k=0; k<numNodes; k++) {
       let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
-      modelConfig.edges.from[edgeIndex] = parentIndex;
-      modelConfig.edges.to[edgeIndex] = n;
+      model.edges[edgeIndex] = {
+        from: parentIndex,
+        to: n
+      };
       edgeIndex++;
 
       if (j === 0) {
-        color = 0;
+        group = 0;
       }
       else if (j === 1) {
-        color = colorIndex++;
+        group = groupIndex++;
       }
       else {
-        color = nodeColors[parentIndex];
+        group = nodeGroups[parentIndex];
       }
 
-      modelConfig.nodes.colors[n] = color;
-      nodeColors[n] = color;
+      model.nodes[n] = {
+        group: group,
+        label: n
+      };
+      nodeGroups[n] = group;
       levels[j].push(n);
       n++;
     }
@@ -86,7 +79,7 @@ for (let j=0; j<NUM_LEVELS; j++) {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(modelConfig),
+  model: ElGrapho.models.ForceDirectedGraph(model),
   debug: true
 });
     </script>
