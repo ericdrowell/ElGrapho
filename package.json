@@ -32,7 +32,8 @@
     "webpack-cli": "^3.0.0"
   },
   "dependencies": {
-    "concretejs": "^3.0.2"
+    "concretejs": "^3.0.2",
+    "webcola": "^3.3.9"
   },
   "watch": {
     "build": {

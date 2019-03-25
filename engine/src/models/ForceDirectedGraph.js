@@ -1,88 +1,104 @@
 const fitToViewport = require('./utils/fitToViewport');
-const DEFAULT_STEPS = 20;
-const POSITION_FACTOR = 0.3;
-const ATTRACT_FACTOR = 0.1;
+const cola = require('webcola');
 
-const initNodePositions = function(nodes) {
-  let numNodes = nodes.length;
-
-  // find group counts
-  let groups = [];
-  nodes.forEach(function(node) {
-    let group = node.group;
-
-    if (groups[group] === undefined) {
-      groups[group] = {
-        count: 0
-      };
-    }
-
-    groups[group].count++;
-  });
-
-  let total = 0;
-  for (let n=0; n<groups.length; n++) {
-    groups[n].next = total;
-    total+=groups[n].count;
-  }
-
-  // initialize positions
-  nodes.forEach(function(node) {
-    let group = node.group;
-    let angle = -2 * Math.PI * groups[group].next++ / numNodes;
-
-    node.x = POSITION_FACTOR * Math.cos(angle);
-    node.y = POSITION_FACTOR * Math.sin(angle);
-  });
-};
-
-// attractive forces between nodes sharing an edge
-// Hooke's Law -> F = kx
-const attractNodes = function(nodes, edges) {
-  edges.forEach(function(edge) {
-    let a = edge.from;
-    let b = edge.to;
-
-    let ax = nodes[a].x;
-    let ay = nodes[a].y;
-    let bx = nodes[b].x;
-    let by = nodes[b].y;
-    let xDiff = bx - ax;
-    let yDiff = by - ay;
-    let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-
-    let xChange, yChange;
-
-    if (dist > 0) {
-      xChange = ATTRACT_FACTOR * xDiff;
-      yChange = ATTRACT_FACTOR * yDiff;
-
-      // move a closer to b
-      nodes[a].x += xChange;
-      nodes[a].y += yChange;
-
-      // move b closer to a
-      nodes[b].x -= xChange;
-      nodes[b].y -= yChange;
-    }
-  });
-};
+//const DEFAULT_STEPS = 20;
 
 const ForceDirectedGraph = function(model) {
-  let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
-  let nodes = model.nodes;
-  let edges = model.edges;
+  console.log(cola);
+  //let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
+  // let nodes = model.nodes;
+  // let edges = model.edges;
 
-  initNodePositions(nodes);
+  // let colaNodes = nodes;
+  // let colaLinks = edges;
 
-  // process steps
-  for (let n=1; n<steps; n++) {
-    attractNodes(nodes, edges);
-  }
+  // let d3cola = cola.d3adaptor()
+  //   .linkDistance(30)
+  //   .size([model.width, model.height]);
 
-  fitToViewport(nodes);
+  // d3cola
+  //   .nodes(colaNodes)
+  //   .links(colaLinks)
+  //   .constraints({
 
-  return model;
+  //   })
+  //   .symmetricDiffLinkLengths(5)
+  //   .avoidOverlaps(true)
+  //   .start(10,15,20);
+
+  // debugger;
+
+  // convert to webcola schema
+  let nodes = [];
+  let links = [];
+
+  model.nodes.forEach(function(node) {
+    nodes.push({
+      group: node.group
+    });
+  });
+
+  model.edges.forEach(function(edge) {
+    links.push({
+      source: edge.from,
+      target: edge.to
+    });
+  });
+
+
+
+  let promise = new Promise((resolve/*, reject*/) => {
+    let onStart = () => {
+      console.log('start');
+    };
+
+    let onTick = () => {
+      console.log('tick');
+    };
+
+    let onEnd = () => {
+      console.log('end');
+
+      console.log(layout.nodes());
+
+      layout.nodes().forEach(function(node, n) {
+        model.nodes[n].x = node.x;
+        model.nodes[n].y = node.y;
+      });
+
+      fitToViewport(model.nodes);
+
+      resolve(model);
+    };
+
+    // https://github.com/tgdwyer/WebCola/issues/230
+    const nodeSize = 20/*, threshold = 0.01*/; 
+     let layout = new cola.Layout() 
+      //  .handleDisconnected(false) // handle disconnected repacks the components which would hide any drift 
+      //  .linkDistance(1) // minimal link distance means nodes would overlap if not for... 
+      //  .avoidOverlaps(true) // force non-overlap 
+       .nodes(nodes)
+       .links(links) 
+       .jaccardLinkLengths(40,0.7)
+       .start(30)
+
+
+      //  .constraints([{ type: "alignment", axis: "y", 
+      //      offsets: [ 
+      //          { node: 0, offset: 0 }, 
+      //          { node: 1, offset: 0 }, 
+      //      ] 
+      //  }]) 
+       .on(cola.EventType.start, onStart) 
+       .on(cola.EventType.tick, onTick) 
+       .on(cola.EventType.end, onEnd); 
+     layout.nodes().forEach(v=>v.width = v.height = nodeSize); // square nodes 
+     layout.start(); // first layout 
+
+  });
+
+
+  return promise;
 };
 
 module.exports = ForceDirectedGraph;

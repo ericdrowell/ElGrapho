@@ -22,106 +22,121 @@ const Loading = require('./components/Loading/Loading');
 const Ring = require('./models/Ring');
 const ForceDirectedGraph = require('./models/ForceDirectedGraph');
 const Labels = require('./Labels');
+const Collapsing = require('./models/Collapsing');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
 
 let ElGrapho = function(config) {
-  this.container = config.container || document.createElement('div');
-  this.id = UUID.generate();
-  this.dirty = true;
-  this.hitDirty = true;
-  this.zoomX = START_SCALE;
-  this.zoomY = START_SCALE;
-  this.panX = 0;
-  this.panY = 0;
-  this.events = new Events();
-  this.model = config.model;
-  this.width = config.model.width;
-  this.height = config.model.height;
-  this.steps = config.model.steps;
-  this.nodeSize = config.nodeSize || 16;
-  this.animations = [];
-  this.wrapper = document.createElement('div');
-  this.wrapper.className = 'el-grapho-wrapper';
-  this.wrapper.style.width = this.width + 'px';
-  this.wrapper.style.height = this.height + 'px';
-  // clear container
-  this.container.innerHTML = '';
-  this.container.appendChild(this.wrapper);
-  this.animations = config.animations === undefined ? true : config.animations;
-  this.setInteractionMode(Enums.interactionMode.SELECT);
-  this.panStart = null;
-  this.idle = true;
-  this.debug = config.debug === undefined ? false : config.debug;
-  
-  this.showArrows = config.arrows === undefined ? false : config.arrows;
+  let that = this;
 
-  // default tooltip template
-  this.tooltipTemplate = function(index, el) {
-    el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
-  };
-  this.hoveredDataIndex = -1;
-
-  let viewport = this.viewport = new Concrete.Viewport({
-    container: this.wrapper,
-    width: this.width,
-    height: this.height
-  });
-
-  let mainLayer = new Concrete.Layer({
-    contextType: 'webgl'
-  });
-
-  let labelsLayer = this.labelsLayer = new Concrete.Layer({
-    contextType: '2d'
-  });
-
-  viewport.add(mainLayer);
-  viewport.add(labelsLayer);
-
-
-  this.webgl = new WebGL({
-    layer: mainLayer
-  });
-
-  //webgl.initShaders();
-
-  if (!ElGraphoCollection.initialized) {
-    ElGraphoCollection.init();
+  // if promise
+  if (config.model.then !== undefined) {
+    config.model.then(function(model) {
+      config.model = model;
+      that.init(config);
+    }); 
   }
-
-
-
-  // mainLayer.hit.canvas.style.display = 'inline-block';
-  // mainLayer.hit.canvas.style.marginLeft = '10px';
-  // this.wrapper.appendChild(mainLayer.hit.canvas);
-
-  //this.model = config.model;
-
-  //this.model = config.model;
-
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
-
-  // need to add focused array to the vertices object here because we need to be able to
-  // modify the focused array by reference, which is passed into webgl buffers
-  let numPoints = vertices.points.positions.length/2;
-  vertices.points.focused = new Float32Array(numPoints);
-
-  this.webgl.initBuffers(vertices);
-  
-
-  this.initComponents();
-
-  this.labels = new Labels();
-
-  this.listen();
-
-  ElGraphoCollection.graphs.push(this);
+  // if regular old object
+  else {
+    this.init(config);
+  }
 };
 
 ElGrapho.prototype = {
+  init: function(config) {
+    this.container = config.container || document.createElement('div');
+    this.id = UUID.generate();
+    this.dirty = true;
+    this.hitDirty = true;
+    this.zoomX = START_SCALE;
+    this.zoomY = START_SCALE;
+    this.panX = 0;
+    this.panY = 0;
+    this.events = new Events();
+    this.model = config.model;
+    this.width = config.model.width;
+    this.height = config.model.height;
+    this.steps = config.model.steps;
+    this.nodeSize = config.nodeSize || 16;
+    this.animations = [];
+    this.wrapper = document.createElement('div');
+    this.wrapper.className = 'el-grapho-wrapper';
+    this.wrapper.style.width = this.width + 'px';
+    this.wrapper.style.height = this.height + 'px';
+    // clear container
+    this.container.innerHTML = '';
+    this.container.appendChild(this.wrapper);
+    this.animations = config.animations === undefined ? true : config.animations;
+    this.setInteractionMode(Enums.interactionMode.SELECT);
+    this.panStart = null;
+    this.idle = true;
+    this.debug = config.debug === undefined ? false : config.debug;
+    
+    this.showArrows = config.arrows === undefined ? false : config.arrows;
 
+    // default tooltip template
+    this.tooltipTemplate = function(index, el) {
+      el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
+    };
+    this.hoveredDataIndex = -1;
+
+    let viewport = this.viewport = new Concrete.Viewport({
+      container: this.wrapper,
+      width: this.width,
+      height: this.height
+    });
+
+    let mainLayer = new Concrete.Layer({
+      contextType: 'webgl'
+    });
+
+    let labelsLayer = this.labelsLayer = new Concrete.Layer({
+      contextType: '2d'
+    });
+
+    viewport.add(mainLayer);
+    viewport.add(labelsLayer);
+
+
+    this.webgl = new WebGL({
+      layer: mainLayer
+    });
+
+    //webgl.initShaders();
+
+    if (!ElGraphoCollection.initialized) {
+      ElGraphoCollection.init();
+    }
+
+
+
+    // mainLayer.hit.canvas.style.display = 'inline-block';
+    // mainLayer.hit.canvas.style.marginLeft = '10px';
+    // this.wrapper.appendChild(mainLayer.hit.canvas);
+
+    //this.model = config.model;
+
+    //this.model = config.model;
+
+    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
+
+    // need to add focused array to the vertices object here because we need to be able to
+    // modify the focused array by reference, which is passed into webgl buffers
+    let numPoints = vertices.points.positions.length/2;
+    vertices.points.focused = new Float32Array(numPoints);
+
+    this.webgl.initBuffers(vertices);
+    
+
+    this.initComponents();
+
+    this.labels = new Labels();
+
+    this.listen();
+
+    ElGraphoCollection.graphs.push(this);
+  },
   initComponents: function() {
     let model = this.model;
 
@@ -575,7 +590,8 @@ ElGrapho.models = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
-  ForceDirectedGraph: ForceDirectedGraph
+  ForceDirectedGraph: ForceDirectedGraph,
+  Collapsing: Collapsing
 };
 
 // node.js export

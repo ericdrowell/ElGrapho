@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Big Force Directed Graph</h1>
+    <h1>El Grapho Big Collapsing Graph</h1>
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
@@ -20,8 +20,8 @@ var url = new URL(window.location.href);
 var steps = parseInt(url.searchParams.get('steps')) || 5;
 console.log('steps=' + steps);
 
-const NUM_LEVELS = 6;
-const NUM_CHILDREN = 4;
+const NUM_LEVELS = 5;
+const NUM_CHILDREN = 3;
 
 let model = {
   nodes: [],
@@ -61,7 +61,7 @@ addChildren(0, 0);
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(model),
+  model: ElGrapho.models.Collapsing(model),
   debug: true
 });
 
