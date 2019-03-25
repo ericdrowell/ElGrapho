@@ -2,11 +2,13 @@
 
 ## P0
 * add license.js to artifact
-* when creating lots of el grapho graphs, concrete throws error about too many webgl contexts
-* lines get fat sometimes when viz stretched.  arrows don't point in right direction when viz is stretched.  this is the same problem
-* controls button that live updates step count
+* make force directed graphs look better
+* new Lineage model
 
 ## P1
+* when creating lots of el grapho graphs, concrete throws error about too many webgl contexts
+* lines get fat sometimes when viz stretched.  arrows don't point in right direction when viz is stretched.  this is the same problem
+* enable animating between models (mostly for marketing reasons)
 * tests and github CI
 * node events should include x,y mouse position, or at least mouse event object
 * tooltips are slow in big network graph.
