@@ -2,15 +2,13 @@
 
 <img width="300" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho.png"/>
 
-## Website
-
-https://www.elgrapho.com/
-
 ## What is El Grapho?
 
 <img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho-examples.png"/>
 
 El Grapho is a high performance WebGL graph data visualization engine.  El Grapho can support millions of interactive nodes and edges in any modern browser.
+
+https://www.elgrapho.com/
 
 ## Why Would I Use This?
 
