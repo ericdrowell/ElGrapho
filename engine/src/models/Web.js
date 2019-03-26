@@ -68,7 +68,7 @@ const attractNodes = function(nodes, edges) {
   });
 };
 
-const Collapsing = function(model) {
+const Web = function(model) {
   let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
   let nodes = model.nodes;
   let edges = model.edges;
@@ -85,4 +85,4 @@ const Collapsing = function(model) {
   return model;
 };
 
-module.exports = Collapsing;
+module.exports = Web;

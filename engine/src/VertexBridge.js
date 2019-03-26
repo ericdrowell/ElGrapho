@@ -42,7 +42,7 @@ const VertexBridge = {
     for (let n=0; n<numEdges; n++) {
       let pointIndex0 = edges[n].from;
       let pointIndex1 = edges[n].to;
-      let normalDistance = MAX_NODE_SIZE*0.1;
+      let normalDistance = MAX_NODE_SIZE*0.08;
 
       let x0 = nodes[pointIndex0].x;
       let x1 = nodes[pointIndex1].x;

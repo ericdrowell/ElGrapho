@@ -2,10 +2,11 @@
 
 ## v2.0
 * License is now MIT!
-* simpler model API
-* color cycling
-* auto viewport fit of visualizations
-* improved ForceDirectedGraph algorithm and huge performance gains, now with a O(n) complexity
+* new API
+* ForceDirected model now using Webcola for layout
+* new Web model which is a simplified force directed graph that runs in O(n) time
+* node color cycling
+* auto viewport fitting
 
 ## v1.6.0
 * new edges API (see docs)

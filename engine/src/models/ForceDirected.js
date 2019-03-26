@@ -1,11 +1,13 @@
 const fitToViewport = require('./utils/fitToViewport');
 const cola = require('webcola');
 
-//const DEFAULT_STEPS = 20;
+const DEFAULT_STEPS = 30;
 
-const ForceDirectedGraph = function(model) {
-  console.log(cola);
-  //let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
+const ForceDirected = function(model) {
+  if (model.steps === undefined) {
+    model.steps = DEFAULT_STEPS;
+  }
+
   // let nodes = model.nodes;
   // let edges = model.edges;
 
@@ -49,17 +51,17 @@ const ForceDirectedGraph = function(model) {
 
   let promise = new Promise((resolve/*, reject*/) => {
     let onStart = () => {
-      console.log('start');
+      //console.log('start');
     };
 
     let onTick = () => {
-      console.log('tick');
+      //console.log('tick');
     };
 
     let onEnd = () => {
-      console.log('end');
+      //console.log('end');
 
-      console.log(layout.nodes());
+      //console.log(layout.nodes());
 
       layout.nodes().forEach(function(node, n) {
         model.nodes[n].x = node.x;
@@ -80,7 +82,7 @@ const ForceDirectedGraph = function(model) {
        .nodes(nodes)
        .links(links) 
        .jaccardLinkLengths(40,0.7)
-       .start(30)
+       .start(model.steps)
 
 
       //  .constraints([{ type: "alignment", axis: "y", 
@@ -101,4 +103,4 @@ const ForceDirectedGraph = function(model) {
   return promise;
 };
 
-module.exports = ForceDirectedGraph;
+module.exports = ForceDirected;

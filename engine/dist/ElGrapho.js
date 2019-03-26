@@ -1408,9 +1408,9 @@ const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 const Loading = __webpack_require__(/*! ./components/Loading/Loading */ "./engine/src/components/Loading/Loading.js");
 const Ring = __webpack_require__(/*! ./models/Ring */ "./engine/src/models/Ring.js");
-const ForceDirectedGraph = __webpack_require__(/*! ./models/ForceDirectedGraph */ "./engine/src/models/ForceDirectedGraph.js");
+const ForceDirected = __webpack_require__(/*! ./models/ForceDirected */ "./engine/src/models/ForceDirected.js");
 const Labels = __webpack_require__(/*! ./Labels */ "./engine/src/Labels.js");
-const Collapsing = __webpack_require__(/*! ./models/Collapsing */ "./engine/src/models/Collapsing.js");
+const Web = __webpack_require__(/*! ./models/Web */ "./engine/src/models/Web.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -1568,14 +1568,16 @@ ElGrapho.prototype = {
     labelsContext.textAlign = 'center'; 
     
 
-    
-    labelsContext.fillStyle = 'black';
+    labelsContext.font = '12px Arial';
+    labelsContext.fillStyle = '#333';
     labelsContext.strokeStyle = 'white';
-    labelsContext.lineWidth = 4;
+    labelsContext.lineWidth = 3;
+    labelsContext.lineJoin = 'round';
 
     this.labels.labelsAdded.forEach(function(label) {
       let x = label.x * that.zoomX + that.panX;
       let y = label.y * -1 * that.zoomY - that.panY - 10;
+      labelsContext.beginPath();
       labelsContext.strokeText(label.str, x, y);
       labelsContext.fillText(label.str, x, y);
     });
@@ -1978,8 +1980,8 @@ ElGrapho.models = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
-  ForceDirectedGraph: ForceDirectedGraph,
-  Collapsing: Collapsing
+  ForceDirected: ForceDirected,
+  Web: Web
 };
 
 // node.js export
@@ -2337,7 +2339,7 @@ const VertexBridge = {
     for (let n=0; n<numEdges; n++) {
       let pointIndex0 = edges[n].from;
       let pointIndex1 = edges[n].to;
-      let normalDistance = MAX_NODE_SIZE*0.1;
+      let normalDistance = MAX_NODE_SIZE*0.08;
 
       let x0 = nodes[pointIndex0].x;
       let x1 = nodes[pointIndex1].x;
@@ -3188,119 +3190,23 @@ module.exports = Cluster;
 
 /***/ }),
 
-/***/ "./engine/src/models/Collapsing.js":
-/*!*****************************************!*\
-  !*** ./engine/src/models/Collapsing.js ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
-const DEFAULT_STEPS = 20;
-const POSITION_FACTOR = 0.3;
-const ATTRACT_FACTOR = 0.1;
-
-const initNodePositions = function(nodes) {
-  let numNodes = nodes.length;
-
-  // find group counts
-  let groups = [];
-  nodes.forEach(function(node) {
-    let group = node.group;
-
-    if (groups[group] === undefined) {
-      groups[group] = {
-        count: 0
-      };
-    }
-
-    groups[group].count++;
-  });
-
-  let total = 0;
-  for (let n=0; n<groups.length; n++) {
-    groups[n].next = total;
-    total+=groups[n].count;
-  }
-
-  // initialize positions
-  nodes.forEach(function(node) {
-    let group = node.group;
-    let angle = -2 * Math.PI * groups[group].next++ / numNodes;
-
-    node.x = POSITION_FACTOR * Math.cos(angle);
-    node.y = POSITION_FACTOR * Math.sin(angle);
-  });
-};
-
-// attractive forces between nodes sharing an edge
-// Hooke's Law -> F = kx
-const attractNodes = function(nodes, edges) {
-  edges.forEach(function(edge) {
-    let a = edge.from;
-    let b = edge.to;
-
-    let ax = nodes[a].x;
-    let ay = nodes[a].y;
-    let bx = nodes[b].x;
-    let by = nodes[b].y;
-    let xDiff = bx - ax;
-    let yDiff = by - ay;
-    let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-
-    let xChange, yChange;
-
-    if (dist > 0) {
-      xChange = ATTRACT_FACTOR * xDiff;
-      yChange = ATTRACT_FACTOR * yDiff;
-
-      // move a closer to b
-      nodes[a].x += xChange;
-      nodes[a].y += yChange;
-
-      // move b closer to a
-      nodes[b].x -= xChange;
-      nodes[b].y -= yChange;
-    }
-  });
-};
-
-const Collapsing = function(model) {
-  let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
-  let nodes = model.nodes;
-  let edges = model.edges;
-
-  initNodePositions(nodes);
-
-  // process steps
-  for (let n=1; n<steps; n++) {
-    attractNodes(nodes, edges);
-  }
-
-  fitToViewport(nodes);
-
-  return model;
-};
-
-module.exports = Collapsing;
-
-/***/ }),
-
-/***/ "./engine/src/models/ForceDirectedGraph.js":
-/*!*************************************************!*\
-  !*** ./engine/src/models/ForceDirectedGraph.js ***!
-  \*************************************************/
+/***/ "./engine/src/models/ForceDirected.js":
+/*!********************************************!*\
+  !*** ./engine/src/models/ForceDirected.js ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
 const cola = __webpack_require__(/*! webcola */ "./node_modules/webcola/dist/index.js");
 
-//const DEFAULT_STEPS = 20;
+const DEFAULT_STEPS = 30;
 
-const ForceDirectedGraph = function(model) {
-  console.log(cola);
-  //let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
+const ForceDirected = function(model) {
+  if (model.steps === undefined) {
+    model.steps = DEFAULT_STEPS;
+  }
+
   // let nodes = model.nodes;
   // let edges = model.edges;
 
@@ -3344,17 +3250,17 @@ const ForceDirectedGraph = function(model) {
 
   let promise = new Promise((resolve/*, reject*/) => {
     let onStart = () => {
-      console.log('start');
+      //console.log('start');
     };
 
     let onTick = () => {
-      console.log('tick');
+      //console.log('tick');
     };
 
     let onEnd = () => {
-      console.log('end');
+      //console.log('end');
 
-      console.log(layout.nodes());
+      //console.log(layout.nodes());
 
       layout.nodes().forEach(function(node, n) {
         model.nodes[n].x = node.x;
@@ -3375,7 +3281,7 @@ const ForceDirectedGraph = function(model) {
        .nodes(nodes)
        .links(links) 
        .jaccardLinkLengths(40,0.7)
-       .start(30)
+       .start(model.steps)
 
 
       //  .constraints([{ type: "alignment", axis: "y", 
@@ -3396,7 +3302,7 @@ const ForceDirectedGraph = function(model) {
   return promise;
 };
 
-module.exports = ForceDirectedGraph;
+module.exports = ForceDirected;
 
 /***/ }),
 
@@ -3550,6 +3456,104 @@ const Tree = function(model) {
 };
 
 module.exports = Tree;
+
+/***/ }),
+
+/***/ "./engine/src/models/Web.js":
+/*!**********************************!*\
+  !*** ./engine/src/models/Web.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const DEFAULT_STEPS = 20;
+const POSITION_FACTOR = 0.3;
+const ATTRACT_FACTOR = 0.1;
+
+const initNodePositions = function(nodes) {
+  let numNodes = nodes.length;
+
+  // find group counts
+  let groups = [];
+  nodes.forEach(function(node) {
+    let group = node.group;
+
+    if (groups[group] === undefined) {
+      groups[group] = {
+        count: 0
+      };
+    }
+
+    groups[group].count++;
+  });
+
+  let total = 0;
+  for (let n=0; n<groups.length; n++) {
+    groups[n].next = total;
+    total+=groups[n].count;
+  }
+
+  // initialize positions
+  nodes.forEach(function(node) {
+    let group = node.group;
+    let angle = -2 * Math.PI * groups[group].next++ / numNodes;
+
+    node.x = POSITION_FACTOR * Math.cos(angle);
+    node.y = POSITION_FACTOR * Math.sin(angle);
+  });
+};
+
+// attractive forces between nodes sharing an edge
+// Hooke's Law -> F = kx
+const attractNodes = function(nodes, edges) {
+  edges.forEach(function(edge) {
+    let a = edge.from;
+    let b = edge.to;
+
+    let ax = nodes[a].x;
+    let ay = nodes[a].y;
+    let bx = nodes[b].x;
+    let by = nodes[b].y;
+    let xDiff = bx - ax;
+    let yDiff = by - ay;
+    let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+    let xChange, yChange;
+
+    if (dist > 0) {
+      xChange = ATTRACT_FACTOR * xDiff;
+      yChange = ATTRACT_FACTOR * yDiff;
+
+      // move a closer to b
+      nodes[a].x += xChange;
+      nodes[a].y += yChange;
+
+      // move b closer to a
+      nodes[b].x -= xChange;
+      nodes[b].y -= yChange;
+    }
+  });
+};
+
+const Web = function(model) {
+  let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
+  let nodes = model.nodes;
+  let edges = model.edges;
+
+  initNodePositions(nodes);
+
+  // process steps
+  for (let n=1; n<steps; n++) {
+    attractNodes(nodes, edges);
+  }
+
+  fitToViewport(nodes);
+
+  return model;
+};
+
+module.exports = Web;
 
 /***/ }),
 

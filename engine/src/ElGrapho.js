@@ -20,9 +20,9 @@ const Cluster = require('./models/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
 const Ring = require('./models/Ring');
-const ForceDirectedGraph = require('./models/ForceDirectedGraph');
+const ForceDirected = require('./models/ForceDirected');
 const Labels = require('./Labels');
-const Collapsing = require('./models/Collapsing');
+const Web = require('./models/Web');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -180,14 +180,16 @@ ElGrapho.prototype = {
     labelsContext.textAlign = 'center'; 
     
 
-    
-    labelsContext.fillStyle = 'black';
+    labelsContext.font = '12px Arial';
+    labelsContext.fillStyle = '#333';
     labelsContext.strokeStyle = 'white';
-    labelsContext.lineWidth = 4;
+    labelsContext.lineWidth = 3;
+    labelsContext.lineJoin = 'round';
 
     this.labels.labelsAdded.forEach(function(label) {
       let x = label.x * that.zoomX + that.panX;
       let y = label.y * -1 * that.zoomY - that.panY - 10;
+      labelsContext.beginPath();
       labelsContext.strokeText(label.str, x, y);
       labelsContext.fillText(label.str, x, y);
     });
@@ -590,8 +592,8 @@ ElGrapho.models = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
-  ForceDirectedGraph: ForceDirectedGraph,
-  Collapsing: Collapsing
+  ForceDirected: ForceDirected,
+  Web: Web
 };
 
 // node.js export

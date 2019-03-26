@@ -12,7 +12,7 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Miserables Data Force Directed Graph</h1>
+    <h1>El Grapho Miserables Force Directed Graph</h1>
 
     <div id="container"></div>
 
@@ -20,8 +20,8 @@
     <script>
 
 var url = new URL(window.location.href);
-var steps = parseInt(url.searchParams.get('steps')) || 20;
-console.log('steps=' + steps);
+var steps = parseInt(url.searchParams.get('steps')) || undefined;
+//console.log('steps=' + steps);
 
 // https://bl.ocks.org/mbostock/ad70335eeef6d167bc36fd3c04378048
 
@@ -391,9 +391,8 @@ data.links.forEach(function(link) {
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirectedGraph(model),
-  debug: true,
-  arrows: true
+  model: ElGrapho.models.ForceDirected(model),
+  debug: true
 });
 
     </script>
@@ -404,12 +403,12 @@ graph = new ElGrapho({
 
     <script>
       document.getElementById('stepDown').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps-1);
+        url.searchParams.set('steps', model.steps-1);
         window.open(url, '_self');
       });
 
       document.getElementById('stepUp').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps+1);
+        url.searchParams.set('steps', model.steps+1);
         window.open(url, '_self');
       });
 
