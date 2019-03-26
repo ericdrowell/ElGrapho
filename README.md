@@ -6,6 +6,10 @@
 
 https://www.elgrapho.com/
 
+## What Does It Look Like?
+
+<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho-examples.png"/>
+
 ## What is El Grapho?
 
 El Grapho is a high performance WebGL graph data visualization engine.  El Grapho can support millions of interactive nodes and edges in any modern browser.
@@ -13,10 +17,6 @@ El Grapho is a high performance WebGL graph data visualization engine.  El Graph
 ## Why Would I Use This?
 
 If you need to build a graph visualization for the web of any kind, such as a tree, force directed graph, network graph, etc., and scale and performance are important to you, then El Grapho is a great option.  It was built from the ground up to optimize for CPU and GPU performance.
-
-## What Does It Look Like?
-
-<img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho-examples.png"/>
 
 ## Live Examples
 
