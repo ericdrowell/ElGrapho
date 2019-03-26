@@ -6,11 +6,9 @@
 
 https://www.elgrapho.com/
 
-## What Does It Look Like?
+## What is El Grapho?
 
 <img width="800" src="https://raw.githubusercontent.com/ericdrowell/ElGrapho/master/img/elgrapho-examples.png"/>
-
-## What is El Grapho?
 
 El Grapho is a high performance WebGL graph data visualization engine.  El Grapho can support millions of interactive nodes and edges in any modern browser.
 
