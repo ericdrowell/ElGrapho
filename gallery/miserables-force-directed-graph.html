@@ -391,7 +391,7 @@ data.links.forEach(function(link) {
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirected(model),
+  model: ElGrapho.layouts.ForceDirected(model),
   debug: true
 });
 

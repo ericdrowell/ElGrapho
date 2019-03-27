@@ -1403,14 +1403,14 @@ const NumberFormatter = __webpack_require__(/*! ./formatters/NumberFormatter */ 
 const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/VertexBridge.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
-const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
-const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models/Cluster.js");
+const Tree = __webpack_require__(/*! ./layouts/Tree */ "./engine/src/layouts/Tree.js");
+const Cluster = __webpack_require__(/*! ./layouts/Cluster */ "./engine/src/layouts/Cluster.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 const Loading = __webpack_require__(/*! ./components/Loading/Loading */ "./engine/src/components/Loading/Loading.js");
-const Ring = __webpack_require__(/*! ./models/Ring */ "./engine/src/models/Ring.js");
-const ForceDirected = __webpack_require__(/*! ./models/ForceDirected */ "./engine/src/models/ForceDirected.js");
+const Ring = __webpack_require__(/*! ./layouts/Ring */ "./engine/src/layouts/Ring.js");
+const ForceDirected = __webpack_require__(/*! ./layouts/ForceDirected */ "./engine/src/layouts/ForceDirected.js");
 const Labels = __webpack_require__(/*! ./Labels */ "./engine/src/Labels.js");
-const Web = __webpack_require__(/*! ./models/Web */ "./engine/src/models/Web.js");
+const Web = __webpack_require__(/*! ./layouts/Web */ "./engine/src/layouts/Web.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -1976,7 +1976,7 @@ ElGrapho.Theme = Theme;
 ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
-ElGrapho.models = {
+ElGrapho.layouts = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
@@ -3101,14 +3101,14 @@ module.exports = NumberFormatter;
 
 /***/ }),
 
-/***/ "./engine/src/models/Cluster.js":
-/*!**************************************!*\
-  !*** ./engine/src/models/Cluster.js ***!
-  \**************************************/
+/***/ "./engine/src/layouts/Cluster.js":
+/*!***************************************!*\
+  !*** ./engine/src/layouts/Cluster.js ***!
+  \***************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 
 const Cluster = function(model) {
   let width = model.width;
@@ -3190,14 +3190,14 @@ module.exports = Cluster;
 
 /***/ }),
 
-/***/ "./engine/src/models/ForceDirected.js":
-/*!********************************************!*\
-  !*** ./engine/src/models/ForceDirected.js ***!
-  \********************************************/
+/***/ "./engine/src/layouts/ForceDirected.js":
+/*!*********************************************!*\
+  !*** ./engine/src/layouts/ForceDirected.js ***!
+  \*********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 const cola = __webpack_require__(/*! webcola */ "./node_modules/webcola/dist/index.js");
 
 const DEFAULT_STEPS = 30;
@@ -3306,14 +3306,14 @@ module.exports = ForceDirected;
 
 /***/ }),
 
-/***/ "./engine/src/models/Ring.js":
-/*!***********************************!*\
-  !*** ./engine/src/models/Ring.js ***!
-  \***********************************/
+/***/ "./engine/src/layouts/Ring.js":
+/*!************************************!*\
+  !*** ./engine/src/layouts/Ring.js ***!
+  \************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 
 const Ring = function(model) {
   let numNodes = model.nodes.length;
@@ -3332,14 +3332,14 @@ module.exports = Ring;
 
 /***/ }),
 
-/***/ "./engine/src/models/Tree.js":
-/*!***********************************!*\
-  !*** ./engine/src/models/Tree.js ***!
-  \***********************************/
+/***/ "./engine/src/layouts/Tree.js":
+/*!************************************!*\
+  !*** ./engine/src/layouts/Tree.js ***!
+  \************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 
 let incrementAncestorTotals = function(node, val) {
   node.totalDescendants+=val;
@@ -3459,14 +3459,14 @@ module.exports = Tree;
 
 /***/ }),
 
-/***/ "./engine/src/models/Web.js":
-/*!**********************************!*\
-  !*** ./engine/src/models/Web.js ***!
-  \**********************************/
+/***/ "./engine/src/layouts/Web.js":
+/*!***********************************!*\
+  !*** ./engine/src/layouts/Web.js ***!
+  \***********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/models/utils/fitToViewport.js");
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 const DEFAULT_STEPS = 20;
 const POSITION_FACTOR = 0.3;
 const ATTRACT_FACTOR = 0.1;
@@ -3557,10 +3557,10 @@ module.exports = Web;
 
 /***/ }),
 
-/***/ "./engine/src/models/utils/fitToViewport.js":
-/*!**************************************************!*\
-  !*** ./engine/src/models/utils/fitToViewport.js ***!
-  \**************************************************/
+/***/ "./engine/src/layouts/utils/fitToViewport.js":
+/*!***************************************************!*\
+  !*** ./engine/src/layouts/utils/fitToViewport.js ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 

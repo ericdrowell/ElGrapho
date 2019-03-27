@@ -15,14 +15,14 @@ const NumberFormatter = require('./formatters/NumberFormatter');
 const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
 const BoxZoom = require('./components/BoxZoom/BoxZoom');
-const Tree = require('./models/Tree');
-const Cluster = require('./models/Cluster');
+const Tree = require('./layouts/Tree');
+const Cluster = require('./layouts/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
-const Ring = require('./models/Ring');
-const ForceDirected = require('./models/ForceDirected');
+const Ring = require('./layouts/Ring');
+const ForceDirected = require('./layouts/ForceDirected');
 const Labels = require('./Labels');
-const Web = require('./models/Web');
+const Web = require('./layouts/Web');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -588,7 +588,7 @@ ElGrapho.Theme = Theme;
 ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
-ElGrapho.models = {
+ElGrapho.layouts = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
