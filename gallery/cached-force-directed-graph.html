@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Cached Force Directed Graph</h1>
+
+    <div id="container"></div>
+
+    <script src="../engine/dist/ElGrapho.js"></script>
+
+    <!-- defines MODEl variable -->
+    <script src="models/bigTree.js"></script>
+    <script>
+
+graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: MODEL,
+  debug: true
+});
+
+    </script>
+
+    <button id="stepDown">Step Down</button>
+    <button id="stepUp">Step Up</button>
+    
+
+    <script>
+      document.getElementById('stepDown').addEventListener('click', function(evt) {
+        url.searchParams.set('steps', steps-1);
+        window.open(url, '_self');
+      });
+
+      document.getElementById('stepUp').addEventListener('click', function(evt) {
+        url.searchParams.set('steps', steps+1);
+        window.open(url, '_self');
+      });
+
+    </script>
+  </body>
+</html>
