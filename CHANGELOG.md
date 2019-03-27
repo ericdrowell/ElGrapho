@@ -1,6 +1,9 @@
 # Changlog
 
-## v2.0
+## v2.1.0
+* models are now called layouts
+
+## v2.0.0
 * License is now MIT!
 * new API
 * ForceDirected model now using Webcola for layout
