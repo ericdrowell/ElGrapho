@@ -8,7 +8,7 @@ const ForceDirected = function(model) {
     model.steps = DEFAULT_STEPS;
   }
 
-  // convert to webcola schema
+  // convert to d3-force schema
   let nodes = [];
   let links = [];
 
