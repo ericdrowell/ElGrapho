@@ -27,9 +27,9 @@ const ForceDirected = function(model) {
   });
 
   let simulation = d3.forceSimulation(nodes)
-    .force("charge", d3.forceManyBody())
-    .force("link", d3.forceLink(links))
-    .force("center", d3.forceCenter());
+    .force('charge', d3.forceManyBody())
+    .force('link', d3.forceLink(links))
+    .force('center', d3.forceCenter());
 
   simulation.tick(model.steps);
   simulation.stop();
