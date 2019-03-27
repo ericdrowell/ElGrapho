@@ -15,14 +15,13 @@
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-let NUM_NODES = 1000;
+let NUM_NODES = 10000;
 
 let model = {
   nodes: [],
   edges: [],
   width: 1000,
-  height: 500,
-  steps: 20
+  height: 500
 };
 
 for (let n=0; n<NUM_NODES; n++) {
@@ -39,7 +38,8 @@ for (let n=0; n<NUM_NODES; n++) {
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Web(model),
-  debug: true
+  debug: true,
+  nodeSize: 0.3
 });
     </script>
   </body>

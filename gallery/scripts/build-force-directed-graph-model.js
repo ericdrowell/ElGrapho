@@ -1,15 +1,14 @@
 const fs = require('fs');
 const ForceDirected = require('../../engine/src/layouts/ForceDirected.js');
 
-let NUM_LEVELS = 8;
-let MAX_LEVEL_MULTIPLIER = 5;
+let NUM_LEVELS = 11;
+let MAX_LEVEL_MULTIPLIER = 4;
 
 let model = {
   nodes: [],
   edges: [],
   width: 1000,
-  height: 500,
-  steps: 1
+  height: 500
 };
 
 let edgeIndex = 0;
@@ -71,14 +70,14 @@ for (let j=0; j<NUM_LEVELS; j++) {
 console.log('applying layout...');
 
 let startTime = new Date().getTime();
-ForceDirected(model).then(function() {
-  fs.writeFileSync('gallery/models/bigTree.js', 'const MODEL=' + JSON.stringify(model) + ';', 'utf-8');
+ForceDirected(model);
 
-  let endTime = new Date().getTime();
+fs.writeFileSync('gallery/models/bigTree.js', 'const MODEL=' + JSON.stringify(model) + ';', 'utf-8');
 
-  let timeDiff = (endTime - startTime) / 1000; // seconds
-  console.log('done!');
-  console.log('applying layout took ' + timeDiff + ' seconds');
-});
+let endTime = new Date().getTime();
+
+let timeDiff = (endTime - startTime) / 1000; // seconds
+console.log('done!');
+console.log('applying layout took ' + timeDiff + ' seconds');
 
 

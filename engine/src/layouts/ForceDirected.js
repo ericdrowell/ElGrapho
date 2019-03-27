@@ -1,5 +1,5 @@
 const fitToViewport = require('./utils/fitToViewport');
-const cola = require('webcola');
+const d3 = require('d3-force');
 
 const DEFAULT_STEPS = 30;
 
@@ -8,34 +8,13 @@ const ForceDirected = function(model) {
     model.steps = DEFAULT_STEPS;
   }
 
-  // let nodes = model.nodes;
-  // let edges = model.edges;
-
-  // let colaNodes = nodes;
-  // let colaLinks = edges;
-
-  // let d3cola = cola.d3adaptor()
-  //   .linkDistance(30)
-  //   .size([model.width, model.height]);
-
-  // d3cola
-  //   .nodes(colaNodes)
-  //   .links(colaLinks)
-  //   .constraints({
-
-  //   })
-  //   .symmetricDiffLinkLengths(5)
-  //   .avoidOverlaps(true)
-  //   .start(10,15,20);
-
-  // debugger;
-
   // convert to webcola schema
   let nodes = [];
   let links = [];
 
-  model.nodes.forEach(function(node) {
+  model.nodes.forEach(function(node, n) {
     nodes.push({
+      id: n,
       group: node.group
     });
   });
@@ -47,60 +26,22 @@ const ForceDirected = function(model) {
     });
   });
 
+  let simulation = d3.forceSimulation(nodes)
+    .force("charge", d3.forceManyBody())
+    .force("link", d3.forceLink(links))
+    .force("center", d3.forceCenter());
 
+  simulation.tick(model.steps);
+  simulation.stop();
 
-  let promise = new Promise((resolve/*, reject*/) => {
-    let onStart = () => {
-      //console.log('start');
-    };
-
-    let onTick = () => {
-      //console.log('tick');
-    };
-
-    let onEnd = () => {
-      //console.log('end');
-
-      //console.log(layout.nodes());
-
-      layout.nodes().forEach(function(node, n) {
-        model.nodes[n].x = node.x;
-        model.nodes[n].y = node.y;
-      });
-
-      fitToViewport(model.nodes);
-
-      resolve(model);
-    };
-
-    // https://github.com/tgdwyer/WebCola/issues/230
-    const nodeSize = 20/*, threshold = 0.01*/; 
-     let layout = new cola.Layout() 
-      //  .handleDisconnected(false) // handle disconnected repacks the components which would hide any drift 
-      //  .linkDistance(1) // minimal link distance means nodes would overlap if not for... 
-      //  .avoidOverlaps(true) // force non-overlap 
-       .nodes(nodes)
-       .links(links) 
-       .jaccardLinkLengths(40,0.7)
-       .start(model.steps)
-
-
-      //  .constraints([{ type: "alignment", axis: "y", 
-      //      offsets: [ 
-      //          { node: 0, offset: 0 }, 
-      //          { node: 1, offset: 0 }, 
-      //      ] 
-      //  }]) 
-       .on(cola.EventType.start, onStart) 
-       .on(cola.EventType.tick, onTick) 
-       .on(cola.EventType.end, onEnd); 
-     layout.nodes().forEach(v=>v.width = v.height = nodeSize); // square nodes 
-     layout.start(); // first layout 
-
+  simulation.nodes().forEach(function(node, n) {
+    model.nodes[n].x = node.x;
+    model.nodes[n].y = node.y;
   });
 
+  fitToViewport(model.nodes);
 
-  return promise;
+  return model;
 };
 
 module.exports = ForceDirected;

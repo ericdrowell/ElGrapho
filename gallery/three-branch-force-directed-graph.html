@@ -16,10 +16,6 @@
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
 
-var url = new URL(window.location.href);
-var steps = parseInt(url.searchParams.get('steps')) || 20;
-console.log('steps=' + steps);
-
 let model = {
   nodes: [
     {group: 0, label: 'a0'},
@@ -57,8 +53,7 @@ let model = {
     {from: 14, to: 15},
   ],
   width: 500,
-  height: 500,
-  steps: steps
+  height: 500
 };
 
 let graph = new ElGrapho({
@@ -68,22 +63,7 @@ let graph = new ElGrapho({
 });
     </script>
 
-    <button id="stepDown">Step Down</button>
-    <button id="stepUp">Step Up</button>
-    
 
-    <script>
-      document.getElementById('stepDown').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps-1);
-        window.open(url, '_self');
-      });
-
-      document.getElementById('stepUp').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps+1);
-        window.open(url, '_self');
-      });
-
-    </script>
 
   </body>
 </html>

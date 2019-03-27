@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "concretejs": "^3.0.2",
-    "webcola": "^3.3.9"
+    "d3-force": "^2.0.1"
   },
   "watch": {
     "build": {
