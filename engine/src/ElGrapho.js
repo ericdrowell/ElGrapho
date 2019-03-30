@@ -595,9 +595,4 @@ ElGrapho.layouts = {
   Web: Web
 };
 
-<<<<<<< HEAD
 module.exports = ElGrapho;
-=======
-// node.js export
-module.exports = ElGrapho;
->>>>>>> upstream/master
