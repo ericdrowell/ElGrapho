@@ -142,9 +142,6 @@ const ForceDirectedGraph = function(config) {
     // }
   }
 
-
-  console.log(model);
-
   return model;
 };
 
