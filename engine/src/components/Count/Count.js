@@ -3,18 +3,17 @@ const NumberFormatter = require('../../formatters/NumberFormatter');
 const Count = function(config) {
   let wrapper = this.wrapper = document.createElement('span');
   let container = config.container;
-  let vertices = config.vertices;
-  let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
-  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/12 : 0;
-
-  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' nodes + ' + NumberFormatter.addCommas(triangleCount) + ' edges';
-  wrapper.className = 'el-grapho-count';
 
   container.appendChild(wrapper);
 };
 
 Count.prototype = {
-
+  update: function(nodeCount, edgeCount, steps) {
+    let nodesAndEdgesStr = NumberFormatter.addCommas(nodeCount) + ' nodes + ' + NumberFormatter.addCommas(edgeCount) + ' edges';
+    let stepsStr = steps === undefined ? '' : ' x ' + steps + ' steps';
+    this.wrapper.innerHTML = nodesAndEdgesStr + stepsStr;
+    this.wrapper.className = 'el-grapho-count';
+  }
 };
 
 module.exports = Count;

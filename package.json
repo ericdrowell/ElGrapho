@@ -1,9 +1,9 @@
 {
   "name": "elgrapho",
-  "version": "1.4.0",
-  "main": "engine/dist/elgrapho.min.js",
+  "version": "2.0.0",
+  "main": "engine/dist/ElGrapho.min.js",
   "author": "Eric Rowell",
-  "license": "SEE LICENSE IN <LICENSE.md>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ericdrowell/ElGrapho.git"
@@ -32,7 +32,8 @@
     "webpack-cli": "^3.0.0"
   },
   "dependencies": {
-    "concretejs": "^3.0.2"
+    "concretejs": "^3.0.2",
+    "d3-force": "^2.0.1"
   },
   "watch": {
     "build": {

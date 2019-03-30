@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <style>
       html, body {
         background-color: #f8f8f8;
@@ -14,38 +16,31 @@
     <script>
       const NUM_NODES = 100000;
 
-      let nodes = {
-        xs: [],
-        ys: [],
-        colors: [],
-        sizes: []
-      };
-
-      let edges = new Float32Array(NUM_NODES*2);
-
-      for (let n=0; n<NUM_NODES; n++) {
-        nodes.xs[n] = Math.random() * 2 - 1; // between -1 and 1
-        nodes.ys[n] = Math.random() * 2 - 1; // between -1 and 1
-        nodes.colors[n] = Math.floor(Math.random() * 3);
-        nodes.sizes[n] = 0.01;
+      let model = {
+        nodes: [],
+        edges: [],
+        width: 1000,
+        height: 500
       }
 
-      let edgeIndex = 0;
       for (let n=0; n<NUM_NODES; n++) {
-        edges[edgeIndex++] = n;
-        edges[edgeIndex++] = n+1;
+        model.nodes[n] = {
+          x: Math.random() * 2 - 1, // between -1 and 1,
+          y: Math.random() * 2 - 1, // between -1 and 1,
+          group: Math.floor(Math.random() * 3)
+        }; 
 
-
+        if (n<NUM_NODES-1) {
+          model.edges[n] = {
+            from: n,
+            to: n+1
+          }
+        }
       }
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: {
-          nodes: nodes,
-          edges: edges,
-          width: 1000,
-          height: 500
-        },
+        model: model,
         nodeSize: 0.01,
         debug: true
       });

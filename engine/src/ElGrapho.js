@@ -14,111 +14,187 @@ const NumberFormatter = require('./formatters/NumberFormatter');
 const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
 const BoxZoom = require('./components/BoxZoom/BoxZoom');
-const Tree = require('./models/Tree');
-const Cluster = require('./models/Cluster');
+const Tree = require('./layouts/Tree');
+const Cluster = require('./layouts/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
-const Ring = require('./models/Ring');
-const ForceDirectedGraph = require('./models/ForceDirectedGraph');
+const Ring = require('./layouts/Ring');
+const ForceDirected = require('./layouts/ForceDirected');
+const Labels = require('./Labels');
+const Web = require('./layouts/Web');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
 
-let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
-  this.container = config.container || document.createElement('div');
-  this.id = UUID.generate();
-  this.dirty = true;
-  this.hitDirty = true;
-  this.zoomX = START_SCALE;
-  this.zoomY = START_SCALE;
-  this.panX = 0;
-  this.panY = 0;
-  this.events = new Events();
-  this.width = config.model.width;
-  this.height = config.model.height;
-  this.nodeSize = config.nodeSize || 16;
-  this.animations = [];
-  this.wrapper = document.createElement('div');
-  this.wrapper.className = 'el-grapho-wrapper';
-  this.wrapper.style.width = this.width + 'px';
-  this.wrapper.style.height = this.height + 'px';
-  this.container.appendChild(this.wrapper);
-  this.animations = config.animations === undefined ? true : config.animations;
-  this.setInteractionMode(Enums.interactionMode.SELECT);
-  this.panStart = null;
-  this.idle = true;
-  this.debug = config.debug === undefined ? false : config.debug;
-  // default tooltip template
-  this.tooltipTemplate = function(index, el) {
-    el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
-  };
-  this.hoveredDataIndex = -1;
+let ElGrapho = function(config) {
+  let that = this;
 
-  let viewport = this.viewport = new Concrete.Viewport({
-    container: this.wrapper,
-    width: this.width,
-    height: this.height
-  });
-
-  let mainLayer = new Concrete.Layer({
-    contextType: 'webgl'
-  });
-
-  viewport.add(mainLayer);
-
-
-  let webgl = this.webgl = new WebGL({
-    layer: mainLayer
-  });
-
-  //webgl.initShaders();
-
-  if (!ElGraphoCollection.initialized) {
-    ElGraphoCollection.init();
+  // if promise
+  if (config.model.then !== undefined) {
+    config.model.then(function(model) {
+      config.model = model;
+      that.init(config);
+    }); 
   }
-
-
-
-  // mainLayer.hit.canvas.style.display = 'inline-block';
-  // mainLayer.hit.canvas.style.marginLeft = '10px';
-  // this.wrapper.appendChild(mainLayer.hit.canvas);
-
-
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
-
-  // need to add focused array to the vertices object here because we need to be able to
-  // modify the focused array by reference, which is passed into webgl buffers
-  let numPoints = vertices.points.positions.length/2;
-  vertices.points.focused = new Float32Array(numPoints);
-
-
-
-  webgl.initBuffers(vertices);
-  
-  if (this.debug) {
-    new Count({
-      container: this.wrapper,
-      vertices: vertices
-    });
+  // if regular old object
+  else {
+    this.init(config);
   }
-
-  this.initComponents();
-
-  this.listen();
-
-  ElGraphoCollection.graphs.push(this);
-});
+};
 
 ElGrapho.prototype = {
+  init: function(config) {
+    this.container = config.container || document.createElement('div');
+    this.id = UUID.generate();
+    this.dirty = true;
+    this.hitDirty = true;
+    this.zoomX = START_SCALE;
+    this.zoomY = START_SCALE;
+    this.panX = 0;
+    this.panY = 0;
+    this.events = new Events();
+    this.model = config.model;
+    this.width = config.model.width;
+    this.height = config.model.height;
+    this.steps = config.model.steps;
+    this.nodeSize = config.nodeSize || 16;
+    this.animations = [];
+    this.wrapper = document.createElement('div');
+    this.wrapper.className = 'el-grapho-wrapper';
+    this.wrapper.style.width = this.width + 'px';
+    this.wrapper.style.height = this.height + 'px';
+    // clear container
+    this.container.innerHTML = '';
+    this.container.appendChild(this.wrapper);
+    this.animations = config.animations === undefined ? true : config.animations;
+    this.setInteractionMode(Enums.interactionMode.SELECT);
+    this.panStart = null;
+    this.idle = true;
+    this.debug = config.debug === undefined ? false : config.debug;
+    
+    this.showArrows = config.arrows === undefined ? false : config.arrows;
+
+    // default tooltip template
+    this.tooltipTemplate = function(index, el) {
+      el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
+    };
+    this.hoveredDataIndex = -1;
+
+    let viewport = this.viewport = new Concrete.Viewport({
+      container: this.wrapper,
+      width: this.width,
+      height: this.height
+    });
+
+    let mainLayer = new Concrete.Layer({
+      contextType: 'webgl'
+    });
+
+    let labelsLayer = this.labelsLayer = new Concrete.Layer({
+      contextType: '2d'
+    });
+
+    viewport.add(mainLayer);
+    viewport.add(labelsLayer);
+
+
+    this.webgl = new WebGL({
+      layer: mainLayer
+    });
+
+    //webgl.initShaders();
+
+    if (!ElGraphoCollection.initialized) {
+      ElGraphoCollection.init();
+    }
+
+
+
+    // mainLayer.hit.canvas.style.display = 'inline-block';
+    // mainLayer.hit.canvas.style.marginLeft = '10px';
+    // this.wrapper.appendChild(mainLayer.hit.canvas);
+
+    //this.model = config.model;
+
+    //this.model = config.model;
+
+    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
+
+    // need to add focused array to the vertices object here because we need to be able to
+    // modify the focused array by reference, which is passed into webgl buffers
+    let numPoints = vertices.points.positions.length/2;
+    vertices.points.focused = new Float32Array(numPoints);
+
+    this.webgl.initBuffers(vertices);
+    
+
+    this.initComponents();
+
+    this.labels = new Labels();
+
+    this.listen();
+
+    ElGraphoCollection.graphs.push(this);
+  },
   initComponents: function() {
+    let model = this.model;
+
     this.controls = new Controls({
       container: this.wrapper,
-      graph: this
+      graph: this,
+      showStepControls: true
     });
 
     this.loading = new Loading({
       container: this.wrapper
     });
+
+    if (this.debug) {
+      this.count = new Count({
+        container: this.wrapper
+      });
+
+      this.count.update(model.nodes.length, model.edges.length, model.steps);
+    }
+  },
+  renderLabels: function() {
+    let that = this;
+
+    // build labels view model
+    this.labels.clear();
+    let positions = this.vertices.points.positions;
+    this.model.nodes.forEach(function(node, n) {
+      let index = n * 2;
+      that.labels.addLabel(node.label, positions[index], positions[index+1]);
+    });
+    
+    // render
+    let labelsScene = this.labelsLayer.scene;
+    let labelsContext = labelsScene.context;
+
+    labelsContext.save();
+    
+    labelsContext.translate(this.width/2, this.height/2);
+    //labelsContext.scale(this.zoomX, this.zoomY);
+    labelsContext.textAlign = 'center'; 
+    
+
+    labelsContext.font = '12px Arial';
+    labelsContext.fillStyle = '#333';
+    labelsContext.strokeStyle = 'white';
+    labelsContext.lineWidth = 3;
+    labelsContext.lineJoin = 'round';
+
+    this.labels.labelsAdded.forEach(function(label) {
+      let x = label.x * that.zoomX + that.panX;
+      let y = label.y * -1 * that.zoomY - that.panY - 10;
+      labelsContext.beginPath();
+      labelsContext.strokeText(label.str, x, y);
+      labelsContext.fillText(label.str, x, y);
+    });
+
+
+    labelsContext.restore();
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
@@ -156,6 +232,14 @@ ElGrapho.prototype = {
 
     this.on('box-zoom', function() {
       that.setInteractionMode(Enums.interactionMode.BOX_ZOOM);
+    });
+
+    this.on('step-up', function() {
+      that.stepUp();
+    });
+
+    this.on('step-down', function() {
+      that.stepDown();
     });
 
     document.addEventListener('mousedown', function(evt) {
@@ -356,11 +440,19 @@ ElGrapho.prototype = {
       }
     });
 
-
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
   },
+  // stepUp: function() {
+  //   console.log('step up');
+
+  //   this.model.step++;
+  //   //this.updateVertices();
+  // },
+  // stepDown: function() {
+  //   console.log('step down');
+  // },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
@@ -473,6 +565,20 @@ ElGrapho.prototype = {
   },
   hideLoading: function() {
     this.wrapper.classList.remove('el-grapho-loading');
+  },
+  destroy: function() {
+    // viewport
+    this.viewport.destroy();
+
+    // remove from collection
+    let graphs = ElGraphoCollection.graphs;
+    let len = graphs.length;
+    for (let n=0; n<len; n++) {
+      if (graphs[n].id === this.id) {
+        graphs.splice(n, 1);
+        break;
+      }
+    }  
   }
 };
 
@@ -481,11 +587,17 @@ ElGrapho.Theme = Theme;
 ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
-ElGrapho.models = {
+ElGrapho.layouts = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
-  ForceDirectedGraph: ForceDirectedGraph
+  ForceDirected: ForceDirected,
+  Web: Web
 };
 
+<<<<<<< HEAD
 module.exports = ElGrapho;
+=======
+// node.js export
+module.exports = ElGrapho;
+>>>>>>> upstream/master

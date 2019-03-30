@@ -11,6 +11,9 @@
     "window": true,
     "requestAnimationFrame": true,
     "alert": true,
-    "console": true
+    "console": true,
+    "module": true,
+    "define": true,
+    "exports": true
   }
 }

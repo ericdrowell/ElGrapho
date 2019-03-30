@@ -1,5 +1,6 @@
 const fs = require('fs');
 
+// icons from https://www.flaticon.com/
 fs.readdir('engine/src/icons', function(err, files) {
   files.forEach(function(file) {
     let glslStr = fs.readFileSync('engine/src/icons/' + file, 'utf-8');

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <style>
       html, body {
         background-color: #f8f8f8;
@@ -14,25 +16,23 @@
     <script>
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-
         model: {
-          nodes: {
-            xs:     [-0.9,  0.9, 0.9, -0.9, 0],
-            ys:     [-0.9, -0.9, 0.9,  0.9, 0],
-            colors: [   0,    1,   2,    3, 4]
-          },
+          nodes: [
+            {x: -0.9, y: -0.9, group: 0},
+            {x: 0.9,  y: -0.9, group: 1},
+            {x: 0.9,  y: 0.9,  group: 2},
+            {x: -0.9, y: 0.9,  group: 3},
+            {x: 0,    y: 0,    group: 4}
+          ],
           edges: [
-            4, 0,
-            4, 1,
-            4, 2,
-            4, 3
+            {from: 4, to: 0},
+            {from: 4, to: 1},
+            {from: 4, to: 2},
+            {from: 4, to: 3}
           ],
           width: 500,
           height: 500
         },
-
-        magicZoom: false,
-        nodeSize: 100,
         animations: false
       });
 

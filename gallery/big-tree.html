@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <style>
       html, body {
         background-color: #f8f8f8;
@@ -16,10 +18,8 @@
 let NUM_LEVELS = 7;
 let MAX_LEVEL_MULTIPLIER = 5;
 
-let modelConfig = {
-  nodes: {
-    colors: []
-  },
+let model = {
+  nodes: [],
   edges: [],
   width: 1000,
   height: 500
@@ -28,16 +28,19 @@ let modelConfig = {
 let edgeIndex = 0;
 let levels = [];
 let n = 0;
-let nodeColors = {};
-let colorIndex = 1;
+let nodeGroups = {};
+let groupIndex = 1;
 
 for (let j=0; j<NUM_LEVELS; j++) {
   levels[j] = [];
 
   if (j === 0) {
-    let color = 0;
-    modelConfig.nodes.colors[n] = color;
-    nodeColors[n] = color;
+    let group = 0;
+    model.nodes[n] = {
+      group: group,
+      //label: n
+    };
+    nodeGroups[n] = group;
     levels[j].push(n);
     n++;
   }
@@ -48,21 +51,27 @@ for (let j=0; j<NUM_LEVELS; j++) {
 
     for (let k=0; k<numNodes; k++) {
       let parentIndex = lastLevel[Math.floor(Math.random() * lastLevelLen)];
-      modelConfig.edges[edgeIndex++] = parentIndex;
-      modelConfig.edges[edgeIndex++] = n;
+      model.edges[edgeIndex] = {
+        from: parentIndex,
+        to: n
+      };
+      edgeIndex++;
 
       if (j === 0) {
-        color = 0;
+        group = 0;
       }
       else if (j === 1) {
-        color = colorIndex++;
+        group = groupIndex++;
       }
       else {
-        color = nodeColors[parentIndex];
+        group = nodeGroups[parentIndex];
       }
 
-      modelConfig.nodes.colors[n] = color;
-      nodeColors[n] = color;
+      model.nodes[n] = {
+        group: group,
+        label: n
+      };
+      nodeGroups[n] = group;
       levels[j].push(n);
       n++;
     }
@@ -71,8 +80,8 @@ for (let j=0; j<NUM_LEVELS; j++) {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Tree(modelConfig),
-  debug: true
+  model: ElGrapho.layouts.Tree(model),
+  debug: false
 });
     </script>
   </body>

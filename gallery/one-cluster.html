@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <style>
       html, body {
         background-color: #f8f8f8;
@@ -17,24 +19,26 @@
 
       const NUM_NODES = 100;
 
-      let modelConfig = {
-        nodes: {
-          colors: []
-        },
+      let model = {
+        nodes: [],
         edges: [],
         width: 1000,
         height: 500
       };
 
       for (let n=0; n<NUM_NODES; n++) {
-        modelConfig.nodes.colors.push(0);
-        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
-        modelConfig.edges.push(Math.round(Math.random() * NUM_NODES));
+        model.nodes.push({
+          group: 0
+        });
+        model.edges.push({
+          from: Math.floor(Math.random() * (NUM_NODES-1)),
+          to: Math.floor(Math.random() * (NUM_NODES-1))
+        });
       }
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.models.Cluster(modelConfig)
+        model: ElGrapho.layouts.Cluster(model)
       });
 
     </script>

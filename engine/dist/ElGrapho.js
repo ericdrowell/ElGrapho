@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ElGrapho"] = factory();
+	else
+		root["ElGrapho"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -1079,30 +1089,32 @@ void main() {
     gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
   }
 
+  float validColor = mod(aVertexColor, 8.0);
+
   // normal color
   if (aVertexFocused == 0.0) {
-    if (aVertexColor == 0.0) {
+    if (validColor == 0.0) {
       vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
     }
-    else if (aVertexColor == 1.0) {
+    else if (validColor == 1.0) {
       vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
     }
-    else if (aVertexColor == 2.0) {
+    else if (validColor == 2.0) {
       vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
     }
-    else if (aVertexColor == 3.0) {
+    else if (validColor == 3.0) {
       vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
     }
-    else if (aVertexColor == 4.0) {
+    else if (validColor == 4.0) {
       vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
     }
-    else if (aVertexColor == 5.0) {
+    else if (validColor == 5.0) {
       vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
     }
-    else if (aVertexColor == 6.0) {
+    else if (validColor == 6.0) {
       vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
     }
-    else if (aVertexColor == 7.0) {
+    else if (validColor == 7.0) {
       vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
     }
   }
@@ -1185,47 +1197,64 @@ uniform bool magicZoom;
 uniform float nodeSize;
 
 float MAX_NODE_SIZE = 16.0;
+const float PI = 3.1415926535897932384626433832795;
 
 varying vec4 vVertexColor;
+
+vec2 rotate(vec2 v, float a) {
+	float s = sin(a);
+	float c = cos(a);
+	mat2 m = mat2(c, -s, s, c);
+	return m * v;
+}
+
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
-  //gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  float zoomX = length(uModelViewMatrix[0]);
+  float zoomY = length(uModelViewMatrix[1]);
+  // vec2 standardZoomVector = normalize(vec2(1.0, 0.0));
+  // vec2 zoomVector = normalize(vec2(zoomX, zoomY));
+  // float zoomAngle = dot(standardZoomVector, zoomVector);
+  // vec2 vec2Normal = vec2(normal.xy);
+  // vec2 rotatedNormal = rotate(vec2Normal, zoomAngle);
+  // vec4 newNormal = vec4(rotatedNormal.x, rotatedNormal.y, 0.0, 0.0);
 
-  vec4 newNormal = vec4(normal.xyz, 0.0);
+  vec4 newNormal = vec4(normal.x, normal.y, 0.0, 0.0);
 
   if (magicZoom) {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * length(uModelViewMatrix[0]) * nodeSize / MAX_NODE_SIZE;
-    newNormal.y = newNormal.y * length(uModelViewMatrix[1]) * nodeSize / MAX_NODE_SIZE;
+    newNormal.x = newNormal.x * zoomX * nodeSize / MAX_NODE_SIZE;
+    newNormal.y = newNormal.y * zoomY * nodeSize / MAX_NODE_SIZE;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   
+  float validColor = mod(aVertexColor, 8.0);
 
-  if (aVertexColor == 0.0) {
+  if (validColor == 0.0) {
     vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
   }
-  else if (aVertexColor == 1.0) {
+  else if (validColor == 1.0) {
     vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
   }
-  else if (aVertexColor == 2.0) {
+  else if (validColor == 2.0) {
     vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
   }
-  else if (aVertexColor == 3.0) {
+  else if (validColor == 3.0) {
     vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
   }
-  else if (aVertexColor == 4.0) {
+  else if (validColor == 4.0) {
     vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
   }
-  else if (aVertexColor == 5.0) {
+  else if (validColor == 5.0) {
     vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
   }
-  else if (aVertexColor == 6.0) {
+  else if (validColor == 6.0) {
     vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
   }
-  else if (aVertexColor == 7.0) {
+  else if (validColor == 7.0) {
     vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
   }
 }`;
@@ -1239,7 +1268,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-controls .el-grapho-step-down-control{transform:scale(1,-1)}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
 `;
 
 /***/ }),
@@ -1374,111 +1403,187 @@ const NumberFormatter = __webpack_require__(/*! ./formatters/NumberFormatter */ 
 const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/VertexBridge.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
-const Tree = __webpack_require__(/*! ./models/Tree */ "./engine/src/models/Tree.js");
-const Cluster = __webpack_require__(/*! ./models/Cluster */ "./engine/src/models/Cluster.js");
+const Tree = __webpack_require__(/*! ./layouts/Tree */ "./engine/src/layouts/Tree.js");
+const Cluster = __webpack_require__(/*! ./layouts/Cluster */ "./engine/src/layouts/Cluster.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 const Loading = __webpack_require__(/*! ./components/Loading/Loading */ "./engine/src/components/Loading/Loading.js");
-const Ring = __webpack_require__(/*! ./models/Ring */ "./engine/src/models/Ring.js");
-const ForceDirectedGraph = __webpack_require__(/*! ./models/ForceDirectedGraph */ "./engine/src/models/ForceDirectedGraph.js");
+const Ring = __webpack_require__(/*! ./layouts/Ring */ "./engine/src/layouts/Ring.js");
+const ForceDirected = __webpack_require__(/*! ./layouts/ForceDirected */ "./engine/src/layouts/ForceDirected.js");
+const Labels = __webpack_require__(/*! ./Labels */ "./engine/src/Labels.js");
+const Web = __webpack_require__(/*! ./layouts/Web */ "./engine/src/layouts/Web.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
 
-let ElGrapho = Profiler('ElGrapho.constructor', function(config) {
-  this.container = config.container || document.createElement('div');
-  this.id = UUID.generate();
-  this.dirty = true;
-  this.hitDirty = true;
-  this.zoomX = START_SCALE;
-  this.zoomY = START_SCALE;
-  this.panX = 0;
-  this.panY = 0;
-  this.events = new Events();
-  this.width = config.model.width;
-  this.height = config.model.height;
-  this.nodeSize = config.nodeSize || 16;
-  this.animations = [];
-  this.wrapper = document.createElement('div');
-  this.wrapper.className = 'el-grapho-wrapper';
-  this.wrapper.style.width = this.width + 'px';
-  this.wrapper.style.height = this.height + 'px';
-  this.container.appendChild(this.wrapper);
-  this.animations = config.animations === undefined ? true : config.animations;
-  this.setInteractionMode(Enums.interactionMode.SELECT);
-  this.panStart = null;
-  this.idle = true;
-  this.debug = config.debug === undefined ? false : config.debug;
-  // default tooltip template
-  this.tooltipTemplate = function(index, el) {
-    el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
-  };
-  this.hoveredDataIndex = -1;
+let ElGrapho = function(config) {
+  let that = this;
 
-  let viewport = this.viewport = new Concrete.Viewport({
-    container: this.wrapper,
-    width: this.width,
-    height: this.height
-  });
-
-  let mainLayer = new Concrete.Layer({
-    contextType: 'webgl'
-  });
-
-  viewport.add(mainLayer);
-
-
-  let webgl = this.webgl = new WebGL({
-    layer: mainLayer
-  });
-
-  //webgl.initShaders();
-
-  if (!ElGraphoCollection.initialized) {
-    ElGraphoCollection.init();
+  // if promise
+  if (config.model.then !== undefined) {
+    config.model.then(function(model) {
+      config.model = model;
+      that.init(config);
+    }); 
   }
-
-
-
-  // mainLayer.hit.canvas.style.display = 'inline-block';
-  // mainLayer.hit.canvas.style.marginLeft = '10px';
-  // this.wrapper.appendChild(mainLayer.hit.canvas);
-
-
-  let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height);
-
-  // need to add focused array to the vertices object here because we need to be able to
-  // modify the focused array by reference, which is passed into webgl buffers
-  let numPoints = vertices.points.positions.length/2;
-  vertices.points.focused = new Float32Array(numPoints);
-
-
-
-  webgl.initBuffers(vertices);
-  
-  if (this.debug) {
-    new Count({
-      container: this.wrapper,
-      vertices: vertices
-    });
+  // if regular old object
+  else {
+    this.init(config);
   }
-
-  this.initComponents();
-
-  this.listen();
-
-  ElGraphoCollection.graphs.push(this);
-});
+};
 
 ElGrapho.prototype = {
+  init: function(config) {
+    this.container = config.container || document.createElement('div');
+    this.id = UUID.generate();
+    this.dirty = true;
+    this.hitDirty = true;
+    this.zoomX = START_SCALE;
+    this.zoomY = START_SCALE;
+    this.panX = 0;
+    this.panY = 0;
+    this.events = new Events();
+    this.model = config.model;
+    this.width = config.model.width;
+    this.height = config.model.height;
+    this.steps = config.model.steps;
+    this.nodeSize = config.nodeSize || 16;
+    this.animations = [];
+    this.wrapper = document.createElement('div');
+    this.wrapper.className = 'el-grapho-wrapper';
+    this.wrapper.style.width = this.width + 'px';
+    this.wrapper.style.height = this.height + 'px';
+    // clear container
+    this.container.innerHTML = '';
+    this.container.appendChild(this.wrapper);
+    this.animations = config.animations === undefined ? true : config.animations;
+    this.setInteractionMode(Enums.interactionMode.SELECT);
+    this.panStart = null;
+    this.idle = true;
+    this.debug = config.debug === undefined ? false : config.debug;
+    
+    this.showArrows = config.arrows === undefined ? false : config.arrows;
+
+    // default tooltip template
+    this.tooltipTemplate = function(index, el) {
+      el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
+    };
+    this.hoveredDataIndex = -1;
+
+    let viewport = this.viewport = new Concrete.Viewport({
+      container: this.wrapper,
+      width: this.width,
+      height: this.height
+    });
+
+    let mainLayer = new Concrete.Layer({
+      contextType: 'webgl'
+    });
+
+    let labelsLayer = this.labelsLayer = new Concrete.Layer({
+      contextType: '2d'
+    });
+
+    viewport.add(mainLayer);
+    viewport.add(labelsLayer);
+
+
+    this.webgl = new WebGL({
+      layer: mainLayer
+    });
+
+    //webgl.initShaders();
+
+    if (!ElGraphoCollection.initialized) {
+      ElGraphoCollection.init();
+    }
+
+
+
+    // mainLayer.hit.canvas.style.display = 'inline-block';
+    // mainLayer.hit.canvas.style.marginLeft = '10px';
+    // this.wrapper.appendChild(mainLayer.hit.canvas);
+
+    //this.model = config.model;
+
+    //this.model = config.model;
+
+    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
+
+    // need to add focused array to the vertices object here because we need to be able to
+    // modify the focused array by reference, which is passed into webgl buffers
+    let numPoints = vertices.points.positions.length/2;
+    vertices.points.focused = new Float32Array(numPoints);
+
+    this.webgl.initBuffers(vertices);
+    
+
+    this.initComponents();
+
+    this.labels = new Labels();
+
+    this.listen();
+
+    ElGraphoCollection.graphs.push(this);
+  },
   initComponents: function() {
+    let model = this.model;
+
     this.controls = new Controls({
       container: this.wrapper,
-      graph: this
+      graph: this,
+      showStepControls: true
     });
 
     this.loading = new Loading({
       container: this.wrapper
     });
+
+    if (this.debug) {
+      this.count = new Count({
+        container: this.wrapper
+      });
+
+      this.count.update(model.nodes.length, model.edges.length, model.steps);
+    }
+  },
+  renderLabels: function() {
+    let that = this;
+
+    // build labels view model
+    this.labels.clear();
+    let positions = this.vertices.points.positions;
+    this.model.nodes.forEach(function(node, n) {
+      let index = n * 2;
+      that.labels.addLabel(node.label, positions[index], positions[index+1]);
+    });
+    
+    // render
+    let labelsScene = this.labelsLayer.scene;
+    let labelsContext = labelsScene.context;
+
+    labelsContext.save();
+    
+    labelsContext.translate(this.width/2, this.height/2);
+    //labelsContext.scale(this.zoomX, this.zoomY);
+    labelsContext.textAlign = 'center'; 
+    
+
+    labelsContext.font = '12px Arial';
+    labelsContext.fillStyle = '#333';
+    labelsContext.strokeStyle = 'white';
+    labelsContext.lineWidth = 3;
+    labelsContext.lineJoin = 'round';
+
+    this.labels.labelsAdded.forEach(function(label) {
+      let x = label.x * that.zoomX + that.panX;
+      let y = label.y * -1 * that.zoomY - that.panY - 10;
+      labelsContext.beginPath();
+      labelsContext.strokeText(label.str, x, y);
+      labelsContext.fillText(label.str, x, y);
+    });
+
+
+    labelsContext.restore();
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
@@ -1516,6 +1621,14 @@ ElGrapho.prototype = {
 
     this.on('box-zoom', function() {
       that.setInteractionMode(Enums.interactionMode.BOX_ZOOM);
+    });
+
+    this.on('step-up', function() {
+      that.stepUp();
+    });
+
+    this.on('step-down', function() {
+      that.stepDown();
     });
 
     document.addEventListener('mousedown', function(evt) {
@@ -1716,11 +1829,19 @@ ElGrapho.prototype = {
       }
     });
 
-
     viewport.container.addEventListener('mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
   },
+  // stepUp: function() {
+  //   console.log('step up');
+
+  //   this.model.step++;
+  //   //this.updateVertices();
+  // },
+  // stepDown: function() {
+  //   console.log('step down');
+  // },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
@@ -1833,6 +1954,20 @@ ElGrapho.prototype = {
   },
   hideLoading: function() {
     this.wrapper.classList.remove('el-grapho-loading');
+  },
+  destroy: function() {
+    // viewport
+    this.viewport.destroy();
+
+    // remove from collection
+    let graphs = ElGraphoCollection.graphs;
+    let len = graphs.length;
+    for (let n=0; n<len; n++) {
+      if (graphs[n].id === this.id) {
+        graphs.splice(n, 1);
+        break;
+      }
+    }  
   }
 };
 
@@ -1841,18 +1976,16 @@ ElGrapho.Theme = Theme;
 ElGrapho.Color = Color;
 ElGrapho.Profiler = Profiler;
 ElGrapho.NumberFormatter = NumberFormatter;
-ElGrapho.models = {
+ElGrapho.layouts = {
   Tree: Tree,
   Cluster: Cluster,
   Ring: Ring,
-  ForceDirectedGraph: ForceDirectedGraph
+  ForceDirected: ForceDirected,
+  Web: Web
 };
 
+// node.js export
 module.exports = ElGrapho;
-
-if (window) {
-  window.ElGrapho = ElGrapho;
-}
 
 /***/ }),
 
@@ -1921,7 +2054,7 @@ let ElGraphoCollection = {
       let zoom = Math.min(graph.zoomX, graph.zoomY);
       
 
-      if (graph.nodeSize * zoom > MAX_NODE_SIZE) {
+      if (graph.nodeSize * zoom >= MAX_NODE_SIZE) {
         magicZoom = true;
         nodeSize = MAX_NODE_SIZE;
       }
@@ -1933,6 +2066,14 @@ let ElGraphoCollection = {
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+
+        graph.labelsLayer.scene.clear();
+
+        let hasLabels = graph.model.nodes[0].label !== undefined;
+        
+        if (hasLabels && magicZoom) {
+          graph.renderLabels();
+        }
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
@@ -2019,6 +2160,37 @@ Events.prototype = {
 };
 
 module.exports = Events;
+
+/***/ }),
+
+/***/ "./engine/src/Labels.js":
+/*!******************************!*\
+  !*** ./engine/src/Labels.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+let Labels = function() {
+  this.labelsAdded = [];
+};
+
+Labels.prototype = {
+  clear: function() {
+    this.labelsAdded = [];
+  },
+  addLabel: function(str, x, y) {
+    // TODO: add logic to filter out overlapped labels
+    this.labelsAdded.push({ 
+      str: str,
+      x: x,
+      y: y,
+      width: 100,
+      height: 10
+    });
+  }
+};
+
+module.exports = Labels;
 
 /***/ }),
 
@@ -2127,143 +2299,127 @@ const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const vec2 = glMatrix.vec2;
 const MAX_NODE_SIZE = 16;
-
+const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
+ 
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
-    let positions = new Float32Array(nodes.xs.length*2);
+    let positions = new Float32Array(nodes.length*2);
     let halfWidth = width/2;
     let halfHeight = height/2;
+    let colors = new Float32Array(nodes.length);
 
-    // convert normalized xs and ys to pixel values
-    nodes.xs = nodes.xs.map(function(el) {
-      return el * halfWidth;
-    });
-    nodes.ys = nodes.ys.map(function(el) {
-      return el * halfHeight;
-    });
-
+    
     let positionCounter = 0;
-    for (let n=0; n<nodes.xs.length; n++) {
-      positions[positionCounter++] = nodes.xs[n];
-      positions[positionCounter++] = nodes.ys[n];
-    }
+    nodes.forEach(function(node, n) {
+      // convert normalized x and y to pixel values
+      node.x *= halfWidth;
+      node.y *= halfHeight;
 
-    let colors = new Float32Array(nodes.colors);
+      positions[positionCounter++] = node.x;
+      positions[positionCounter++] = node.y;
+
+      colors[n] = node.group;
+    });
+
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
-    let numEdges = edges.length / 2;
-    let trianglePositions = new Float32Array(numEdges * 12);
-    let triangleNormals = new Float32Array(numEdges * 12);
-    let triangleColors = new Float32Array(numEdges * 6);
+    let numEdges = edges.length;
+    let numArrows = showArrows ? numEdges : 0;
+
+    let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
+    let triangleNormals = new Float32Array(numEdges * 12 + numArrows * 6);
+    let triangleColors = new Float32Array(numEdges * 6 + numArrows * 6);
 
     let trianglePositionsIndex = 0;
     let triangleNormalsIndex = 0;
     let triangleColorsIndex = 0;
 
-    for (let n=0; n<edges.length; n+=2) {
-      let pointIndex0 = edges[n];
-      let pointIndex1 = edges[n+1];
-      let normalDistance0 = MAX_NODE_SIZE*0.1;
-      let normalDistance1 = MAX_NODE_SIZE*0.1;
+    for (let n=0; n<numEdges; n++) {
+      let pointIndex0 = edges[n].from;
+      let pointIndex1 = edges[n].to;
+      let normalDistance = MAX_NODE_SIZE*0.08;
 
-      let x0 = nodes.xs[pointIndex0];
-      let x1 = nodes.xs[pointIndex1];
-      let y0 = nodes.ys[pointIndex0];
-      let y1 = nodes.ys[pointIndex1];
+      let x0 = nodes[pointIndex0].x;
+      let x1 = nodes[pointIndex1].x;
+      let y0 = nodes[pointIndex0].y;
+      let y1 = nodes[pointIndex1].y;
       let vectorX = x1 - x0;
       let vectorY = y1 - y0;
       let vector = vec2.fromValues(vectorX, vectorY);
       let normalizedVector = vec2.normalize(vec2.create(), vector);
       let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
-      let offsetVector0 = vec2.scale(vec2.create(), perpVector, normalDistance0);
-      let offsetVector1 = vec2.scale(vec2.create(), perpVector, normalDistance1);
-      let xOffset0 = -1 * offsetVector0[0];
-      let yOffset0 = offsetVector0[1];
-      let xOffset1 = -1 * offsetVector1[0];
-      let yOffset1 = offsetVector1[1];
+      let offsetVector = vec2.scale(vec2.create(), perpVector, normalDistance);
+      let xOffset = -1 * offsetVector[0];
+      let yOffset = offsetVector[1];
 
-      //if (magicZoom) {
-      // first triangle
+      let arrowVector = vec2.scale(vec2.create(), normalizedVector, 16);
+      let arrowOffsetX = arrowVector[0];
+      let arrowOffsetY = arrowVector[1];
+
+      let color0 = colors[pointIndex0];
+      let color1 = colors[pointIndex1];
+ 
+      // first triangle of line
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset0 * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset0;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleNormals[triangleNormalsIndex++] = xOffset * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset;
+      triangleColors[triangleColorsIndex++] = color0;
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleNormals[triangleNormalsIndex++] = xOffset * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset;
+      triangleColors[triangleColorsIndex++] = color1;
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset0;
-      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleNormals[triangleNormalsIndex++] = xOffset;
+      triangleNormals[triangleNormalsIndex++] = yOffset * -1;
+      triangleColors[triangleColorsIndex++] = color0;
 
-
-      // second triangle
+      // second triangle of line
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset1;
-      triangleNormals[triangleNormalsIndex++] = yOffset1 * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      triangleNormals[triangleNormalsIndex++] = xOffset;
+      triangleNormals[triangleNormalsIndex++] = yOffset * -1;
+      triangleColors[triangleColorsIndex++] = color1;
 
       trianglePositions[trianglePositionsIndex++] = x0;
       trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset0;
-      triangleNormals[triangleNormalsIndex++] = yOffset0 * -1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleNormals[triangleNormalsIndex++] = xOffset;
+      triangleNormals[triangleNormalsIndex++] = yOffset * -1;
+      triangleColors[triangleColorsIndex++] = color0;
 
       trianglePositions[trianglePositionsIndex++] = x1;
       trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset1 * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset1;
-      triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-      // }
-      // else {
-      //   // first triangle
-      //   trianglePositions[trianglePositionsIndex++] = x0 + xOffset0 * -1;
-      //   trianglePositions[trianglePositionsIndex++] = y0 + yOffset0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
-
-      //   trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
-      //   trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-
-      //   trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
-      //   trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+      triangleNormals[triangleNormalsIndex++] = xOffset * -1;
+      triangleNormals[triangleNormalsIndex++] = yOffset;
+      triangleColors[triangleColorsIndex++] = color1;
 
 
-      //   // second triangle
-      //   trianglePositions[trianglePositionsIndex++] = x1 + xOffset1;
-      //   trianglePositions[trianglePositionsIndex++] = y1 + yOffset1 * -1;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
+      if (showArrows) {
+        // triangle for arrow
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleNormals[triangleNormalsIndex++] = 0;
+        triangleColors[triangleColorsIndex++] = color1;
 
-      //   trianglePositions[trianglePositionsIndex++] = x0 + xOffset0;
-      //   trianglePositions[trianglePositionsIndex++] = y0 + yOffset0 * -1;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex0];
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+        triangleColors[triangleColorsIndex++] = color1;
 
-      //   trianglePositions[trianglePositionsIndex++] = x1 + xOffset1 * -1;
-      //   trianglePositions[trianglePositionsIndex++] = y1 + yOffset1;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleNormals[triangleNormalsIndex++] = 0;
-      //   triangleColors[triangleColorsIndex++] = nodes.colors[pointIndex1];
-      // }
+        trianglePositions[trianglePositionsIndex++] = x1;
+        trianglePositions[trianglePositionsIndex++] = y1;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
+        triangleColors[triangleColorsIndex++] = color1;
+      }
     }
 
     return {
@@ -2742,6 +2898,7 @@ const moveIcon = __webpack_require__(/*! ../../../dist/icons/moveIcon.svg */ "./
 const selectIcon = __webpack_require__(/*! ../../../dist/icons/selectIcon.svg */ "./engine/dist/icons/selectIcon.svg.js");
 const boxZoomIcon = __webpack_require__(/*! ../../../dist/icons/boxZoomIcon.svg */ "./engine/dist/icons/boxZoomIcon.svg.js");
 const resetIcon = __webpack_require__(/*! ../../../dist/icons/resetIcon.svg */ "./engine/dist/icons/resetIcon.svg.js");
+//const arrowUpIcon = require('../../../dist/icons/arrowUpIcon.svg');
 
 const Controls = function(config) {
   this.graph = config.graph;
@@ -2775,6 +2932,20 @@ const Controls = function(config) {
     icon: zoomOutIcon,
     evtName: 'zoom-out'
   });
+
+
+  // if (config.showStepControls) {
+  //   this.stepUpButton = this.addButton({
+  //     icon: arrowUpIcon,
+  //     evtName: 'step-up'
+  //   });
+  //   this.stepDownButton = this.addButton({
+  //     icon: arrowUpIcon,
+  //     evtName: 'step-down'
+  //   });
+
+
+  // }
 
 
 };
@@ -2813,18 +2984,17 @@ const NumberFormatter = __webpack_require__(/*! ../../formatters/NumberFormatter
 const Count = function(config) {
   let wrapper = this.wrapper = document.createElement('span');
   let container = config.container;
-  let vertices = config.vertices;
-  let pointCount = vertices.points ? vertices.points.positions.length/2 : 0;
-  let triangleCount = vertices.triangles ? vertices.triangles.positions.length/12 : 0;
-
-  wrapper.innerHTML = NumberFormatter.addCommas(pointCount) + ' nodes + ' + NumberFormatter.addCommas(triangleCount) + ' edges';
-  wrapper.className = 'el-grapho-count';
 
   container.appendChild(wrapper);
 };
 
 Count.prototype = {
-
+  update: function(nodeCount, edgeCount, steps) {
+    let nodesAndEdgesStr = NumberFormatter.addCommas(nodeCount) + ' nodes + ' + NumberFormatter.addCommas(edgeCount) + ' edges';
+    let stepsStr = steps === undefined ? '' : ' x ' + steps + ' steps';
+    this.wrapper.innerHTML = nodesAndEdgesStr + stepsStr;
+    this.wrapper.className = 'el-grapho-count';
+  }
 };
 
 module.exports = Count;
@@ -2931,16 +3101,18 @@ module.exports = NumberFormatter;
 
 /***/ }),
 
-/***/ "./engine/src/models/Cluster.js":
-/*!**************************************!*\
-  !*** ./engine/src/models/Cluster.js ***!
-  \**************************************/
+/***/ "./engine/src/layouts/Cluster.js":
+/*!***************************************!*\
+  !*** ./engine/src/layouts/Cluster.js ***!
+  \***************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-let Cluster = function(config) {
-  let width = config.width;
-  let height = config.height;
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+
+const Cluster = function(model) {
+  let width = model.width;
+  let height = model.height;
 
   let xFactor, yFactor;
 
@@ -2953,36 +3125,19 @@ let Cluster = function(config) {
     yFactor = width/height;
   }
 
-
-
-  let model = {
-    nodes: {
-      xs: [],
-      ys: [],
-      colors: config.nodes.colors.slice()
-    },
-    edges: config.edges.slice(),
-    width: width,
-    height: height
-  };
-
   // keys are color integers, values are arrays.  The arrays contain node indices
   let groups = {};
 
-  config.nodes.colors.forEach(function(color, n) {
-    if (groups[color] === undefined) {
-      groups[color] = [];
+  model.nodes.forEach(function(node, n) {
+    let group = node.group;
+    if (groups[group] === undefined) {
+      groups[group] = [];
     }
-
-    groups[color].push(n);
+    groups[group].push(n);
   });
-
-  //console.log(groups);
 
   let keys = Object.keys(groups);
   let numGroups = keys.length;
-  //let clusterRadius = 0.2;
-
   let key;
   let groupIndex = 0;
 
@@ -2995,7 +3150,7 @@ let Cluster = function(config) {
 
   for (key in groups) {
     let indices = groups[key];
-    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI/2;
+    let centerAngle = -2*Math.PI*groupIndex/numGroups + Math.PI;
 
     let clusterCenterX, clusterCenterY;
 
@@ -3016,9 +3171,8 @@ let Cluster = function(config) {
       let x = Math.cos(angle) * radius * xFactor;
       let y = Math.sin(angle) * radius * yFactor;
 
-      model.nodes.xs[index] = clusterCenterX + x;
-      model.nodes.ys[index] = clusterCenterY + y;
-
+      model.nodes[index].x = clusterCenterX + x;
+      model.nodes[index].y = clusterCenterY + y;
       radius += arcLength * angleStep / (2 * Math.PI);
       angleStep = arcLength / radius;
       angle -= angleStep;
@@ -3027,6 +3181,8 @@ let Cluster = function(config) {
     groupIndex++;
   }
 
+  fitToViewport(model.nodes);
+
   return model;
 };
 
@@ -3034,197 +3190,81 @@ module.exports = Cluster;
 
 /***/ }),
 
-/***/ "./engine/src/models/ForceDirectedGraph.js":
-/*!*************************************************!*\
-  !*** ./engine/src/models/ForceDirectedGraph.js ***!
-  \*************************************************/
+/***/ "./engine/src/layouts/ForceDirected.js":
+/*!*********************************************!*\
+  !*** ./engine/src/layouts/ForceDirected.js ***!
+  \*********************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-const ForceDirectedGraph = function(config) {
-  let numNodes = config.nodes.colors.length;
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+const d3 = __webpack_require__(/*! d3-force */ "./node_modules/d3-force/src/index.js");
 
-  let model = {
-    nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
-    },
-    edges: [], 
-    width: config.width,
-    height: config.height
-  };
+const DEFAULT_STEPS = 30;
 
-  model.nodes.xs.length = numNodes;
-  model.nodes.xs.fill(0);
-
-  model.nodes.ys.length = numNodes;
-  model.nodes.ys.fill(0);
-
-  model.nodes.colors = config.nodes.colors.slice();
-  model.edges = config.edges.slice();
-
-  let nodes = model.nodes;
-  let edges = model.edges;
-
-  // find color counts
-  let colors = [];
-  for (let a=0; a<numNodes; a++) {
-    let color = nodes.colors[a];
-
-    if (colors[color] === undefined) {
-      colors[color] = {
-        count: 0
-      };
-    }
-
-    colors[color].count++;
+const ForceDirected = function(model) {
+  if (model.steps === undefined) {
+    model.steps = DEFAULT_STEPS;
   }
 
-  let total = 0;
-  for (let n=0; n<colors.length; n++) {
-    colors[n].next = total;
-    total+=colors[n].count;
-  }
+  // convert to webcola schema
+  let nodes = [];
+  let links = [];
 
-  // initialize positions
-  for (let a=0; a<numNodes; a++) {
-    let color = nodes.colors[a];
-    let angle = -2 * Math.PI * colors[color].next++ / numNodes;
+  model.nodes.forEach(function(node, n) {
+    nodes.push({
+      id: n,
+      group: node.group
+    });
+  });
 
-    const K = 0.3;
-    nodes.xs[a] = K * Math.cos(angle);
-    nodes.ys[a] = K * Math.sin(angle);
-  }
+  model.edges.forEach(function(edge) {
+    links.push({
+      source: edge.from,
+      target: edge.to
+    });
+  });
 
-  // process steps
-  for (let n=1; n<config.steps; n++) {
-    // let xChanges = [];
-    // let yChanges = [];
+  let simulation = d3.forceSimulation(nodes)
+    .force("charge", d3.forceManyBody())
+    .force("link", d3.forceLink(links))
+    .force("center", d3.forceCenter());
 
-    console.log('--- step ' + n + ' ---');
+  simulation.tick(model.steps);
+  simulation.stop();
 
-    // repulsive forces for all nodes
-    for (let a=0; a<numNodes; a++) {
-      // xChanges[a] = 0;
-      // yChanges[a] = 0;
+  simulation.nodes().forEach(function(node, n) {
+    model.nodes[n].x = node.x;
+    model.nodes[n].y = node.y;
+  });
 
-      for (let b=0; b<numNodes; b++) {
-        let ax = nodes.xs[a];
-        let ay = nodes.ys[a];
-        let bx = nodes.xs[b];
-        let by = nodes.ys[b];
-        let xDiff = bx - ax;
-        let yDiff = by - ay;
-        let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-        let aColor = nodes.colors[a];
-        let bColor = nodes.colors[b];
-
-        if (dist > 0) {
-          // move a away from b
-          // for repelling forces, the force is stronger than the distance between the nodes is small
-          let K = 1 / (numNodes * numNodes);
-
-          // make repel stronger for nodes that are in different groups
-          if (aColor !== bColor) {
-            K*=3;
-          }
-
-          let xChange = -1 * K * xDiff / (dist * dist);
-          let yChange = -1 * K * yDiff / (dist * dist);
-
-          nodes.xs[a] += xChange;
-          nodes.ys[a] += yChange;
-        }
-      }
-    }
-
-    // attractive forces between nodes sharing an edge
-    for (let i=0; i<edges.length; i+=2) {
-      let a = edges[i];
-      let b = edges[i+1];
-
-      let ax = nodes.xs[a];
-      let ay = nodes.ys[a];
-      let bx = nodes.xs[b];
-      let by = nodes.ys[b];
-      let xDiff = bx - ax;
-      let yDiff = by - ay;
-      let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-
-      let xChange, yChange;
-
-      if (dist > 0) {
-        // for attractive forces, the force is stronger when the nodes are farther apart
-        let K = 0.3;
-        xChange = K * xDiff;
-        yChange = K * yDiff;
-
-        //let changeMagnitude = Math.sqrt(xChange * xChange * yChange * yChange);
-
-        // move a closer to b
-        nodes.xs[a] += xChange;
-        nodes.ys[a] += yChange;
-
-        // move b closer to a
-        nodes.xs[b] -= xChange;
-        nodes.ys[b] -= yChange;
-      }
-
-
-
-    }
-
-    //debugger;
-
-    // update node positions
-    // for (let i=0; i<numNodes; i++) {
-    //   //console.log('updating node ' + i + ': (' + nodes.xs[i] + ',' + nodes.ys[i] + ') + (' + xChanges[i] + ',' + yChanges[i] + ')');
-    //   nodes.xs[i] += xChanges[i];
-    //   nodes.ys[i] += yChanges[i];
-    // }
-  }
-
-
-  console.log(model);
+  fitToViewport(model.nodes);
 
   return model;
 };
 
-module.exports = ForceDirectedGraph;
+module.exports = ForceDirected;
 
 /***/ }),
 
-/***/ "./engine/src/models/Ring.js":
-/*!***********************************!*\
-  !*** ./engine/src/models/Ring.js ***!
-  \***********************************/
+/***/ "./engine/src/layouts/Ring.js":
+/*!************************************!*\
+  !*** ./engine/src/layouts/Ring.js ***!
+  \************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-const Ring = function(config) {
-  let numNodes = config.nodes.colors.length;
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 
-  let model = {
-    nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
-    },
-    edges: [], 
-    width: config.width,
-    height: config.height
-  };
-
-  // TODO: need to sort colors first and shuffle edges
-  model.nodes.colors = config.nodes.colors;
-  model.edges = config.edges;
-
-  for (let n=0; n<numNodes; n++) {
+const Ring = function(model) {
+  let numNodes = model.nodes.length;
+  model.nodes.forEach(function(node, n) {
     let angle = (-1*Math.PI*2*n / numNodes) + Math.PI/2;
-    model.nodes.xs.push(Math.cos(angle));
-    model.nodes.ys.push(Math.sin(angle));
-  }
+    node.x = Math.cos(angle);
+    node.y = Math.sin(angle);
+  });
+
+  fitToViewport(model.nodes);
 
   return model;
 };
@@ -3233,12 +3273,14 @@ module.exports = Ring;
 
 /***/ }),
 
-/***/ "./engine/src/models/Tree.js":
-/*!***********************************!*\
-  !*** ./engine/src/models/Tree.js ***!
-  \***********************************/
+/***/ "./engine/src/layouts/Tree.js":
+/*!************************************!*\
+  !*** ./engine/src/layouts/Tree.js ***!
+  \************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
 
 let incrementAncestorTotals = function(node, val) {
   node.totalDescendants+=val;
@@ -3257,7 +3299,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
   targetNode.right = right;
   targetNode.x = (left + right) / 2;
   targetNode.level = level;
-  targetNode.color = srcNode.color || 0;
+  targetNode.group = srcNode.group || 0;
   targetNode.index = srcNode.index;
 
   callback(targetNode);
@@ -3284,35 +3326,34 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 };
 
 // BFS
-let getNestedTree = function(config) {
-  let edges = config.edges;
-  let colors = config.nodes.colors;
-  let nodes = {};
-  let edgeIndex = 0;
+let getNestedTree = function(model) {
+  let nodes = model.nodes;
+  let edges = model.edges;
+  let nestedNodes = {};
 
   // build nodes
-  for (let n=0; n<colors.length; n++) {
-    nodes[n] = {
+  nodes.forEach(function(node, n) {
+    nestedNodes[n] = {
       index: n,
-      color: colors[n],
+      group: node.group,
       children: [],
       hasParent: false
     };
-  }
+  });
 
-  while(edgeIndex < edges.length) {
-    let fromIndex = edges[edgeIndex++];
-    let toIndex = edges[edgeIndex++];
+  edges.forEach(function(edge) {
+    let fromIndex = edge.from;
+    let toIndex = edge.to;
 
     // parent child relationship
-    nodes[fromIndex].children.push(nodes[toIndex]);
-    nodes[toIndex].parent = nodes[fromIndex];
-    nodes[toIndex].hasParent = true;
-  }
+    nestedNodes[fromIndex].children.push(nestedNodes[toIndex]);
+    nestedNodes[toIndex].parent = nestedNodes[fromIndex];
+    nestedNodes[toIndex].hasParent = true;
+  });
 
   // to find the root node, iterate through nodes and find the node that does not have a parent
-  for (var key in nodes) {
-    let node = nodes[key];
+  for (var key in nestedNodes) {
+    let node = nestedNodes[key];
     if (!node.hasParent) {
       return node;
     }
@@ -3322,11 +3363,9 @@ let getNestedTree = function(config) {
 };
 
 
-const Tree = function(config) {
-  let rootNode = getNestedTree(config);
-
+const Tree = function(model) {
+  let rootNode = getNestedTree(model);
   let newRootNode = {};
-
   let nodes = [];
   let n=0;
   let maxLevel = 0;
@@ -3345,37 +3384,1966 @@ const Tree = function(config) {
     return a.index - b.index;
   });
 
-  //let numNodes = nodes.length;
-
-  let model = {
-    nodes: {
-      xs:     [],
-      ys:     [],
-      colors: []
-    },
-    edges: [], // num edges = num nodes - 1
-    width: config.width,
-    height: config.height
-  };
-
-  let edgeIndex = 0;
-
   // O(n)
   nodes.forEach(function(node, n) {
-    model.nodes.xs[n] = node.x;
-    model.nodes.ys[n] = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
-    model.nodes.colors[n] = node.color;
+    model.nodes[n].x = node.x;
+    model.nodes[n].y = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
 
-    if (node.parent) {
-      model.edges[edgeIndex++] = node.parent.index;
-      model.edges[edgeIndex++] = node.index;
-    }
   });
+
+  fitToViewport(model.nodes);
 
   return model;
 };
 
 module.exports = Tree;
+
+/***/ }),
+
+/***/ "./engine/src/layouts/Web.js":
+/*!***********************************!*\
+  !*** ./engine/src/layouts/Web.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+const DEFAULT_STEPS = 20;
+const POSITION_FACTOR = 0.3;
+const ATTRACT_FACTOR = 0.1;
+
+const initNodePositions = function(nodes) {
+  let numNodes = nodes.length;
+
+  // find group counts
+  let groups = [];
+  nodes.forEach(function(node) {
+    let group = node.group;
+
+    if (groups[group] === undefined) {
+      groups[group] = {
+        count: 0
+      };
+    }
+
+    groups[group].count++;
+  });
+
+  let total = 0;
+  for (let n=0; n<groups.length; n++) {
+    groups[n].next = total;
+    total+=groups[n].count;
+  }
+
+  // initialize positions
+  nodes.forEach(function(node) {
+    let group = node.group;
+    let angle = -2 * Math.PI * groups[group].next++ / numNodes;
+
+    node.x = POSITION_FACTOR * Math.cos(angle);
+    node.y = POSITION_FACTOR * Math.sin(angle);
+  });
+};
+
+// attractive forces between nodes sharing an edge
+// Hooke's Law -> F = kx
+const attractNodes = function(nodes, edges) {
+  edges.forEach(function(edge) {
+    let a = edge.from;
+    let b = edge.to;
+
+    let ax = nodes[a].x;
+    let ay = nodes[a].y;
+    let bx = nodes[b].x;
+    let by = nodes[b].y;
+    let xDiff = bx - ax;
+    let yDiff = by - ay;
+    let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+    let xChange, yChange;
+
+    if (dist > 0) {
+      xChange = ATTRACT_FACTOR * xDiff;
+      yChange = ATTRACT_FACTOR * yDiff;
+
+      // move a closer to b
+      nodes[a].x += xChange;
+      nodes[a].y += yChange;
+
+      // move b closer to a
+      nodes[b].x -= xChange;
+      nodes[b].y -= yChange;
+    }
+  });
+};
+
+const Web = function(model) {
+  let steps = model.steps === undefined ? DEFAULT_STEPS : model.steps;
+  let nodes = model.nodes;
+  let edges = model.edges;
+
+  initNodePositions(nodes);
+
+  // process steps
+  for (let n=1; n<steps; n++) {
+    attractNodes(nodes, edges);
+  }
+
+  fitToViewport(nodes);
+
+  return model;
+};
+
+module.exports = Web;
+
+/***/ }),
+
+/***/ "./engine/src/layouts/utils/fitToViewport.js":
+/*!***************************************************!*\
+  !*** ./engine/src/layouts/utils/fitToViewport.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(nodes) {
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+
+  nodes.forEach(function(node) {
+    let nodeX = node.x;
+    let nodeY = node.y;
+
+    minX = Math.min(minX, nodeX);
+    minY = Math.min(minY, nodeY);
+    maxX = Math.max(maxX, nodeX);
+    maxY = Math.max(maxY, nodeY);
+  });
+
+  // normalized width is 2 and height is 2.  Thus, to give a little padding,
+  // using 1.9
+  let diffX = maxX - minX;
+  let diffY = maxY - minY;
+  let xOffset = minX + diffX / 2;
+  let yOffset = minY + diffY / 2;
+  let xFactor = 1.9 / diffX;
+  let yFactor = 1.9 / diffY;
+
+  // we want to adjust the x and y equally to preserve ratio
+  let factor = Math.min(xFactor, yFactor);
+
+  nodes.forEach(function(node) {
+    node.x = (node.x - xOffset) * factor;
+    node.y = (node.y - yOffset) * factor;
+  });
+};
+
+/***/ }),
+
+/***/ "./node_modules/d3-dispatch/src/dispatch.js":
+/*!**************************************************!*\
+  !*** ./node_modules/d3-dispatch/src/dispatch.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var noop = {value: function() {}};
+
+function dispatch() {
+  for (var i = 0, n = arguments.length, _ = {}, t; i < n; ++i) {
+    if (!(t = arguments[i] + "") || (t in _)) throw new Error("illegal type: " + t);
+    _[t] = [];
+  }
+  return new Dispatch(_);
+}
+
+function Dispatch(_) {
+  this._ = _;
+}
+
+function parseTypenames(typenames, types) {
+  return typenames.trim().split(/^|\s+/).map(function(t) {
+    var name = "", i = t.indexOf(".");
+    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+    if (t && !types.hasOwnProperty(t)) throw new Error("unknown type: " + t);
+    return {type: t, name: name};
+  });
+}
+
+Dispatch.prototype = dispatch.prototype = {
+  constructor: Dispatch,
+  on: function(typename, callback) {
+    var _ = this._,
+        T = parseTypenames(typename + "", _),
+        t,
+        i = -1,
+        n = T.length;
+
+    // If no callback was specified, return the callback of the given type and name.
+    if (arguments.length < 2) {
+      while (++i < n) if ((t = (typename = T[i]).type) && (t = get(_[t], typename.name))) return t;
+      return;
+    }
+
+    // If a type was specified, set the callback for the given type and name.
+    // Otherwise, if a null callback was specified, remove callbacks of the given name.
+    if (callback != null && typeof callback !== "function") throw new Error("invalid callback: " + callback);
+    while (++i < n) {
+      if (t = (typename = T[i]).type) _[t] = set(_[t], typename.name, callback);
+      else if (callback == null) for (t in _) _[t] = set(_[t], typename.name, null);
+    }
+
+    return this;
+  },
+  copy: function() {
+    var copy = {}, _ = this._;
+    for (var t in _) copy[t] = _[t].slice();
+    return new Dispatch(copy);
+  },
+  call: function(type, that) {
+    if ((n = arguments.length - 2) > 0) for (var args = new Array(n), i = 0, n, t; i < n; ++i) args[i] = arguments[i + 2];
+    if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
+    for (t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
+  },
+  apply: function(type, that, args) {
+    if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
+    for (var t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
+  }
+};
+
+function get(type, name) {
+  for (var i = 0, n = type.length, c; i < n; ++i) {
+    if ((c = type[i]).name === name) {
+      return c.value;
+    }
+  }
+}
+
+function set(type, name, callback) {
+  for (var i = 0, n = type.length; i < n; ++i) {
+    if (type[i].name === name) {
+      type[i] = noop, type = type.slice(0, i).concat(type.slice(i + 1));
+      break;
+    }
+  }
+  if (callback != null) type.push({name: name, value: callback});
+  return type;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (dispatch);
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-dispatch/src/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-dispatch/src/index.js ***!
+  \***********************************************/
+/*! exports provided: dispatch */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _dispatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dispatch */ "./node_modules/d3-dispatch/src/dispatch.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "dispatch", function() { return _dispatch__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/center.js":
+/*!*********************************************!*\
+  !*** ./node_modules/d3-force/src/center.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function(x, y) {
+  var nodes;
+
+  if (x == null) x = 0;
+  if (y == null) y = 0;
+
+  function force() {
+    var i,
+        n = nodes.length,
+        node,
+        sx = 0,
+        sy = 0;
+
+    for (i = 0; i < n; ++i) {
+      node = nodes[i], sx += node.x, sy += node.y;
+    }
+
+    for (sx = sx / n - x, sy = sy / n - y, i = 0; i < n; ++i) {
+      node = nodes[i], node.x -= sx, node.y -= sy;
+    }
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+  };
+
+  force.x = function(_) {
+    return arguments.length ? (x = +_, force) : x;
+  };
+
+  force.y = function(_) {
+    return arguments.length ? (y = +_, force) : y;
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/collide.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-force/src/collide.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var d3_quadtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-quadtree */ "./node_modules/d3-quadtree/src/index.js");
+/* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
+/* harmony import */ var _jiggle_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./jiggle.js */ "./node_modules/d3-force/src/jiggle.js");
+
+
+
+
+function x(d) {
+  return d.x + d.vx;
+}
+
+function y(d) {
+  return d.y + d.vy;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (function(radius) {
+  var nodes,
+      radii,
+      strength = 1,
+      iterations = 1;
+
+  if (typeof radius !== "function") radius = Object(_constant_js__WEBPACK_IMPORTED_MODULE_1__["default"])(radius == null ? 1 : +radius);
+
+  function force() {
+    var i, n = nodes.length,
+        tree,
+        node,
+        xi,
+        yi,
+        ri,
+        ri2;
+
+    for (var k = 0; k < iterations; ++k) {
+      tree = Object(d3_quadtree__WEBPACK_IMPORTED_MODULE_0__["quadtree"])(nodes, x, y).visitAfter(prepare);
+      for (i = 0; i < n; ++i) {
+        node = nodes[i];
+        ri = radii[node.index], ri2 = ri * ri;
+        xi = node.x + node.vx;
+        yi = node.y + node.vy;
+        tree.visit(apply);
+      }
+    }
+
+    function apply(quad, x0, y0, x1, y1) {
+      var data = quad.data, rj = quad.r, r = ri + rj;
+      if (data) {
+        if (data.index > node.index) {
+          var x = xi - data.x - data.vx,
+              y = yi - data.y - data.vy,
+              l = x * x + y * y;
+          if (l < r * r) {
+            if (x === 0) x = Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_2__["default"])(), l += x * x;
+            if (y === 0) y = Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_2__["default"])(), l += y * y;
+            l = (r - (l = Math.sqrt(l))) / l * strength;
+            node.vx += (x *= l) * (r = (rj *= rj) / (ri2 + rj));
+            node.vy += (y *= l) * r;
+            data.vx -= x * (r = 1 - r);
+            data.vy -= y * r;
+          }
+        }
+        return;
+      }
+      return x0 > xi + r || x1 < xi - r || y0 > yi + r || y1 < yi - r;
+    }
+  }
+
+  function prepare(quad) {
+    if (quad.data) return quad.r = radii[quad.data.index];
+    for (var i = quad.r = 0; i < 4; ++i) {
+      if (quad[i] && quad[i].r > quad.r) {
+        quad.r = quad[i].r;
+      }
+    }
+  }
+
+  function initialize() {
+    if (!nodes) return;
+    var i, n = nodes.length, node;
+    radii = new Array(n);
+    for (i = 0; i < n; ++i) node = nodes[i], radii[node.index] = +radius(node, i, nodes);
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+    initialize();
+  };
+
+  force.iterations = function(_) {
+    return arguments.length ? (iterations = +_, force) : iterations;
+  };
+
+  force.strength = function(_) {
+    return arguments.length ? (strength = +_, force) : strength;
+  };
+
+  force.radius = function(_) {
+    return arguments.length ? (radius = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_1__["default"])(+_), initialize(), force) : radius;
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/constant.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-force/src/constant.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function(x) {
+  return function() {
+    return x;
+  };
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/index.js":
+/*!********************************************!*\
+  !*** ./node_modules/d3-force/src/index.js ***!
+  \********************************************/
+/*! exports provided: forceCenter, forceCollide, forceLink, forceManyBody, forceRadial, forceSimulation, forceX, forceY */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _center__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./center */ "./node_modules/d3-force/src/center.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceCenter", function() { return _center__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+/* harmony import */ var _collide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./collide */ "./node_modules/d3-force/src/collide.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceCollide", function() { return _collide__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+
+/* harmony import */ var _link__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./link */ "./node_modules/d3-force/src/link.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceLink", function() { return _link__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+
+/* harmony import */ var _manyBody__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./manyBody */ "./node_modules/d3-force/src/manyBody.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceManyBody", function() { return _manyBody__WEBPACK_IMPORTED_MODULE_3__["default"]; });
+
+/* harmony import */ var _radial__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./radial */ "./node_modules/d3-force/src/radial.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceRadial", function() { return _radial__WEBPACK_IMPORTED_MODULE_4__["default"]; });
+
+/* harmony import */ var _simulation__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./simulation */ "./node_modules/d3-force/src/simulation.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceSimulation", function() { return _simulation__WEBPACK_IMPORTED_MODULE_5__["default"]; });
+
+/* harmony import */ var _x__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./x */ "./node_modules/d3-force/src/x.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceX", function() { return _x__WEBPACK_IMPORTED_MODULE_6__["default"]; });
+
+/* harmony import */ var _y__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./y */ "./node_modules/d3-force/src/y.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "forceY", function() { return _y__WEBPACK_IMPORTED_MODULE_7__["default"]; });
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/jiggle.js":
+/*!*********************************************!*\
+  !*** ./node_modules/d3-force/src/jiggle.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function() {
+  return (Math.random() - 0.5) * 1e-6;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/link.js":
+/*!*******************************************!*\
+  !*** ./node_modules/d3-force/src/link.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
+/* harmony import */ var _jiggle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./jiggle.js */ "./node_modules/d3-force/src/jiggle.js");
+
+
+
+function index(d) {
+  return d.index;
+}
+
+function find(nodeById, nodeId) {
+  var node = nodeById.get(nodeId);
+  if (!node) throw new Error("missing: " + nodeId);
+  return node;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (function(links) {
+  var id = index,
+      strength = defaultStrength,
+      strengths,
+      distance = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(30),
+      distances,
+      nodes,
+      count,
+      bias,
+      iterations = 1;
+
+  if (links == null) links = [];
+
+  function defaultStrength(link) {
+    return 1 / Math.min(count[link.source.index], count[link.target.index]);
+  }
+
+  function force(alpha) {
+    for (var k = 0, n = links.length; k < iterations; ++k) {
+      for (var i = 0, link, source, target, x, y, l, b; i < n; ++i) {
+        link = links[i], source = link.source, target = link.target;
+        x = target.x + target.vx - source.x - source.vx || Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_1__["default"])();
+        y = target.y + target.vy - source.y - source.vy || Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_1__["default"])();
+        l = Math.sqrt(x * x + y * y);
+        l = (l - distances[i]) / l * alpha * strengths[i];
+        x *= l, y *= l;
+        target.vx -= x * (b = bias[i]);
+        target.vy -= y * b;
+        source.vx += x * (b = 1 - b);
+        source.vy += y * b;
+      }
+    }
+  }
+
+  function initialize() {
+    if (!nodes) return;
+
+    var i,
+        n = nodes.length,
+        m = links.length,
+        nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d])),
+        link;
+
+    for (i = 0, count = new Array(n); i < m; ++i) {
+      link = links[i], link.index = i;
+      if (typeof link.source !== "object") link.source = find(nodeById, link.source);
+      if (typeof link.target !== "object") link.target = find(nodeById, link.target);
+      count[link.source.index] = (count[link.source.index] || 0) + 1;
+      count[link.target.index] = (count[link.target.index] || 0) + 1;
+    }
+
+    for (i = 0, bias = new Array(m); i < m; ++i) {
+      link = links[i], bias[i] = count[link.source.index] / (count[link.source.index] + count[link.target.index]);
+    }
+
+    strengths = new Array(m), initializeStrength();
+    distances = new Array(m), initializeDistance();
+  }
+
+  function initializeStrength() {
+    if (!nodes) return;
+
+    for (var i = 0, n = links.length; i < n; ++i) {
+      strengths[i] = +strength(links[i], i, links);
+    }
+  }
+
+  function initializeDistance() {
+    if (!nodes) return;
+
+    for (var i = 0, n = links.length; i < n; ++i) {
+      distances[i] = +distance(links[i], i, links);
+    }
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+    initialize();
+  };
+
+  force.links = function(_) {
+    return arguments.length ? (links = _, initialize(), force) : links;
+  };
+
+  force.id = function(_) {
+    return arguments.length ? (id = _, force) : id;
+  };
+
+  force.iterations = function(_) {
+    return arguments.length ? (iterations = +_, force) : iterations;
+  };
+
+  force.strength = function(_) {
+    return arguments.length ? (strength = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initializeStrength(), force) : strength;
+  };
+
+  force.distance = function(_) {
+    return arguments.length ? (distance = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initializeDistance(), force) : distance;
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/manyBody.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-force/src/manyBody.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var d3_quadtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-quadtree */ "./node_modules/d3-quadtree/src/index.js");
+/* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
+/* harmony import */ var _jiggle_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./jiggle.js */ "./node_modules/d3-force/src/jiggle.js");
+/* harmony import */ var _simulation_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./simulation.js */ "./node_modules/d3-force/src/simulation.js");
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function() {
+  var nodes,
+      node,
+      alpha,
+      strength = Object(_constant_js__WEBPACK_IMPORTED_MODULE_1__["default"])(-30),
+      strengths,
+      distanceMin2 = 1,
+      distanceMax2 = Infinity,
+      theta2 = 0.81;
+
+  function force(_) {
+    var i, n = nodes.length, tree = Object(d3_quadtree__WEBPACK_IMPORTED_MODULE_0__["quadtree"])(nodes, _simulation_js__WEBPACK_IMPORTED_MODULE_3__["x"], _simulation_js__WEBPACK_IMPORTED_MODULE_3__["y"]).visitAfter(accumulate);
+    for (alpha = _, i = 0; i < n; ++i) node = nodes[i], tree.visit(apply);
+  }
+
+  function initialize() {
+    if (!nodes) return;
+    var i, n = nodes.length, node;
+    strengths = new Array(n);
+    for (i = 0; i < n; ++i) node = nodes[i], strengths[node.index] = +strength(node, i, nodes);
+  }
+
+  function accumulate(quad) {
+    var strength = 0, q, c, weight = 0, x, y, i;
+
+    // For internal nodes, accumulate forces from child quadrants.
+    if (quad.length) {
+      for (x = y = i = 0; i < 4; ++i) {
+        if ((q = quad[i]) && (c = Math.abs(q.value))) {
+          strength += q.value, weight += c, x += c * q.x, y += c * q.y;
+        }
+      }
+      quad.x = x / weight;
+      quad.y = y / weight;
+    }
+
+    // For leaf nodes, accumulate forces from coincident quadrants.
+    else {
+      q = quad;
+      q.x = q.data.x;
+      q.y = q.data.y;
+      do strength += strengths[q.data.index];
+      while (q = q.next);
+    }
+
+    quad.value = strength;
+  }
+
+  function apply(quad, x1, _, x2) {
+    if (!quad.value) return true;
+
+    var x = quad.x - node.x,
+        y = quad.y - node.y,
+        w = x2 - x1,
+        l = x * x + y * y;
+
+    // Apply the Barnes-Hut approximation if possible.
+    // Limit forces for very close nodes; randomize direction if coincident.
+    if (w * w / theta2 < l) {
+      if (l < distanceMax2) {
+        if (x === 0) x = Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_2__["default"])(), l += x * x;
+        if (y === 0) y = Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_2__["default"])(), l += y * y;
+        if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
+        node.vx += x * quad.value * alpha / l;
+        node.vy += y * quad.value * alpha / l;
+      }
+      return true;
+    }
+
+    // Otherwise, process points directly.
+    else if (quad.length || l >= distanceMax2) return;
+
+    // Limit forces for very close nodes; randomize direction if coincident.
+    if (quad.data !== node || quad.next) {
+      if (x === 0) x = Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_2__["default"])(), l += x * x;
+      if (y === 0) y = Object(_jiggle_js__WEBPACK_IMPORTED_MODULE_2__["default"])(), l += y * y;
+      if (l < distanceMin2) l = Math.sqrt(distanceMin2 * l);
+    }
+
+    do if (quad.data !== node) {
+      w = strengths[quad.data.index] * alpha / l;
+      node.vx += x * w;
+      node.vy += y * w;
+    } while (quad = quad.next);
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+    initialize();
+  };
+
+  force.strength = function(_) {
+    return arguments.length ? (strength = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_1__["default"])(+_), initialize(), force) : strength;
+  };
+
+  force.distanceMin = function(_) {
+    return arguments.length ? (distanceMin2 = _ * _, force) : Math.sqrt(distanceMin2);
+  };
+
+  force.distanceMax = function(_) {
+    return arguments.length ? (distanceMax2 = _ * _, force) : Math.sqrt(distanceMax2);
+  };
+
+  force.theta = function(_) {
+    return arguments.length ? (theta2 = _ * _, force) : Math.sqrt(theta2);
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/radial.js":
+/*!*********************************************!*\
+  !*** ./node_modules/d3-force/src/radial.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(radius, x, y) {
+  var nodes,
+      strength = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(0.1),
+      strengths,
+      radiuses;
+
+  if (typeof radius !== "function") radius = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+radius);
+  if (x == null) x = 0;
+  if (y == null) y = 0;
+
+  function force(alpha) {
+    for (var i = 0, n = nodes.length; i < n; ++i) {
+      var node = nodes[i],
+          dx = node.x - x || 1e-6,
+          dy = node.y - y || 1e-6,
+          r = Math.sqrt(dx * dx + dy * dy),
+          k = (radiuses[i] - r) * strengths[i] * alpha / r;
+      node.vx += dx * k;
+      node.vy += dy * k;
+    }
+  }
+
+  function initialize() {
+    if (!nodes) return;
+    var i, n = nodes.length;
+    strengths = new Array(n);
+    radiuses = new Array(n);
+    for (i = 0; i < n; ++i) {
+      radiuses[i] = +radius(nodes[i], i, nodes);
+      strengths[i] = isNaN(radiuses[i]) ? 0 : +strength(nodes[i], i, nodes);
+    }
+  }
+
+  force.initialize = function(_) {
+    nodes = _, initialize();
+  };
+
+  force.strength = function(_) {
+    return arguments.length ? (strength = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initialize(), force) : strength;
+  };
+
+  force.radius = function(_) {
+    return arguments.length ? (radius = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initialize(), force) : radius;
+  };
+
+  force.x = function(_) {
+    return arguments.length ? (x = +_, force) : x;
+  };
+
+  force.y = function(_) {
+    return arguments.length ? (y = +_, force) : y;
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/simulation.js":
+/*!*************************************************!*\
+  !*** ./node_modules/d3-force/src/simulation.js ***!
+  \*************************************************/
+/*! exports provided: x, y, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return x; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return y; });
+/* harmony import */ var d3_dispatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-dispatch */ "./node_modules/d3-dispatch/src/index.js");
+/* harmony import */ var d3_timer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-timer */ "./node_modules/d3-timer/src/index.js");
+
+
+
+function x(d) {
+  return d.x;
+}
+
+function y(d) {
+  return d.y;
+}
+
+var initialRadius = 10,
+    initialAngle = Math.PI * (3 - Math.sqrt(5));
+
+/* harmony default export */ __webpack_exports__["default"] = (function(nodes) {
+  var simulation,
+      alpha = 1,
+      alphaMin = 0.001,
+      alphaDecay = 1 - Math.pow(alphaMin, 1 / 300),
+      alphaTarget = 0,
+      velocityDecay = 0.6,
+      forces = new Map(),
+      stepper = Object(d3_timer__WEBPACK_IMPORTED_MODULE_1__["timer"])(step),
+      event = Object(d3_dispatch__WEBPACK_IMPORTED_MODULE_0__["dispatch"])("tick", "end");
+
+  if (nodes == null) nodes = [];
+
+  function step() {
+    tick();
+    event.call("tick", simulation);
+    if (alpha < alphaMin) {
+      stepper.stop();
+      event.call("end", simulation);
+    }
+  }
+
+  function tick(iterations) {
+    var i, n = nodes.length, node;
+
+    if (iterations === undefined) iterations = 1;
+
+    for (var k = 0; k < iterations; ++k) {
+      alpha += (alphaTarget - alpha) * alphaDecay;
+
+      forces.forEach(function(force) {
+        force(alpha);
+      });
+
+      for (i = 0; i < n; ++i) {
+        node = nodes[i];
+        if (node.fx == null) node.x += node.vx *= velocityDecay;
+        else node.x = node.fx, node.vx = 0;
+        if (node.fy == null) node.y += node.vy *= velocityDecay;
+        else node.y = node.fy, node.vy = 0;
+      }
+    }
+
+    return simulation;
+  }
+
+  function initializeNodes() {
+    for (var i = 0, n = nodes.length, node; i < n; ++i) {
+      node = nodes[i], node.index = i;
+      if (node.fx != null) node.x = node.fx;
+      if (node.fy != null) node.y = node.fy;
+      if (isNaN(node.x) || isNaN(node.y)) {
+        var radius = initialRadius * Math.sqrt(i), angle = i * initialAngle;
+        node.x = radius * Math.cos(angle);
+        node.y = radius * Math.sin(angle);
+      }
+      if (isNaN(node.vx) || isNaN(node.vy)) {
+        node.vx = node.vy = 0;
+      }
+    }
+  }
+
+  function initializeForce(force) {
+    if (force.initialize) force.initialize(nodes);
+    return force;
+  }
+
+  initializeNodes();
+
+  return simulation = {
+    tick: tick,
+
+    restart: function() {
+      return stepper.restart(step), simulation;
+    },
+
+    stop: function() {
+      return stepper.stop(), simulation;
+    },
+
+    nodes: function(_) {
+      return arguments.length ? (nodes = _, initializeNodes(), forces.forEach(initializeForce), simulation) : nodes;
+    },
+
+    alpha: function(_) {
+      return arguments.length ? (alpha = +_, simulation) : alpha;
+    },
+
+    alphaMin: function(_) {
+      return arguments.length ? (alphaMin = +_, simulation) : alphaMin;
+    },
+
+    alphaDecay: function(_) {
+      return arguments.length ? (alphaDecay = +_, simulation) : +alphaDecay;
+    },
+
+    alphaTarget: function(_) {
+      return arguments.length ? (alphaTarget = +_, simulation) : alphaTarget;
+    },
+
+    velocityDecay: function(_) {
+      return arguments.length ? (velocityDecay = 1 - _, simulation) : 1 - velocityDecay;
+    },
+
+    force: function(name, _) {
+      return arguments.length > 1 ? ((_ == null ? forces.delete(name) : forces.set(name, initializeForce(_))), simulation) : forces.get(name);
+    },
+
+    find: function(x, y, radius) {
+      var i = 0,
+          n = nodes.length,
+          dx,
+          dy,
+          d2,
+          node,
+          closest;
+
+      if (radius == null) radius = Infinity;
+      else radius *= radius;
+
+      for (i = 0; i < n; ++i) {
+        node = nodes[i];
+        dx = x - node.x;
+        dy = y - node.y;
+        d2 = dx * dx + dy * dy;
+        if (d2 < radius) closest = node, radius = d2;
+      }
+
+      return closest;
+    },
+
+    on: function(name, _) {
+      return arguments.length > 1 ? (event.on(name, _), simulation) : event.on(name);
+    }
+  };
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/x.js":
+/*!****************************************!*\
+  !*** ./node_modules/d3-force/src/x.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(x) {
+  var strength = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(0.1),
+      nodes,
+      strengths,
+      xz;
+
+  if (typeof x !== "function") x = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(x == null ? 0 : +x);
+
+  function force(alpha) {
+    for (var i = 0, n = nodes.length, node; i < n; ++i) {
+      node = nodes[i], node.vx += (xz[i] - node.x) * strengths[i] * alpha;
+    }
+  }
+
+  function initialize() {
+    if (!nodes) return;
+    var i, n = nodes.length;
+    strengths = new Array(n);
+    xz = new Array(n);
+    for (i = 0; i < n; ++i) {
+      strengths[i] = isNaN(xz[i] = +x(nodes[i], i, nodes)) ? 0 : +strength(nodes[i], i, nodes);
+    }
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+    initialize();
+  };
+
+  force.strength = function(_) {
+    return arguments.length ? (strength = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initialize(), force) : strength;
+  };
+
+  force.x = function(_) {
+    return arguments.length ? (x = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initialize(), force) : x;
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-force/src/y.js":
+/*!****************************************!*\
+  !*** ./node_modules/d3-force/src/y.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(y) {
+  var strength = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(0.1),
+      nodes,
+      strengths,
+      yz;
+
+  if (typeof y !== "function") y = Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(y == null ? 0 : +y);
+
+  function force(alpha) {
+    for (var i = 0, n = nodes.length, node; i < n; ++i) {
+      node = nodes[i], node.vy += (yz[i] - node.y) * strengths[i] * alpha;
+    }
+  }
+
+  function initialize() {
+    if (!nodes) return;
+    var i, n = nodes.length;
+    strengths = new Array(n);
+    yz = new Array(n);
+    for (i = 0; i < n; ++i) {
+      strengths[i] = isNaN(yz[i] = +y(nodes[i], i, nodes)) ? 0 : +strength(nodes[i], i, nodes);
+    }
+  }
+
+  force.initialize = function(_) {
+    nodes = _;
+    initialize();
+  };
+
+  force.strength = function(_) {
+    return arguments.length ? (strength = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initialize(), force) : strength;
+  };
+
+  force.y = function(_) {
+    return arguments.length ? (y = typeof _ === "function" ? _ : Object(_constant_js__WEBPACK_IMPORTED_MODULE_0__["default"])(+_), initialize(), force) : y;
+  };
+
+  return force;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/add.js":
+/*!*********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/add.js ***!
+  \*********************************************/
+/*! exports provided: default, addAll */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addAll", function() { return addAll; });
+/* harmony default export */ __webpack_exports__["default"] = (function(d) {
+  var x = +this._x.call(null, d),
+      y = +this._y.call(null, d);
+  return add(this.cover(x, y), x, y, d);
+});
+
+function add(tree, x, y, d) {
+  if (isNaN(x) || isNaN(y)) return tree; // ignore invalid points
+
+  var parent,
+      node = tree._root,
+      leaf = {data: d},
+      x0 = tree._x0,
+      y0 = tree._y0,
+      x1 = tree._x1,
+      y1 = tree._y1,
+      xm,
+      ym,
+      xp,
+      yp,
+      right,
+      bottom,
+      i,
+      j;
+
+  // If the tree is empty, initialize the root as a leaf.
+  if (!node) return tree._root = leaf, tree;
+
+  // Find the existing leaf for the new point, or add it.
+  while (node.length) {
+    if (right = x >= (xm = (x0 + x1) / 2)) x0 = xm; else x1 = xm;
+    if (bottom = y >= (ym = (y0 + y1) / 2)) y0 = ym; else y1 = ym;
+    if (parent = node, !(node = node[i = bottom << 1 | right])) return parent[i] = leaf, tree;
+  }
+
+  // Is the new point is exactly coincident with the existing point?
+  xp = +tree._x.call(null, node.data);
+  yp = +tree._y.call(null, node.data);
+  if (x === xp && y === yp) return leaf.next = node, parent ? parent[i] = leaf : tree._root = leaf, tree;
+
+  // Otherwise, split the leaf node until the old and new point are separated.
+  do {
+    parent = parent ? parent[i] = new Array(4) : tree._root = new Array(4);
+    if (right = x >= (xm = (x0 + x1) / 2)) x0 = xm; else x1 = xm;
+    if (bottom = y >= (ym = (y0 + y1) / 2)) y0 = ym; else y1 = ym;
+  } while ((i = bottom << 1 | right) === (j = (yp >= ym) << 1 | (xp >= xm)));
+  return parent[j] = node, parent[i] = leaf, tree;
+}
+
+function addAll(data) {
+  var d, i, n = data.length,
+      x,
+      y,
+      xz = new Array(n),
+      yz = new Array(n),
+      x0 = Infinity,
+      y0 = Infinity,
+      x1 = -Infinity,
+      y1 = -Infinity;
+
+  // Compute the points and their extent.
+  for (i = 0; i < n; ++i) {
+    if (isNaN(x = +this._x.call(null, d = data[i])) || isNaN(y = +this._y.call(null, d))) continue;
+    xz[i] = x;
+    yz[i] = y;
+    if (x < x0) x0 = x;
+    if (x > x1) x1 = x;
+    if (y < y0) y0 = y;
+    if (y > y1) y1 = y;
+  }
+
+  // If there were no (valid) points, abort.
+  if (x0 > x1 || y0 > y1) return this;
+
+  // Expand the tree to cover the new points.
+  this.cover(x0, y0).cover(x1, y1);
+
+  // Add the new points.
+  for (i = 0; i < n; ++i) {
+    add(this, xz[i], yz[i], data[i]);
+  }
+
+  return this;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/cover.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/cover.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function(x, y) {
+  if (isNaN(x = +x) || isNaN(y = +y)) return this; // ignore invalid points
+
+  var x0 = this._x0,
+      y0 = this._y0,
+      x1 = this._x1,
+      y1 = this._y1;
+
+  // If the quadtree has no extent, initialize them.
+  // Integer extent are necessary so that if we later double the extent,
+  // the existing quadrant boundaries don’t change due to floating point error!
+  if (isNaN(x0)) {
+    x1 = (x0 = Math.floor(x)) + 1;
+    y1 = (y0 = Math.floor(y)) + 1;
+  }
+
+  // Otherwise, double repeatedly to cover.
+  else {
+    var z = x1 - x0,
+        node = this._root,
+        parent,
+        i;
+
+    while (x0 > x || x >= x1 || y0 > y || y >= y1) {
+      i = (y < y0) << 1 | (x < x0);
+      parent = new Array(4), parent[i] = node, node = parent, z *= 2;
+      switch (i) {
+        case 0: x1 = x0 + z, y1 = y0 + z; break;
+        case 1: x0 = x1 - z, y1 = y0 + z; break;
+        case 2: x1 = x0 + z, y0 = y1 - z; break;
+        case 3: x0 = x1 - z, y0 = y1 - z; break;
+      }
+    }
+
+    if (this._root && this._root.length) this._root = node;
+  }
+
+  this._x0 = x0;
+  this._y0 = y0;
+  this._x1 = x1;
+  this._y1 = y1;
+  return this;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/data.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/data.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function() {
+  var data = [];
+  this.visit(function(node) {
+    if (!node.length) do data.push(node.data); while (node = node.next)
+  });
+  return data;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/extent.js":
+/*!************************************************!*\
+  !*** ./node_modules/d3-quadtree/src/extent.js ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function(_) {
+  return arguments.length
+      ? this.cover(+_[0][0], +_[0][1]).cover(+_[1][0], +_[1][1])
+      : isNaN(this._x0) ? undefined : [[this._x0, this._y0], [this._x1, this._y1]];
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/find.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/find.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _quad__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quad */ "./node_modules/d3-quadtree/src/quad.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(x, y, radius) {
+  var data,
+      x0 = this._x0,
+      y0 = this._y0,
+      x1,
+      y1,
+      x2,
+      y2,
+      x3 = this._x1,
+      y3 = this._y1,
+      quads = [],
+      node = this._root,
+      q,
+      i;
+
+  if (node) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](node, x0, y0, x3, y3));
+  if (radius == null) radius = Infinity;
+  else {
+    x0 = x - radius, y0 = y - radius;
+    x3 = x + radius, y3 = y + radius;
+    radius *= radius;
+  }
+
+  while (q = quads.pop()) {
+
+    // Stop searching if this quadrant can’t contain a closer node.
+    if (!(node = q.node)
+        || (x1 = q.x0) > x3
+        || (y1 = q.y0) > y3
+        || (x2 = q.x1) < x0
+        || (y2 = q.y1) < y0) continue;
+
+    // Bisect the current quadrant.
+    if (node.length) {
+      var xm = (x1 + x2) / 2,
+          ym = (y1 + y2) / 2;
+
+      quads.push(
+        new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](node[3], xm, ym, x2, y2),
+        new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](node[2], x1, ym, xm, y2),
+        new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](node[1], xm, y1, x2, ym),
+        new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](node[0], x1, y1, xm, ym)
+      );
+
+      // Visit the closest quadrant first.
+      if (i = (y >= ym) << 1 | (x >= xm)) {
+        q = quads[quads.length - 1];
+        quads[quads.length - 1] = quads[quads.length - 1 - i];
+        quads[quads.length - 1 - i] = q;
+      }
+    }
+
+    // Visit this point. (Visiting coincident points isn’t necessary!)
+    else {
+      var dx = x - +this._x.call(null, node.data),
+          dy = y - +this._y.call(null, node.data),
+          d2 = dx * dx + dy * dy;
+      if (d2 < radius) {
+        var d = Math.sqrt(radius = d2);
+        x0 = x - d, y0 = y - d;
+        x3 = x + d, y3 = y + d;
+        data = node.data;
+      }
+    }
+  }
+
+  return data;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/index.js ***!
+  \***********************************************/
+/*! exports provided: quadtree */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _quadtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quadtree */ "./node_modules/d3-quadtree/src/quadtree.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "quadtree", function() { return _quadtree__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/quad.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/quad.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function(node, x0, y0, x1, y1) {
+  this.node = node;
+  this.x0 = x0;
+  this.y0 = y0;
+  this.x1 = x1;
+  this.y1 = y1;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/quadtree.js":
+/*!**************************************************!*\
+  !*** ./node_modules/d3-quadtree/src/quadtree.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return quadtree; });
+/* harmony import */ var _add__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add */ "./node_modules/d3-quadtree/src/add.js");
+/* harmony import */ var _cover__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cover */ "./node_modules/d3-quadtree/src/cover.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./data */ "./node_modules/d3-quadtree/src/data.js");
+/* harmony import */ var _extent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./extent */ "./node_modules/d3-quadtree/src/extent.js");
+/* harmony import */ var _find__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./find */ "./node_modules/d3-quadtree/src/find.js");
+/* harmony import */ var _remove__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./remove */ "./node_modules/d3-quadtree/src/remove.js");
+/* harmony import */ var _root__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./root */ "./node_modules/d3-quadtree/src/root.js");
+/* harmony import */ var _size__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./size */ "./node_modules/d3-quadtree/src/size.js");
+/* harmony import */ var _visit__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./visit */ "./node_modules/d3-quadtree/src/visit.js");
+/* harmony import */ var _visitAfter__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./visitAfter */ "./node_modules/d3-quadtree/src/visitAfter.js");
+/* harmony import */ var _x__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./x */ "./node_modules/d3-quadtree/src/x.js");
+/* harmony import */ var _y__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./y */ "./node_modules/d3-quadtree/src/y.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+function quadtree(nodes, x, y) {
+  var tree = new Quadtree(x == null ? _x__WEBPACK_IMPORTED_MODULE_10__["defaultX"] : x, y == null ? _y__WEBPACK_IMPORTED_MODULE_11__["defaultY"] : y, NaN, NaN, NaN, NaN);
+  return nodes == null ? tree : tree.addAll(nodes);
+}
+
+function Quadtree(x, y, x0, y0, x1, y1) {
+  this._x = x;
+  this._y = y;
+  this._x0 = x0;
+  this._y0 = y0;
+  this._x1 = x1;
+  this._y1 = y1;
+  this._root = undefined;
+}
+
+function leaf_copy(leaf) {
+  var copy = {data: leaf.data}, next = copy;
+  while (leaf = leaf.next) next = next.next = {data: leaf.data};
+  return copy;
+}
+
+var treeProto = quadtree.prototype = Quadtree.prototype;
+
+treeProto.copy = function() {
+  var copy = new Quadtree(this._x, this._y, this._x0, this._y0, this._x1, this._y1),
+      node = this._root,
+      nodes,
+      child;
+
+  if (!node) return copy;
+
+  if (!node.length) return copy._root = leaf_copy(node), copy;
+
+  nodes = [{source: node, target: copy._root = new Array(4)}];
+  while (node = nodes.pop()) {
+    for (var i = 0; i < 4; ++i) {
+      if (child = node.source[i]) {
+        if (child.length) nodes.push({source: child, target: node.target[i] = new Array(4)});
+        else node.target[i] = leaf_copy(child);
+      }
+    }
+  }
+
+  return copy;
+};
+
+treeProto.add = _add__WEBPACK_IMPORTED_MODULE_0__["default"];
+treeProto.addAll = _add__WEBPACK_IMPORTED_MODULE_0__["addAll"];
+treeProto.cover = _cover__WEBPACK_IMPORTED_MODULE_1__["default"];
+treeProto.data = _data__WEBPACK_IMPORTED_MODULE_2__["default"];
+treeProto.extent = _extent__WEBPACK_IMPORTED_MODULE_3__["default"];
+treeProto.find = _find__WEBPACK_IMPORTED_MODULE_4__["default"];
+treeProto.remove = _remove__WEBPACK_IMPORTED_MODULE_5__["default"];
+treeProto.removeAll = _remove__WEBPACK_IMPORTED_MODULE_5__["removeAll"];
+treeProto.root = _root__WEBPACK_IMPORTED_MODULE_6__["default"];
+treeProto.size = _size__WEBPACK_IMPORTED_MODULE_7__["default"];
+treeProto.visit = _visit__WEBPACK_IMPORTED_MODULE_8__["default"];
+treeProto.visitAfter = _visitAfter__WEBPACK_IMPORTED_MODULE_9__["default"];
+treeProto.x = _x__WEBPACK_IMPORTED_MODULE_10__["default"];
+treeProto.y = _y__WEBPACK_IMPORTED_MODULE_11__["default"];
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/remove.js":
+/*!************************************************!*\
+  !*** ./node_modules/d3-quadtree/src/remove.js ***!
+  \************************************************/
+/*! exports provided: default, removeAll */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeAll", function() { return removeAll; });
+/* harmony default export */ __webpack_exports__["default"] = (function(d) {
+  if (isNaN(x = +this._x.call(null, d)) || isNaN(y = +this._y.call(null, d))) return this; // ignore invalid points
+
+  var parent,
+      node = this._root,
+      retainer,
+      previous,
+      next,
+      x0 = this._x0,
+      y0 = this._y0,
+      x1 = this._x1,
+      y1 = this._y1,
+      x,
+      y,
+      xm,
+      ym,
+      right,
+      bottom,
+      i,
+      j;
+
+  // If the tree is empty, initialize the root as a leaf.
+  if (!node) return this;
+
+  // Find the leaf node for the point.
+  // While descending, also retain the deepest parent with a non-removed sibling.
+  if (node.length) while (true) {
+    if (right = x >= (xm = (x0 + x1) / 2)) x0 = xm; else x1 = xm;
+    if (bottom = y >= (ym = (y0 + y1) / 2)) y0 = ym; else y1 = ym;
+    if (!(parent = node, node = node[i = bottom << 1 | right])) return this;
+    if (!node.length) break;
+    if (parent[(i + 1) & 3] || parent[(i + 2) & 3] || parent[(i + 3) & 3]) retainer = parent, j = i;
+  }
+
+  // Find the point to remove.
+  while (node.data !== d) if (!(previous = node, node = node.next)) return this;
+  if (next = node.next) delete node.next;
+
+  // If there are multiple coincident points, remove just the point.
+  if (previous) return (next ? previous.next = next : delete previous.next), this;
+
+  // If this is the root point, remove it.
+  if (!parent) return this._root = next, this;
+
+  // Remove this leaf.
+  next ? parent[i] = next : delete parent[i];
+
+  // If the parent now contains exactly one leaf, collapse superfluous parents.
+  if ((node = parent[0] || parent[1] || parent[2] || parent[3])
+      && node === (parent[3] || parent[2] || parent[1] || parent[0])
+      && !node.length) {
+    if (retainer) retainer[j] = node;
+    else this._root = node;
+  }
+
+  return this;
+});
+
+function removeAll(data) {
+  for (var i = 0, n = data.length; i < n; ++i) this.remove(data[i]);
+  return this;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/root.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/root.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function() {
+  return this._root;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/size.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/size.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function() {
+  var size = 0;
+  this.visit(function(node) {
+    if (!node.length) do ++size; while (node = node.next)
+  });
+  return size;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/visit.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-quadtree/src/visit.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _quad__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quad */ "./node_modules/d3-quadtree/src/quad.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(callback) {
+  var quads = [], q, node = this._root, child, x0, y0, x1, y1;
+  if (node) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](node, this._x0, this._y0, this._x1, this._y1));
+  while (q = quads.pop()) {
+    if (!callback(node = q.node, x0 = q.x0, y0 = q.y0, x1 = q.x1, y1 = q.y1) && node.length) {
+      var xm = (x0 + x1) / 2, ym = (y0 + y1) / 2;
+      if (child = node[3]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, xm, ym, x1, y1));
+      if (child = node[2]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, x0, ym, xm, y1));
+      if (child = node[1]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, xm, y0, x1, ym));
+      if (child = node[0]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, x0, y0, xm, ym));
+    }
+  }
+  return this;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/visitAfter.js":
+/*!****************************************************!*\
+  !*** ./node_modules/d3-quadtree/src/visitAfter.js ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _quad__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quad */ "./node_modules/d3-quadtree/src/quad.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(callback) {
+  var quads = [], next = [], q;
+  if (this._root) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](this._root, this._x0, this._y0, this._x1, this._y1));
+  while (q = quads.pop()) {
+    var node = q.node;
+    if (node.length) {
+      var child, x0 = q.x0, y0 = q.y0, x1 = q.x1, y1 = q.y1, xm = (x0 + x1) / 2, ym = (y0 + y1) / 2;
+      if (child = node[0]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, x0, y0, xm, ym));
+      if (child = node[1]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, xm, y0, x1, ym));
+      if (child = node[2]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, x0, ym, xm, y1));
+      if (child = node[3]) quads.push(new _quad__WEBPACK_IMPORTED_MODULE_0__["default"](child, xm, ym, x1, y1));
+    }
+    next.push(q);
+  }
+  while (q = next.pop()) {
+    callback(q.node, q.x0, q.y0, q.x1, q.y1);
+  }
+  return this;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/x.js":
+/*!*******************************************!*\
+  !*** ./node_modules/d3-quadtree/src/x.js ***!
+  \*******************************************/
+/*! exports provided: defaultX, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defaultX", function() { return defaultX; });
+function defaultX(d) {
+  return d[0];
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (function(_) {
+  return arguments.length ? (this._x = _, this) : this._x;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-quadtree/src/y.js":
+/*!*******************************************!*\
+  !*** ./node_modules/d3-quadtree/src/y.js ***!
+  \*******************************************/
+/*! exports provided: defaultY, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defaultY", function() { return defaultY; });
+function defaultY(d) {
+  return d[1];
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (function(_) {
+  return arguments.length ? (this._y = _, this) : this._y;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-timer/src/index.js":
+/*!********************************************!*\
+  !*** ./node_modules/d3-timer/src/index.js ***!
+  \********************************************/
+/*! exports provided: now, timer, timerFlush, timeout, interval */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _timer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./timer */ "./node_modules/d3-timer/src/timer.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "now", function() { return _timer__WEBPACK_IMPORTED_MODULE_0__["now"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "timer", function() { return _timer__WEBPACK_IMPORTED_MODULE_0__["timer"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "timerFlush", function() { return _timer__WEBPACK_IMPORTED_MODULE_0__["timerFlush"]; });
+
+/* harmony import */ var _timeout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./timeout */ "./node_modules/d3-timer/src/timeout.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "timeout", function() { return _timeout__WEBPACK_IMPORTED_MODULE_1__["default"]; });
+
+/* harmony import */ var _interval__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./interval */ "./node_modules/d3-timer/src/interval.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "interval", function() { return _interval__WEBPACK_IMPORTED_MODULE_2__["default"]; });
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-timer/src/interval.js":
+/*!***********************************************!*\
+  !*** ./node_modules/d3-timer/src/interval.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _timer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./timer */ "./node_modules/d3-timer/src/timer.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(callback, delay, time) {
+  var t = new _timer__WEBPACK_IMPORTED_MODULE_0__["Timer"], total = delay;
+  if (delay == null) return t.restart(callback, delay, time), t;
+  delay = +delay, time = time == null ? Object(_timer__WEBPACK_IMPORTED_MODULE_0__["now"])() : +time;
+  t.restart(function tick(elapsed) {
+    elapsed += total;
+    t.restart(tick, total += delay, time);
+    callback(elapsed);
+  }, delay, time);
+  return t;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-timer/src/timeout.js":
+/*!**********************************************!*\
+  !*** ./node_modules/d3-timer/src/timeout.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _timer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./timer */ "./node_modules/d3-timer/src/timer.js");
+
+
+/* harmony default export */ __webpack_exports__["default"] = (function(callback, delay, time) {
+  var t = new _timer__WEBPACK_IMPORTED_MODULE_0__["Timer"];
+  delay = delay == null ? 0 : +delay;
+  t.restart(function(elapsed) {
+    t.stop();
+    callback(elapsed + delay);
+  }, delay, time);
+  return t;
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/d3-timer/src/timer.js":
+/*!********************************************!*\
+  !*** ./node_modules/d3-timer/src/timer.js ***!
+  \********************************************/
+/*! exports provided: now, Timer, timer, timerFlush */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Timer", function() { return Timer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "timer", function() { return timer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "timerFlush", function() { return timerFlush; });
+var frame = 0, // is an animation frame pending?
+    timeout = 0, // is a timeout pending?
+    interval = 0, // are any timers active?
+    pokeDelay = 1000, // how frequently we check for clock skew
+    taskHead,
+    taskTail,
+    clockLast = 0,
+    clockNow = 0,
+    clockSkew = 0,
+    clock = typeof performance === "object" && performance.now ? performance : Date,
+    setFrame = typeof window === "object" && window.requestAnimationFrame ? window.requestAnimationFrame.bind(window) : function(f) { setTimeout(f, 17); };
+
+function now() {
+  return clockNow || (setFrame(clearNow), clockNow = clock.now() + clockSkew);
+}
+
+function clearNow() {
+  clockNow = 0;
+}
+
+function Timer() {
+  this._call =
+  this._time =
+  this._next = null;
+}
+
+Timer.prototype = timer.prototype = {
+  constructor: Timer,
+  restart: function(callback, delay, time) {
+    if (typeof callback !== "function") throw new TypeError("callback is not a function");
+    time = (time == null ? now() : +time) + (delay == null ? 0 : +delay);
+    if (!this._next && taskTail !== this) {
+      if (taskTail) taskTail._next = this;
+      else taskHead = this;
+      taskTail = this;
+    }
+    this._call = callback;
+    this._time = time;
+    sleep();
+  },
+  stop: function() {
+    if (this._call) {
+      this._call = null;
+      this._time = Infinity;
+      sleep();
+    }
+  }
+};
+
+function timer(callback, delay, time) {
+  var t = new Timer;
+  t.restart(callback, delay, time);
+  return t;
+}
+
+function timerFlush() {
+  now(); // Get the current time, if not already set.
+  ++frame; // Pretend we’ve set an alarm, if we haven’t already.
+  var t = taskHead, e;
+  while (t) {
+    if ((e = clockNow - t._time) >= 0) t._call.call(null, e);
+    t = t._next;
+  }
+  --frame;
+}
+
+function wake() {
+  clockNow = (clockLast = clock.now()) + clockSkew;
+  frame = timeout = 0;
+  try {
+    timerFlush();
+  } finally {
+    frame = 0;
+    nap();
+    clockNow = 0;
+  }
+}
+
+function poke() {
+  var now = clock.now(), delay = now - clockLast;
+  if (delay > pokeDelay) clockSkew -= delay, clockLast = now;
+}
+
+function nap() {
+  var t0, t1 = taskHead, t2, time = Infinity;
+  while (t1) {
+    if (t1._call) {
+      if (time > t1._time) time = t1._time;
+      t0 = t1, t1 = t1._next;
+    } else {
+      t2 = t1._next, t1._next = null;
+      t1 = t0 ? t0._next = t2 : taskHead = t2;
+    }
+  }
+  taskTail = t0;
+  sleep(time);
+}
+
+function sleep(time) {
+  if (frame) return; // Soonest alarm already set, or will be.
+  if (timeout) timeout = clearTimeout(timeout);
+  var delay = time - clockNow; // Strictly less than if we recomputed clockNow.
+  if (delay > 24) {
+    if (time < Infinity) timeout = setTimeout(wake, time - clock.now() - clockSkew);
+    if (interval) interval = clearInterval(interval);
+  } else {
+    if (!interval) clockLast = clock.now(), interval = setInterval(poke, pokeDelay);
+    frame = 1, setFrame(wake);
+  }
+}
+
 
 /***/ }),
 
@@ -28215,4 +30183,5 @@ module.exports = function(module) {
 /***/ })
 
 /******/ });
+});
 //# sourceMappingURL=ElGrapho.js.map

@@ -56,7 +56,7 @@ let ElGraphoCollection = {
       let zoom = Math.min(graph.zoomX, graph.zoomY);
       
 
-      if (graph.nodeSize * zoom > MAX_NODE_SIZE) {
+      if (graph.nodeSize * zoom >= MAX_NODE_SIZE) {
         magicZoom = true;
         nodeSize = MAX_NODE_SIZE;
       }
@@ -68,6 +68,14 @@ let ElGraphoCollection = {
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+
+        graph.labelsLayer.scene.clear();
+
+        let hasLabels = graph.model.nodes[0].label !== undefined;
+        
+        if (hasLabels && magicZoom) {
+          graph.renderLabels();
+        }
         graph.viewport.render(); // render composite
         graph.dirty = false;
       }
