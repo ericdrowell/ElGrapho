@@ -23,7 +23,7 @@ const Tree = require('./layouts/Tree');
 const Cluster = require('./layouts/Cluster');
 const Chord = require('./layouts/Chord');
 const ForceDirected = require('./layouts/ForceDirected');
-const HairBall = require('./layouts/HairBall');
+const Hairball = require('./layouts/Hairball');
 const RadialTree = require('./layouts/RadialTree');
 
 const ZOOM_FACTOR = 2;
@@ -263,13 +263,15 @@ ElGrapho.prototype = {
       }
     });
     viewport.container.addEventListener('mousedown', function(evt) {
+      Tooltip.hide();
+      
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
         that.panStart = mousePos;
-        Tooltip.hide();
+        
 
       }
     });
@@ -598,7 +600,7 @@ ElGrapho.layouts = {
   Cluster: Cluster,
   Chord: Chord,
   ForceDirected: ForceDirected,
-  HairBall: HairBall,
+  Hairball: Hairball,
   RadialTree: RadialTree
 };
 

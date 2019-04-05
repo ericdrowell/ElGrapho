@@ -68,7 +68,7 @@ const attractNodes = function(nodes, edges) {
   });
 };
 
-const HairBall = function(model) {
+const Hairball = function(model) {
   if (model.steps === undefined) {
     model.steps = DEFAULT_STEPS;
   }
@@ -88,4 +88,4 @@ const HairBall = function(model) {
   return model;
 };
 
-module.exports = HairBall;
+module.exports = Hairball;

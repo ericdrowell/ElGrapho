@@ -49,8 +49,8 @@ const Cluster = function(model) {
       clusterCenterY = 0;
     }
     else {
-      clusterCenterX = Math.cos(centerAngle) * xFactor;
-      clusterCenterY = Math.sin(centerAngle) * yFactor;
+      clusterCenterX = Math.cos(centerAngle);
+      clusterCenterY = Math.sin(centerAngle);
     }
 
     let radius = arcLength;
