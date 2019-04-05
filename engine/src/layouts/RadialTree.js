@@ -1,7 +1,7 @@
 const fitToViewport = require('./utils/fitToViewport');
 const buildTreeLevels = require('./utils/buildTreeLevels');
 
-const Tree = function(model) {
+const RadialTree = function(model) {
   let treeLevels = buildTreeLevels(model);
   let numLevels = treeLevels.length;
 
@@ -9,8 +9,10 @@ const Tree = function(model) {
   treeLevels.forEach(function(nodes, level) {
     nodes.forEach(function(node) {
       let n = node.index;
-      model.nodes[n].x = node.pos;
-      model.nodes[n].y = 1 - (2 * (level / (numLevels - 1)));
+      let angle = Math.PI * node.pos;
+      let radius = level / (numLevels-1);
+      model.nodes[n].x = radius * Math.cos(angle);
+      model.nodes[n].y = radius * Math.sin(angle);
     });
   });
 
@@ -19,4 +21,4 @@ const Tree = function(model) {
   return model;
 };
 
-module.exports = Tree;
+module.exports = RadialTree;

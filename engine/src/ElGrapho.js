@@ -15,17 +15,20 @@ const NumberFormatter = require('./formatters/NumberFormatter');
 const VertexBridge = require('./VertexBridge');
 const Enums = require('./Enums');
 const BoxZoom = require('./components/BoxZoom/BoxZoom');
-const Tree = require('./layouts/Tree');
-const Cluster = require('./layouts/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
+const Labels = require('./Labels');
+
+const Tree = require('./layouts/Tree');
+const Cluster = require('./layouts/Cluster');
 const Chord = require('./layouts/Chord');
 const ForceDirected = require('./layouts/ForceDirected');
-const Labels = require('./Labels');
 const HairBall = require('./layouts/HairBall');
+const RadialTree = require('./layouts/RadialTree');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
+const MAX_NODE_SIZE = 16;
 
 let ElGrapho = function(config) {
   let that = this;
@@ -58,7 +61,9 @@ ElGrapho.prototype = {
     this.width = config.model.width;
     this.height = config.model.height;
     this.steps = config.model.steps;
-    this.nodeSize = config.nodeSize || 16;
+    this.nodeSize = config.nodeSize || 1;
+    this.nodeSize *= MAX_NODE_SIZE;
+    
     this.animations = [];
     this.wrapper = document.createElement('div');
     this.wrapper.className = 'el-grapho-wrapper';
@@ -593,7 +598,8 @@ ElGrapho.layouts = {
   Cluster: Cluster,
   Chord: Chord,
   ForceDirected: ForceDirected,
-  HairBall: HairBall
+  HairBall: HairBall,
+  RadialTree: RadialTree
 };
 
 // node.js export

@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Big Tree</h1>
+    <h1>El Grapho Big Radial Tree</h1>
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
@@ -75,7 +75,7 @@ addChildren(0, 0);
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.layouts.Tree(model),
+  model: ElGrapho.layouts.RadialTree(model),
   debug: true
 });
 

@@ -1403,17 +1403,20 @@ const NumberFormatter = __webpack_require__(/*! ./formatters/NumberFormatter */ 
 const VertexBridge = __webpack_require__(/*! ./VertexBridge */ "./engine/src/VertexBridge.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 const BoxZoom = __webpack_require__(/*! ./components/BoxZoom/BoxZoom */ "./engine/src/components/BoxZoom/BoxZoom.js");
-const Tree = __webpack_require__(/*! ./layouts/Tree */ "./engine/src/layouts/Tree.js");
-const Cluster = __webpack_require__(/*! ./layouts/Cluster */ "./engine/src/layouts/Cluster.js");
 const Dom = __webpack_require__(/*! ./Dom */ "./engine/src/Dom.js");
 const Loading = __webpack_require__(/*! ./components/Loading/Loading */ "./engine/src/components/Loading/Loading.js");
+const Labels = __webpack_require__(/*! ./Labels */ "./engine/src/Labels.js");
+
+const Tree = __webpack_require__(/*! ./layouts/Tree */ "./engine/src/layouts/Tree.js");
+const Cluster = __webpack_require__(/*! ./layouts/Cluster */ "./engine/src/layouts/Cluster.js");
 const Chord = __webpack_require__(/*! ./layouts/Chord */ "./engine/src/layouts/Chord.js");
 const ForceDirected = __webpack_require__(/*! ./layouts/ForceDirected */ "./engine/src/layouts/ForceDirected.js");
-const Labels = __webpack_require__(/*! ./Labels */ "./engine/src/Labels.js");
-const HairBall = __webpack_require__(/*! ./layouts/HairBall */ "./engine/src/layouts/HairBall.js");
+const HairBall = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module './layouts/HairBall'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+const RadialTree = __webpack_require__(/*! ./layouts/RadialTree */ "./engine/src/layouts/RadialTree.js");
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
+const MAX_NODE_SIZE = 16;
 
 let ElGrapho = function(config) {
   let that = this;
@@ -1446,7 +1449,9 @@ ElGrapho.prototype = {
     this.width = config.model.width;
     this.height = config.model.height;
     this.steps = config.model.steps;
-    this.nodeSize = config.nodeSize || 16;
+    this.nodeSize = config.nodeSize || 1;
+    this.nodeSize *= MAX_NODE_SIZE;
+    
     this.animations = [];
     this.wrapper = document.createElement('div');
     this.wrapper.className = 'el-grapho-wrapper';
@@ -1981,7 +1986,8 @@ ElGrapho.layouts = {
   Cluster: Cluster,
   Chord: Chord,
   ForceDirected: ForceDirected,
-  HairBall: HairBall
+  HairBall: HairBall,
+  RadialTree: RadialTree
 };
 
 // node.js export
@@ -3273,104 +3279,37 @@ module.exports = ForceDirected;
 
 /***/ }),
 
-/***/ "./engine/src/layouts/HairBall.js":
-/*!****************************************!*\
-  !*** ./engine/src/layouts/HairBall.js ***!
-  \****************************************/
+/***/ "./engine/src/layouts/RadialTree.js":
+/*!******************************************!*\
+  !*** ./engine/src/layouts/RadialTree.js ***!
+  \******************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
-const DEFAULT_STEPS = 20;
-const POSITION_FACTOR = 0.3;
-const ATTRACT_FACTOR = 0.1;
+const buildTreeLevels = __webpack_require__(/*! ./utils/buildTreeLevels */ "./engine/src/layouts/utils/buildTreeLevels.js");
 
-const initNodePositions = function(nodes) {
-  let numNodes = nodes.length;
+const RadialTree = function(model) {
+  let treeLevels = buildTreeLevels(model);
+  let numLevels = treeLevels.length;
 
-  // find group counts
-  let groups = [];
-  nodes.forEach(function(node) {
-    let group = node.group;
-
-    if (groups[group] === undefined) {
-      groups[group] = {
-        count: 0
-      };
-    }
-
-    groups[group].count++;
+  // O(n)
+  treeLevels.forEach(function(nodes, level) {
+    nodes.forEach(function(node) {
+      let n = node.index;
+      let angle = Math.PI * node.pos;
+      let radius = level / (numLevels-1);
+      model.nodes[n].x = radius * Math.cos(angle);
+      model.nodes[n].y = radius * Math.sin(angle);
+    });
   });
 
-  let total = 0;
-  for (let n=0; n<groups.length; n++) {
-    groups[n].next = total;
-    total+=groups[n].count;
-  }
-
-  // initialize positions
-  nodes.forEach(function(node) {
-    let group = node.group;
-    let angle = -2 * Math.PI * groups[group].next++ / numNodes;
-
-    node.x = POSITION_FACTOR * Math.cos(angle);
-    node.y = POSITION_FACTOR * Math.sin(angle);
-  });
-};
-
-// attractive forces between nodes sharing an edge
-// Hooke's Law -> F = kx
-const attractNodes = function(nodes, edges) {
-  edges.forEach(function(edge) {
-    let a = edge.from;
-    let b = edge.to;
-
-    let ax = nodes[a].x;
-    let ay = nodes[a].y;
-    let bx = nodes[b].x;
-    let by = nodes[b].y;
-    let xDiff = bx - ax;
-    let yDiff = by - ay;
-    let dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-
-    let xChange, yChange;
-
-    if (dist > 0) {
-      xChange = ATTRACT_FACTOR * xDiff;
-      yChange = ATTRACT_FACTOR * yDiff;
-
-      // move a closer to b
-      nodes[a].x += xChange;
-      nodes[a].y += yChange;
-
-      // move b closer to a
-      nodes[b].x -= xChange;
-      nodes[b].y -= yChange;
-    }
-  });
-};
-
-const HairBall = function(model) {
-  if (model.steps === undefined) {
-    model.steps = DEFAULT_STEPS;
-  }
-
-  let nodes = model.nodes;
-  let edges = model.edges;
-
-  initNodePositions(nodes);
-
-  // process steps
-  for (let n=1; n<model.steps; n++) {
-    attractNodes(nodes, edges);
-  }
-
-  fitToViewport(nodes);
+  fitToViewport(model.nodes);
 
   return model;
 };
 
-module.exports = HairBall;
+module.exports = RadialTree;
 
 /***/ }),
 
@@ -3382,6 +3321,37 @@ module.exports = HairBall;
 /***/ (function(module, exports, __webpack_require__) {
 
 const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+const buildTreeLevels = __webpack_require__(/*! ./utils/buildTreeLevels */ "./engine/src/layouts/utils/buildTreeLevels.js");
+
+const Tree = function(model) {
+  let treeLevels = buildTreeLevels(model);
+  let numLevels = treeLevels.length;
+
+  // O(n)
+  treeLevels.forEach(function(nodes, level) {
+    nodes.forEach(function(node) {
+      let n = node.index;
+      model.nodes[n].x = node.pos;
+      model.nodes[n].y = 1 - (2 * (level / (numLevels - 1)));
+    });
+  });
+
+  fitToViewport(model.nodes);
+
+  return model;
+};
+
+module.exports = Tree;
+
+/***/ }),
+
+/***/ "./engine/src/layouts/utils/buildTreeLevels.js":
+/*!*****************************************************!*\
+  !*** ./engine/src/layouts/utils/buildTreeLevels.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 
 let incrementAncestorTotals = function(node, val) {
   node.totalDescendants+=val;
@@ -3398,7 +3368,7 @@ let buildMetaTree = function(srcNode, targetNode, left, right, level, callback) 
 
   targetNode.left = left;
   targetNode.right = right;
-  targetNode.x = (left + right) / 2;
+  targetNode.pos = (left + right) / 2;
   targetNode.level = level;
   targetNode.group = srcNode.group || 0;
   targetNode.index = srcNode.index;
@@ -3463,16 +3433,16 @@ let getNestedTree = function(model) {
   return null;
 };
 
-
-const Tree = function(model) {
+module.exports = function(model) {
   let rootNode = getNestedTree(model);
   let newRootNode = {};
   let nodes = [];
   let n=0;
   let maxLevel = 0;
+  let levels = [];
 
   // O(n)
-  buildMetaTree(rootNode, newRootNode, -1, 1, 1, function(node) {
+  buildMetaTree(rootNode, newRootNode, -1, 1, 0, function(node) {
     nodes[n] = node;
     n++;
 
@@ -3485,19 +3455,17 @@ const Tree = function(model) {
     return a.index - b.index;
   });
 
-  // O(n)
-  nodes.forEach(function(node, n) {
-    model.nodes[n].x = node.x;
-    model.nodes[n].y = 1 - (2 * ((node.level - 1) / (maxLevel - 1)));
+  for (let i=0; i<=maxLevel; i++) {
+    levels.push([]);
+  }
 
+  nodes.forEach(function(node, n) {
+    node.index = n;
+    levels[node.level].push(node);
   });
 
-  fitToViewport(model.nodes);
-
-  return model;
+  return levels;
 };
-
-module.exports = Tree;
 
 /***/ }),
 
