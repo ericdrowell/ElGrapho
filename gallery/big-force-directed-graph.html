@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <style>
+      html, body {
+        background-color: #f8f8f8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>El Grapho Force Directed Graph</h1>
+    <div id="container"></div>
+
+    <script src="../engine/dist/ElGrapho.js"></script>
+    <script>
+
+const NUM_LEVELS = 5;
+const NUM_CHILDREN = 3;
+
+let model = {
+  nodes: [],
+  edges: [],
+  width: 500,
+  height: 500
+};
+
+// https://en.wikipedia.org/wiki/K-ary_tree
+let numNodes = (Math.pow(NUM_CHILDREN, NUM_LEVELS)-1) / (NUM_CHILDREN-1);
+
+for (let n=0; n<numNodes; n++) {
+  model.nodes.push({
+    group: 0
+  })
+}
+
+let n = 1;
+
+function addChildren(parent, level) {
+  if (level < NUM_LEVELS-1) {
+    for (let i=0; i<NUM_CHILDREN; i++) {
+      model.edges.push({
+        from: parent,
+        to: n
+      });
+
+      addChildren(n++, level+1);
+    }
+  }
+}
+
+addChildren(0, 0);
+
+
+
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.layouts.ForceDirected(model),
+  debug: true
+});
+
+    </script>
+
+
+  </body>
+</html>
