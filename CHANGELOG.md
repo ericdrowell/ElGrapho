@@ -7,6 +7,7 @@
 * ForceDirected layouts now using d3-force which is O(nlog(n)) instead of Webcola which is much slower
 * new RadialTree layout
 * nodeSize range now 0 to 1
+* Cluster layout now better positions the cluster centers to fully utilize viewport space
 
 ## v2.0.0
 * License is now MIT
