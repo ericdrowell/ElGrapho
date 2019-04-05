@@ -31,21 +31,6 @@ graph = new ElGrapho({
 
     </script>
 
-    <button id="stepDown">Step Down</button>
-    <button id="stepUp">Step Up</button>
-    
 
-    <script>
-      document.getElementById('stepDown').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps-1);
-        window.open(url, '_self');
-      });
-
-      document.getElementById('stepUp').addEventListener('click', function(evt) {
-        url.searchParams.set('steps', steps+1);
-        window.open(url, '_self');
-      });
-
-    </script>
   </body>
 </html>

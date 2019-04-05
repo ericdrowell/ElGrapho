@@ -19,10 +19,10 @@ const Tree = require('./layouts/Tree');
 const Cluster = require('./layouts/Cluster');
 const Dom = require('./Dom');
 const Loading = require('./components/Loading/Loading');
-const Ring = require('./layouts/Ring');
+const Chord = require('./layouts/Chord');
 const ForceDirected = require('./layouts/ForceDirected');
 const Labels = require('./Labels');
-const Web = require('./layouts/Web');
+const HairBall = require('./layouts/HairBall');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
@@ -591,9 +591,9 @@ ElGrapho.NumberFormatter = NumberFormatter;
 ElGrapho.layouts = {
   Tree: Tree,
   Cluster: Cluster,
-  Ring: Ring,
+  Chord: Chord,
   ForceDirected: ForceDirected,
-  Web: Web
+  HairBall: HairBall
 };
 
 // node.js export

@@ -2,9 +2,12 @@
 
 ## v2.1.0
 * models are now called layouts
+* Ring layout renamed to Chord because I plan to use arcs for edges in the future
+* Web layout renamed to HairBall
+* ForceDirected layouts now using d3-force which is O(nlog(n)) instead of Webcola which is much slower
 
 ## v2.0.0
-* License is now MIT!
+* License is now MIT
 * new API
 * ForceDirected model now using Webcola for layout
 * new Web model which is a simplified force directed graph that runs in O(n) time

@@ -1,6 +1,6 @@
 const fitToViewport = require('./utils/fitToViewport');
 
-const Ring = function(model) {
+const Chord = function(model) {
   let numNodes = model.nodes.length;
   model.nodes.forEach(function(node, n) {
     let angle = (-1*Math.PI*2*n / numNodes) + Math.PI/2;
@@ -13,4 +13,4 @@ const Ring = function(model) {
   return model;
 };
 
-module.exports = Ring;
+module.exports = Chord;

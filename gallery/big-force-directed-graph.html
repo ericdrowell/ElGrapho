@@ -10,36 +10,56 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Force Directed Graph</h1>
+    <h1>El Grapho Big Force Directed Graph</h1>
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
 
-const NUM_LEVELS = 5;
+const NUM_LEVELS = 6;
 const NUM_CHILDREN = 3;
 
 let model = {
   nodes: [],
   edges: [],
   width: 500,
-  height: 500
+  height: 500,
+  steps: 100
 };
 
 // https://en.wikipedia.org/wiki/K-ary_tree
 let numNodes = (Math.pow(NUM_CHILDREN, NUM_LEVELS)-1) / (NUM_CHILDREN-1);
 
 for (let n=0; n<numNodes; n++) {
+  let group;
+
+  if (n<numNodes/3) {
+    group = 0;
+  }
+  else if (n<2*numNodes/3) {
+    group = 1;
+  }
+  else {
+    group = 2;
+  }
   model.nodes.push({
-    group: 0
+    group: group
   })
 }
+
+// model.nodes.push({
+//   group: 0
+// });
 
 let n = 1;
 
 function addChildren(parent, level) {
   if (level < NUM_LEVELS-1) {
     for (let i=0; i<NUM_CHILDREN; i++) {
+      // model.nodes.push({
+      //   group: parent
+      // });
+
       model.edges.push({
         from: parent,
         to: n

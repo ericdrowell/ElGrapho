@@ -10,12 +10,12 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Network Web Graph</h1>
+    <h1>El Grapho Network Hair Ball Graph</h1>
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-let NUM_NODES = 10000;
+let NUM_NODES = 100000;
 
 let model = {
   nodes: [],
@@ -37,9 +37,9 @@ for (let n=0; n<NUM_NODES; n++) {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.layouts.Web(model),
+  model: ElGrapho.layouts.HairBall(model),
   debug: true,
-  nodeSize: 0.3
+  nodeSize: 5
 });
     </script>
   </body>

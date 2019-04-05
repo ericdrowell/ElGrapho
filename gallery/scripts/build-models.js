@@ -5,7 +5,7 @@ const layouts = {
   ForceDirected: require('../../engine/src/layouts/ForceDirected.js')
 };
 
-let NUM_LEVELS = 5;
+let NUM_LEVELS = 10;
 let MAX_LEVEL_MULTIPLIER = 4;
 
 let model = {

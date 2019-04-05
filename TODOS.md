@@ -2,10 +2,10 @@
 
 ## P0
 * add license.js to artifact
-* make force directed graphs look better
-* new Lineage model
+* new RadialTree layout
 
 ## P1
+* Chord diagrams should have arcs for edges, i.e. edge bundling
 * when creating lots of el grapho graphs, concrete throws error about too many webgl contexts
 * lines get fat sometimes when viz stretched.  arrows don't point in right direction when viz is stretched.  this is the same problem
 * enable animating between models (mostly for marketing reasons)
@@ -14,13 +14,10 @@
 * tooltips are slow in big network graph.
 * antialiased nodes - seems to require APIs in webgl2.  Currently using webgl1.
 * ability to anchor node in force directed graph, and configure a flow diretion (for example to the right)
-* look into Licensing again.  May try dual license. maybe MIT.
 
 ## P2
-* Radial tree
 * consider rework clusters to cluster by edges, not colors.  The result should be less cross connections between clusters
 * new chart controls - expand/shrink along x or y
 * panning outside viewport messes it up
 * can I use ints in glsl where appropriate? Right now using all floats
 * back and forward buttons to go through state stack (pan and zoom)
-* chord diagram
