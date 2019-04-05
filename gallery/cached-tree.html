@@ -12,21 +12,21 @@
     </style>
   </head>
   <body>
-    <h1>El Grapho Cached Force Directed Graph</h1>
+    <h1>El Grapho Cached Tree</h1>
 
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
 
     <!-- defines MODEl variable -->
-    <script src="models/ForceDirected.js"></script>
+    <script src="models/Tree.js"></script>
     <script>
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
   model: MODEL,
   debug: true,
-  nodeSize: 10
+  nodeSize: 4
 });
 
     </script>

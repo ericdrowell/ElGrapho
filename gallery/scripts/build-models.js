@@ -1,14 +1,19 @@
 const fs = require('fs');
-const ForceDirected = require('../../engine/src/layouts/ForceDirected.js');
 
-let NUM_LEVELS = 11;
+const layouts = {
+  Tree: require('../../engine/src/layouts/Tree.js'),
+  ForceDirected: require('../../engine/src/layouts/ForceDirected.js')
+};
+
+let NUM_LEVELS = 5;
 let MAX_LEVEL_MULTIPLIER = 4;
 
 let model = {
   nodes: [],
   edges: [],
   width: 1000,
-  height: 500
+  height: 500,
+  steps: 100
 };
 
 let edgeIndex = 0;
@@ -66,18 +71,18 @@ for (let j=0; j<NUM_LEVELS; j++) {
   }
 }
 
+function applyLayout(layout) {
+  console.log('applying ' + layout + ' layout...');
+  let startTime = new Date().getTime();
+  layouts[layout](model);
+  fs.writeFileSync('gallery/models/' + layout + '.js', 'const MODEL=' + JSON.stringify(model) + ';', 'utf-8');
+  let endTime = new Date().getTime();
+  let timeDiff = (endTime - startTime) / 1000; // seconds
+  console.log('done!');
+  console.log('applying ' + layout + ' layout took ' + timeDiff + ' seconds');
+}
 
-console.log('applying layout...');
-
-let startTime = new Date().getTime();
-ForceDirected(model);
-
-fs.writeFileSync('gallery/models/bigTree.js', 'const MODEL=' + JSON.stringify(model) + ';', 'utf-8');
-
-let endTime = new Date().getTime();
-
-let timeDiff = (endTime - startTime) / 1000; // seconds
-console.log('done!');
-console.log('applying layout took ' + timeDiff + ' seconds');
+applyLayout('Tree');
+applyLayout('ForceDirected');
 
 
