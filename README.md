@@ -23,7 +23,7 @@ If you need to build a graph visualization for the web of any kind, such as a tr
 
 To get started, you can install El Grapho from npm like this
 
-```npm install elgrapho```
+```npm install --save elgrapho```
 
 or you can download the latest El Grapho distribution file found here 
 
@@ -76,11 +76,13 @@ let graph = new ElGrapho({
 
 * ```arrows``` - boolean that enables or disables edge arrows. The default is false.  For non directed or bi-directional graphs, you should keep ```arrows``` as ```false```.
 
-### Models
+* ```nodeSize``` - number between 0 and 1 which defines the node size.  The default is 1.
 
-Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph layouts, most El Grapho users will want to leverage the provided El Grapho models which will generate node positions for you.  Currently, ElGrapho supports ```ForceDirected```, ```Tree```, ```Web```, ```Cluster```, and ```Ring```
+### Layouts
 
-#### ForceDirected Model
+Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph layouts, most El Grapho users will want to leverage the provided El Grapho layouts which will generate node positions for you.  Currently, ElGrapho supports ```ForceDirected```, ```Tree```, ```RadialTree```, ```Hairball```, ```Chord```, and ```Cluster```
+
+#### ForceDirected Layout
 
 ```
 let model = {
@@ -106,15 +108,15 @@ let model = {
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.ForceDirected(model)
+  model: ElGrapho.layouts.ForceDirected(model)
 });
 ```
 
-The ```ForceDirected``` model uses Webcola to reduce edge crossing and optimize node spacing.  Be warned that force directed graphs take O(n^2) time, which means they may not be appropriate for generating models on the client with lots of nodes.  If it's possible to build your models in advance, it's a good idea to build the force directed graph model on the server and then cache it.  If you require your models to be constructed at execution time, and the number of nodes is very high, you may consider using an O(n) model substitude such as ```Web``` or ```Cluster```
+The ```ForceDirected``` layout uses d3-force to reduce edge crossing and optimize node spacing.  Although the algorithm is fairly efficient with a runtime of O(nlog(n)) via the Barnes-Hut approximation which uses quad trees, this can still be slow for very large graphs of 50k nodes or more.  If it's possible to build your models in advance, it's a good idea to build the force directed graph model on the server and then cache it.  If you require your models to be constructed at execution time, and the number of nodes is very high, you may consider using an O(n) model substitude such as ```HairBall``` or ```Cluster```
 
-The ```ForceDirected``` model accepts a ```steps``` property from the model config which can be used to define the accuracy of the result.  This is because force directed graphs require multiple passes to obtain the final result.  The default is 30.  Lowering this number will result in faster model construction but less accurate results.  Increasing this number will result in slower model construction but more accurate results. 
+The ```ForceDirected``` layout accepts a ```steps``` property from the model config which can be used to define the accuracy of the result.  This is because force directed graphs require multiple passes to obtain a final result.  The default is 30.  Lowering this number will result in faster model construction but less accurate results.  Increasing this number will result in slower model construction but more accurate results. 
 
-#### Tree Model
+#### Tree Layout
 
 ```
 let model = {
@@ -141,12 +143,13 @@ let model = {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Tree(model),
+  model: ElGrapho.layouts.Tree(model),
   arrows: true
 });
 ```
 
-#### Web Model
+
+#### RadialTree Layout
 
 ```
 let model = {
@@ -173,14 +176,11 @@ let model = {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Web(model),
-  arrows: true
+  model: ElGrapho.layouts.RadialTree(model)
 });
 ```
 
-Web begin by positioning all of the nodes in a ring, and then iteratively move nodes closer together that share an edge.  This essentially moves nodes with lots of edges towards the center, and pushes nodes with few or no edges to the outside.  Often times, Web models looks fairly similar to ForceDirected models, but Web models run in O(n) time compared to ForceDirected models, which run in O(n^2) time, which makes them great alternatives for large numbers of nodes and edges.
-
-#### Cluster Model
+#### Hairball Layout
 
 ```
 let model = {
@@ -207,14 +207,13 @@ let model = {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Cluster(model),
-  arrows: true
+  model: ElGrapho.layouts.Hairball(model)
 });
 ```
 
-The Cluster model clusters nodes by group.  If a single group is used for all of the nodes, ElGrapho will generate a single centered cluster.  If there are several groups used, ElGrapho will render distinct clusters.  Because Cluster models can be generated in ```O(n)``` time, i.e. linear time, they are very fast to construct compared to other models such as force directed graphs which are polynomial in time.
+The ```Hairball``` layout is an excellent alternative to ```ForceDirected``` layouts when the number of nodes is very high, for example in the millions.  This is because it runs in O(n) time, i.e. linear time.  Essentially, nodes with lots of edges are forced towards the center, and nodes with few edges are pushed out to the perimeter, creating a hairball effect.  
 
-#### Ring Model
+#### Cluster Layout
 
 ```
 let model = {
@@ -241,19 +240,51 @@ let model = {
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.models.Ring(model),
+  model: ElGrapho.layouts.Cluster(model),
   arrows: true
 });
 ```
 
+The ```Cluster``` layout clusters nodes by group.  If a single group is used for all of the nodes, ElGrapho will generate a single centered cluster.  If there are several groups used, ElGrapho will render distinct clusters.  Because Cluster layouts can be generated in ```O(n)``` time, i.e. linear time, they are another great alternative to ```ForceDirected``` if performance becomes an issue.
 
-## Model Polymorphism
+#### Chord Layout
 
-You may have noticed that the model config schema is identical for all models.  As a result, El Grapho visualizations are polymorphic, meaning you can pass the same data structure into different models and get different graph layouts.  Pretty cool!
+```
+let model = {
+  nodes: [
+    {group: 0},
+    {group: 1},
+    {group: 1},
+    {group: 2},
+    {group: 2},
+    {group: 3},
+    {group: 3}
+  ],
+  edges: [
+    {from: 0, to: 1},
+    {from: 0, to: 2},
+    {from: 1, to: 3},
+    {from: 1, to: 4},
+    {from: 2, to: 5},
+    {from: 2, to: 6}
+  ],
+  width: 500,
+  height: 500
+};
+
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.layouts.Chord(model)
+});
+```
+
+## Layout Polymorphism
+
+You may have noticed that the layout config schema is identical for all layouts.  As a result, El Grapho visualizations are polymorphic, meaning you can pass the same data structure into different layouts and get different graphs.  Pretty cool!
 
 ## Server Side Model Generation
 
-Because the El Grapho models are fully decoupled from the rendering engine itself, they can be executed on the client or on the server, depending on your needs.  For really complex models, it may be best to build the model on the server, deliver the output over http to the browser, and pass it directly into the El Grapho config.
+Because the El Grapho layouts are fully decoupled from the rendering engine itself, they can be executed on the client or on the server, depending on your needs.  For really complex layouts, it may be best to build the model on the server, deliver the output over http to the browser, and pass it directly into the El Grapho config.
 
 ## Controls
 
@@ -281,7 +312,7 @@ graph.tooltipTemplate = function(index, el) {
 };
 ```
 
-This means that your tooltips can be anything!  You can show lots of information about the node, insert images, etc.
+This means that your tooltips can be anything!  You can show lots of information about the node, insert images, etc.  The tooltip template is decoupled from the El Grapho config in order to ensure that the config is serializable and thus transferrable over http.
 
 ## Events
 

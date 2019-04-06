@@ -2,7 +2,7 @@
 
 ## v2.1.0
 * models are now called layouts
-* Ring layout renamed to Chord because I plan to use arcs for edges in the future
+* Ring layout renamed to Chord
 * Web layout renamed to Hairball
 * ForceDirected layouts now using d3-force which is O(nlog(n)) instead of Webcola which is much slower
 * new RadialTree layout
