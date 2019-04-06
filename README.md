@@ -80,7 +80,7 @@ let graph = new ElGrapho({
 
 ### Layouts
 
-Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph layouts, most El Grapho users will want to leverage the provided El Grapho layouts which will generate node positions for you.  Currently, ElGrapho supports ```ForceDirected```, ```Tree```, ```RadialTree```, ```Hairball```, ```Chord```, and ```Cluster```
+Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph layouts, most El Grapho users will want to leverage the provided El Grapho layouts which will generate node positions for you.  Currently, El Grapho supports ```ForceDirected```, ```Tree```, ```RadialTree```, ```Hairball```, ```Chord```, and ```Cluster```
 
 #### ForceDirected Layout
 
@@ -245,7 +245,7 @@ let graph = new ElGrapho({
 });
 ```
 
-The ```Cluster``` layout clusters nodes by group.  If a single group is used for all of the nodes, ElGrapho will generate a single centered cluster.  If there are several groups used, ElGrapho will render distinct clusters.  Because Cluster layouts can be generated in ```O(n)``` time, i.e. linear time, they are another great alternative to ```ForceDirected``` if performance becomes an issue.
+The ```Cluster``` layout clusters nodes by group.  If a single group is used for all of the nodes, El Grapho will generate a single centered cluster.  If there are several groups used, El Grapho will render distinct clusters.  Because Cluster layouts can be generated in ```O(n)``` time, i.e. linear time, they are another great alternative to ```ForceDirected``` if performance becomes an issue.
 
 #### Chord Layout
 
