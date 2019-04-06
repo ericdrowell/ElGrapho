@@ -1,7 +1,6 @@
 # TODOS
 
 ## P0
-* add license.js to artifact
 * new optional color attribute to decouple from grouping
 
 ## P1

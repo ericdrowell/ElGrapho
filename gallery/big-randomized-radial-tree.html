@@ -21,7 +21,7 @@ let MAX_LEVEL_MULTIPLIER = 4;
 let model = {
   nodes: [],
   edges: [],
-  width: 1000,
+  width: 500,
   height: 500
 };
 
@@ -81,7 +81,7 @@ for (let j=0; j<NUM_LEVELS; j++) {
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.RadialTree(model),
-  debug: true,
+  debug: false,
   nodeSize: 0.5
 });
     </script>

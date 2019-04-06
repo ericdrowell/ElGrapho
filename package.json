@@ -21,17 +21,19 @@
   ],
   "homepage": "https://www.elgrapho.com/",
   "devDependencies": {
-    "gl-matrix": "^2.6.1",
+    "concat": "^1.0.3",
     "jshint": "^2.9.5",
-    "lodash": "^4.17.10",
-    "node-sass": "^4.9.0",
     "npm-watch": "^0.4.0",
+    "replace": "^1.1.0",
     "uglify-es": "^3.3.9",
     "uglifycss": "0.0.29",
     "webpack": "^4.10.2",
     "webpack-cli": "^3.0.0"
   },
   "dependencies": {
+    "lodash": "^4.17.10",
+    "node-sass": "^4.9.0",
+    "gl-matrix": "^2.6.1",
     "concretejs": "^3.0.2",
     "d3-force": "^2.0.1"
   },
@@ -56,6 +58,7 @@
     "sass": "node-sass engine/src/styles.scss engine/dist/styles/ElGrapho.css && uglifycss engine/dist/styles/ElGrapho.css > engine/dist/styles/ElGrapho.min.css && node engine/scripts/build-styles.js",
     "prep-dists": "rm -rf engine/dist && mkdir engine/dist && mkdir engine/dist/icons && mkdir engine/dist/shaders && mkdir engine/dist/styles",
     "uglify": "uglifyjs engine/dist/ElGrapho.js -c -m -o engine/dist/ElGrapho.min.js",
-    "watch": "npm-watch"
+    "watch": "npm-watch",
+    "add-license": "concat -o engine/dist/ElGrapho.js license.js engine/dist/ElGrapho.js && concat -o engine/dist/ElGrapho.min.js license.js engine/dist/ElGrapho.min.js && replace '@@VERSION' $npm_package_version engine/dist/ElGrapho.js engine/dist/ElGrapho.min.js && replace '@@DATE' $(date '+%m-%d-%Y') engine/dist/ElGrapho.js engine/dist/ElGrapho.min.js && replace '@@YEAR' $(date '+%Y') engine/dist/ElGrapho.js engine/dist/ElGrapho.min.js"
   }
 }
