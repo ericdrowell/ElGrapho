@@ -1,6 +1,6 @@
 {
   "name": "elgrapho",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "engine/dist/ElGrapho.min.js",
   "author": "Eric Rowell",
   "license": "MIT",
@@ -53,7 +53,7 @@
     }
   },
   "scripts": {
-    "build": "npm run jshint && npm run prep-dists && node engine/scripts/build-icons.js && node engine/scripts/build-shaders.js && npm run sass && webpack --config webpack.config.js && npm run uglify",
+    "build": "npm run jshint && npm run prep-dists && node engine/scripts/build-icons.js && node engine/scripts/build-shaders.js && npm run sass && webpack --config webpack.config.js && npm run uglify && npm run add-license",
     "jshint": "jshint engine/src/",
     "sass": "node-sass engine/src/styles.scss engine/dist/styles/ElGrapho.css && uglifycss engine/dist/styles/ElGrapho.css > engine/dist/styles/ElGrapho.min.css && node engine/scripts/build-styles.js",
     "prep-dists": "rm -rf engine/dist && mkdir engine/dist && mkdir engine/dist/icons && mkdir engine/dist/shaders && mkdir engine/dist/styles",
