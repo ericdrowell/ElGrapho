@@ -8,7 +8,7 @@ const Chord = function(model) {
     node.y = Math.sin(angle);
   });
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, false);
 
   return model;
 };

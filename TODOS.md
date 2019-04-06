@@ -2,7 +2,7 @@
 
 ## P0
 * add license.js to artifact
-* new RadialTree layout
+* new optional color attribute to decouple from grouping
 
 ## P1
 * Chord diagrams should have arcs for edges, i.e. edge bundling

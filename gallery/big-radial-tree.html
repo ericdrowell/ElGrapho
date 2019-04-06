@@ -16,7 +16,7 @@
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
 
-const NUM_LEVELS = 6;
+const NUM_LEVELS = 8; //14;
 const NUM_CHILDREN = 3;
 
 let model = {
@@ -76,7 +76,8 @@ addChildren(0, 0);
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.RadialTree(model),
-  debug: true
+  debug: true,
+  nodeSize: 0.5
 });
 
     </script>

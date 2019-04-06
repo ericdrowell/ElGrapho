@@ -39,7 +39,7 @@ const ForceDirected = function(model) {
     model.nodes[n].y = node.y;
   });
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, false);
 
   return model;
 };

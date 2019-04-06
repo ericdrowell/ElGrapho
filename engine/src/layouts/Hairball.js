@@ -83,7 +83,7 @@ const Hairball = function(model) {
     attractNodes(nodes, edges);
   }
 
-  fitToViewport(nodes);
+  fitToViewport(nodes, false);
 
   return model;
 };

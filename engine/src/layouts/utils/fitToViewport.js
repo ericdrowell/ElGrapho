@@ -1,4 +1,4 @@
-module.exports = function(nodes) {
+module.exports = function(nodes, maintainAspectRatio) {
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
   let maxX = Number.NEGATIVE_INFINITY;
@@ -24,10 +24,15 @@ module.exports = function(nodes) {
   let yFactor = 1.9 / diffY;
 
   // we want to adjust the x and y equally to preserve ratio
-  let factor = Math.min(xFactor, yFactor);
+
+  if (maintainAspectRatio) {
+    let factor = Math.min(xFactor, yFactor);
+    xFactor = factor;
+    yFactor = factor;
+  }
 
   nodes.forEach(function(node) {
-    node.x = (node.x - xOffset) * factor;
-    node.y = (node.y - yOffset) * factor;
+    node.x = (node.x - xOffset) * xFactor;
+    node.y = (node.y - yOffset) * yFactor;
   });
 };

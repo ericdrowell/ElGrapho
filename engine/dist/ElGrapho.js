@@ -3126,7 +3126,7 @@ const Chord = function(model) {
     node.y = Math.sin(angle);
   });
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -3215,7 +3215,7 @@ const Cluster = function(model) {
     groupIndex++;
   }
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, true);
 
   return model;
 };
@@ -3272,7 +3272,7 @@ const ForceDirected = function(model) {
     model.nodes[n].y = node.y;
   });
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -3373,7 +3373,7 @@ const Hairball = function(model) {
     attractNodes(nodes, edges);
   }
 
-  fitToViewport(nodes);
+  fitToViewport(nodes, false);
 
   return model;
 };
@@ -3394,20 +3394,20 @@ const buildTreeLevels = __webpack_require__(/*! ./utils/buildTreeLevels */ "./en
 
 const RadialTree = function(model) {
   let treeLevels = buildTreeLevels(model);
-  let numLevels = treeLevels.length;
 
-  // O(n)
   treeLevels.forEach(function(nodes, level) {
+    let radius = level === 0 ? 0 : 1 - Math.pow(0.9, level);
+
     nodes.forEach(function(node) {
       let n = node.index;
       let angle = Math.PI * node.pos;
-      let radius = level / (numLevels-1);
+     
       model.nodes[n].x = radius * Math.cos(angle);
       model.nodes[n].y = radius * Math.sin(angle);
     });
   });
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -3430,16 +3430,21 @@ const Tree = function(model) {
   let treeLevels = buildTreeLevels(model);
   let numLevels = treeLevels.length;
 
+  let maxDist = Math.pow(1.3, treeLevels.length-1);
+
   // O(n)
   treeLevels.forEach(function(nodes, level) {
     nodes.forEach(function(node) {
       let n = node.index;
+      let dist = (Math.pow(1.3, numLevels - level)) / maxDist;
+
       model.nodes[n].x = node.pos;
-      model.nodes[n].y = 1 - (2 * (level / (numLevels - 1)));
+      //model.nodes[n].y = 1 - (2 * (level / (numLevels - 1)));
+      model.nodes[n].y = dist;
     });
   });
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -3579,7 +3584,7 @@ module.exports = function(model) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = function(nodes) {
+module.exports = function(nodes, maintainAspectRatio) {
   let minX = Number.POSITIVE_INFINITY;
   let minY = Number.POSITIVE_INFINITY;
   let maxX = Number.NEGATIVE_INFINITY;
@@ -3605,11 +3610,16 @@ module.exports = function(nodes) {
   let yFactor = 1.9 / diffY;
 
   // we want to adjust the x and y equally to preserve ratio
-  let factor = Math.min(xFactor, yFactor);
+
+  if (maintainAspectRatio) {
+    let factor = Math.min(xFactor, yFactor);
+    xFactor = factor;
+    yFactor = factor;
+  }
 
   nodes.forEach(function(node) {
-    node.x = (node.x - xOffset) * factor;
-    node.y = (node.y - yOffset) * factor;
+    node.x = (node.x - xOffset) * xFactor;
+    node.y = (node.y - yOffset) * yFactor;
   });
 };
 

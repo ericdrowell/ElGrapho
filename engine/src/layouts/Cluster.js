@@ -71,7 +71,7 @@ const Cluster = function(model) {
     groupIndex++;
   }
 
-  fitToViewport(model.nodes);
+  fitToViewport(model.nodes, true);
 
   return model;
 };
