@@ -86,6 +86,9 @@ ElGrapho.prototype = {
     };
     this.hoveredDataIndex = -1;
 
+    // dom Listeners we need to destroy on cleanup
+    this.domListeners = [];
+
     let viewport = this.viewport = new Concrete.Viewport({
       container: this.wrapper,
       width: this.width,
@@ -212,6 +215,23 @@ ElGrapho.prototype = {
       y: y
     };
   },
+  domListen: function(o, on, fn) {
+    this.domListeners[on] = this.domListeners[on] || [];
+    this.domListeners[on].push({
+      o: o,
+      on: on,
+      fn: fn
+    });
+    o.addEventListener(on, fn);
+  },
+  removeDomListeners: function() {
+    const len = this.domListeners.length;
+    for (let n=0; n<len; n++) {
+      let l = this.domListeners[n];
+      l.o.removeEventListener(l.on, l.fn);
+    }
+    this.domListeners = [];
+  },
   listen: function() {
     let that = this;
     let viewport = this.viewport;
@@ -248,7 +268,7 @@ ElGrapho.prototype = {
       that.stepDown();
     });
 
-    document.addEventListener('mousedown', function(evt) {
+    this.listenDom(document, 'mousedown', function (evt) {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
@@ -262,6 +282,7 @@ ElGrapho.prototype = {
         BoxZoom.create(evt.clientX, evt.clientY);
       }
     });
+
     viewport.container.addEventListener('mousedown', function(evt) {
       Tooltip.hide();
       
@@ -276,7 +297,7 @@ ElGrapho.prototype = {
       }
     });
 
-    document.addEventListener('mousemove', function(evt) {
+    this.listenDom(document, 'mousemove', function(evt) {
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
         BoxZoom.update(evt.clientX, evt.clientY);
       }
@@ -335,7 +356,7 @@ ElGrapho.prototype = {
     }, 17));
 
 
-    document.addEventListener('mouseup', function(evt) {
+    this.listenDom(document, 'mouseup', function(evt) {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
@@ -577,6 +598,9 @@ ElGrapho.prototype = {
   destroy: function() {
     // viewport
     this.viewport.destroy();
+
+    // dom events outside of viewport
+    this.removeDomListeners();
 
     // remove from collection
     let graphs = ElGraphoCollection.graphs;
