@@ -5,8 +5,7 @@ const ElGraphoCollection = require('./ElGraphoCollection');
 const Controls = require('./components/Controls/Controls');
 const Count = require('./components/Count/Count');
 const Events = require('./Events');
-const Concrete = require('../../../../concrete/build/concrete.js');
-//const Concrete = require('concretejs');
+const Concrete = require('concretejs');
 const _ = require('lodash');
 const Color = require('./Color');
 const Theme = require('./Theme');
@@ -85,6 +84,9 @@ ElGrapho.prototype = {
       el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
     };
     this.hoveredDataIndex = -1;
+
+    // all Listeners we need to call remove for on cleanup
+    this.allListeners = [];
 
     let viewport = this.viewport = new Concrete.Viewport({
       container: this.wrapper,
@@ -212,6 +214,23 @@ ElGrapho.prototype = {
       y: y
     };
   },
+  addListener: function(o, on, fn) {
+    this.allListeners[on] = this.allListeners[on] || [];
+    this.allListeners[on].push({
+      o: o,
+      on: on,
+      fn: fn
+    });
+    o.addEventListener(on, fn);
+  },
+  removeAllListeners: function() {
+    const len = this.allListeners.length;
+    for (let n=0; n<len; n++) {
+      let l = this.allListeners[n];
+      l.o.removeEventListener(l.on, l.fn);
+    }
+    this.allListeners = [];
+  },
   listen: function() {
     let that = this;
     let viewport = this.viewport;
@@ -248,7 +267,7 @@ ElGrapho.prototype = {
       that.stepDown();
     });
 
-    document.addEventListener('mousedown', function(evt) {
+    this.addListener(document, 'mousedown', function(evt) {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
@@ -262,7 +281,8 @@ ElGrapho.prototype = {
         BoxZoom.create(evt.clientX, evt.clientY);
       }
     });
-    viewport.container.addEventListener('mousedown', function(evt) {
+
+    this.addListener(viewport.container, 'mousedown', function(evt) {
       Tooltip.hide();
       
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
@@ -276,13 +296,13 @@ ElGrapho.prototype = {
       }
     });
 
-    document.addEventListener('mousemove', function(evt) {
+    this.addListener(document, 'mousemove', function(evt) {
       if (that.interactionMode === Enums.interactionMode.BOX_ZOOM) {
         BoxZoom.update(evt.clientX, evt.clientY);
       }
     });
     
-    viewport.container.addEventListener('mousemove', _.throttle(function(evt) {
+    this.addListener(viewport.container, 'mousemove', _.throttle(function(evt) {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
@@ -335,7 +355,7 @@ ElGrapho.prototype = {
     }, 17));
 
 
-    document.addEventListener('mouseup', function(evt) {
+    this.addListener(document, 'mouseup', function(evt) {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
@@ -409,7 +429,7 @@ ElGrapho.prototype = {
         that.zoomBoxAnchor = null;
       }
     });
-    viewport.container.addEventListener('mouseup', function(evt) {
+    this.addListener(viewport.container, 'mouseup', function(evt) {
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
       }
@@ -448,7 +468,7 @@ ElGrapho.prototype = {
       }
     });
 
-    viewport.container.addEventListener('mouseout', _.throttle(function() {
+    this.addListener(viewport.container, 'mouseout', _.throttle(function() {
       Tooltip.hide();
     }));
   },
@@ -575,6 +595,9 @@ ElGrapho.prototype = {
     this.wrapper.classList.remove('el-grapho-loading');
   },
   destroy: function() {
+    // listeners
+    this.removeAllListeners();
+    
     // viewport
     this.viewport.destroy();
 
