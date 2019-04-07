@@ -10,6 +10,7 @@ let ElGraphoCollection = {
   init: function() {
     ElGraphoCollection.injectStyles();
     ElGraphoCollection.executeFrame();
+    ElGraphoCollection.initialized = true;
   },
   injectStyles: function() {
     let head = document.getElementsByTagName('head')[0];
@@ -96,6 +97,20 @@ let ElGraphoCollection = {
     });
 
     requestAnimationFrame(ElGraphoCollection.executeFrame);
+  },
+  remove: function(graph) {
+    let graphs = ElGraphoCollection.graphs;
+    let len = graphs.length;
+    for (let n=0; n<len; n++) {
+      if (graphs[n].id === graph.id) {
+        graphs.splice(n, 1);
+        // return true if element found and removed
+        return true;
+      }
+    }
+
+    // return false if nothing was removed
+    return false;
   }
 };
 

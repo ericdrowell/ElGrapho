@@ -12,22 +12,21 @@
   <body>
     <h1>El Grapho Simple Tree</h1>
     <div id="container"></div>
+    <div id="container2"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
       // for debugging
       //ElGrapho.Profiler.enabled = true;
 
-      let customData = ['0.0', 1.1, 2.2, 3.3, 4.4, 5.5, 6.6];
-
       let model = {
         nodes: [
-          {group: 0},
-          {group: 1},
-          {group: 1},
-          {group: 2},
-          {group: 2},
-          {group: 3},
-          {group: 3}
+          {group: 0, value: 'A'},
+          {group: 1, value: 'B'},
+          {group: 1, value: 'C'},
+          {group: 2, value: 'D'},
+          {group: 2, value: 'E'},
+          {group: 3, value: 'F'},
+          {group: 3, value: 'G'}
         ],
         edges: [
           {from: 0, to: 1},
@@ -65,7 +64,61 @@
       });
 
       graph.tooltipTemplate = function(index, el) {
-        el.innerHTML = 'node value: ' + customData[index];
+        el.innerHTML = 'node index:' + index + ', node value: ' + model.nodes[index].value;
+      };
+
+
+
+
+      //graph.destroy();
+
+      model = {
+        nodes: [
+          {group: 0, value: 'A'},
+          {group: 1, value: 'B'},
+          {group: 1, value: 'C'},
+          {group: 2, value: 'D'},
+          {group: 2, value: 'E'},
+          {group: 3, value: 'F'},
+          {group: 3, value: 'G'}
+        ],
+        edges: [
+          {from: 0, to: 1},
+          {from: 0, to: 2},
+          {from: 1, to: 3},
+          {from: 1, to: 4},
+          {from: 2, to: 5},
+          {from: 2, to: 6}
+        ],
+        width: 500,
+        height: 500
+      };
+
+      let graph2 = new ElGrapho({
+        container: document.getElementById('container2'),
+        model: ElGrapho.layouts.Tree(model),
+        arrows: true,
+        debug: true
+      });
+
+      graph2.on('idle', function() {
+        console.log('idle');
+      });
+
+      graph2.on('node-mouseover', function(evt) {
+        console.log('node-mouseover: ' + evt.dataIndex);
+      });
+
+      graph2.on('node-mouseout', function(evt) {
+        console.log('node-mouseout: ' + evt.dataIndex);
+      });
+
+      graph2.on('node-click', function(evt) {
+        console.log('node-click: ' + evt.dataIndex);
+      });
+
+      graph2.tooltipTemplate = function(index, el) {
+        el.innerHTML = 'node index:' + index + ', node value: ' + model.nodes[index].value;
       };
 
     </script>
