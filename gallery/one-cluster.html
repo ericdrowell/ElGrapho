@@ -17,29 +17,29 @@
       // for debugging
       //ElGrapho.Profiler.enabled = true;
 
-      const NUM_NODES = 100;
+const NUM_NODES = 100;
 
-      let model = {
-        nodes: [],
-        edges: [],
-        width: 1000,
-        height: 500
-      };
+let model = {
+  nodes: [],
+  edges: [],
+  width: 1000,
+  height: 500
+};
 
-      for (let n=0; n<NUM_NODES; n++) {
-        model.nodes.push({
-          group: 0
-        });
-        model.edges.push({
-          from: Math.floor(Math.random() * (NUM_NODES-1)),
-          to: Math.floor(Math.random() * (NUM_NODES-1))
-        });
-      }
+for (let n=0; n<NUM_NODES; n++) {
+  model.nodes.push({
+    group: 0
+  });
+  model.edges.push({
+    from: Math.floor(Math.random() * (NUM_NODES-1)),
+    to: Math.floor(Math.random() * (NUM_NODES-1))
+  });
+}
 
-      let graph = new ElGrapho({
-        container: document.getElementById('container'),
-        model: ElGrapho.layouts.Cluster(model)
-      });
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.layouts.Cluster(model)
+});
 
     </script>
   </body>

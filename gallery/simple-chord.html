@@ -14,32 +14,32 @@
     <div id="container"></div>
     <script src="../engine/dist/ElGrapho.js"></script>
     <script>
-      const NUM_NODES = 30;
-      const NUM_NODES_FIRST_GROUP = 10;
+const NUM_NODES = 30;
+const NUM_NODES_FIRST_GROUP = 10;
 
-      let model = {
-        nodes: [],
-        edges: [],
-        width: 500,
-        height: 500
-      };
+let model = {
+  nodes: [],
+  edges: [],
+  width: 500,
+  height: 500
+};
 
-      for (let n=0; n<NUM_NODES; n++) {
-        model.nodes.push({
-          group: n < NUM_NODES_FIRST_GROUP ? 0 : 1,
-          label: n
-        });
+for (let n=0; n<NUM_NODES; n++) {
+  model.nodes.push({
+    group: n < NUM_NODES_FIRST_GROUP ? 0 : 1,
+    label: n
+  });
 
-        model.edges.push({
-          from: Math.floor(Math.random() * (NUM_NODES - 1)),
-          to: Math.floor(Math.random() * (NUM_NODES - 1))
-        });
-      }
+  model.edges.push({
+    from: Math.floor(Math.random() * (NUM_NODES - 1)),
+    to: Math.floor(Math.random() * (NUM_NODES - 1))
+  });
+}
 
-      let graph = new ElGrapho({
-        container: document.getElementById('container'),
-        model: ElGrapho.layouts.Chord(model)
-      });
+let graph = new ElGrapho({
+  container: document.getElementById('container'),
+  model: ElGrapho.layouts.Chord(model)
+});
 
     </script>
   </body>

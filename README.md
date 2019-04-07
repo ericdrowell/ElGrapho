@@ -16,8 +16,13 @@ If you need to build a graph visualization for the web of any kind, such as a tr
 
 ## Live Examples
 
-* https://codepen.io/ericdrowell/pen/qLYrEm
-* https://codepen.io/ericdrowell/pen/wNRyoZ
+* [Custom Layout](https://codepen.io/ericdrowell/pen/dLpNvK)
+* [Miserables Force Directed Graph](https://codepen.io/ericdrowell/pen/wNRyoZ)
+* [Tree](https://codepen.io/ericdrowell/pen/qLYrEm)
+* [Radial Tree](https://codepen.io/ericdrowell/pen/bJwgRG)
+* [Hairball](https://codepen.io/ericdrowell/pen/eodgGW)
+* [Chord](https://codepen.io/ericdrowell/pen/dLpNzj)
+* [Cluster](https://codepen.io/ericdrowell/pen/JVREJp)
 
 ## Getting Started
 
