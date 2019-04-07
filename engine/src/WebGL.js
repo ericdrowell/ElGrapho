@@ -1,6 +1,6 @@
 const glMatrix = require('gl-matrix');
 const mat4 = glMatrix.mat4;
-const Concrete = require('../../../../concrete/build/concrete.js');
+const Concrete = require('concretejs');
 const pointVert = require('../dist/shaders/point.vert');
 const pointStrokeVert = require('../dist/shaders/pointStroke.vert');
 const hitPointVert = require('../dist/shaders/hitPoint.vert');
