@@ -4,6 +4,7 @@
 * fixed bug related to events firing multiple times when creating multiple graphs
 * fixed Concrete dependency issue
 * fixed ElGraphoCollection issue in which it was being instantiated everytime a new graph was created
+* fixed issue where tooltip would hide on click
 
 ## v2.1.0
 * models are now called layouts

@@ -283,7 +283,7 @@ ElGrapho.prototype = {
     });
 
     this.addListener(viewport.container, 'mousedown', function(evt) {
-      Tooltip.hide();
+      
       
       if (Dom.closest(evt.target, '.el-grapho-controls')) {
         return;
@@ -291,6 +291,7 @@ ElGrapho.prototype = {
       if (that.interactionMode === Enums.interactionMode.PAN) {
         let mousePos = that.getMousePosition(evt);
         that.panStart = mousePos;
+        Tooltip.hide();
         
 
       }
@@ -315,7 +316,14 @@ ElGrapho.prototype = {
 
           viewport.scene.canvas.style.marginLeft = mouseDiff.x + 'px';
           viewport.scene.canvas.style.marginTop = mouseDiff.y + 'px';
+
+          
         }
+      }
+
+      // if panning or zoom boxing hide tooltip
+      if (that.panStart || that.zoomBoxAnchor) {
+        Tooltip.hide();
       }
 
       // don't show tooltips if actively panning or zoom boxing
@@ -486,6 +494,7 @@ ElGrapho.prototype = {
     this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
   },
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
+    Tooltip.hide();
     if (this.animations) {
       this.animations = [];
 
@@ -530,12 +539,15 @@ ElGrapho.prototype = {
     }
   },
   zoomIn: function() {
+    Tooltip.hide();
     this.zoomToPoint(0, 0, ZOOM_FACTOR, ZOOM_FACTOR);
   },
   zoomOut: function() {
+    Tooltip.hide();
     this.zoomToPoint(0, 0, 1/ZOOM_FACTOR, 1/ZOOM_FACTOR);
   },
   reset: function() {
+    Tooltip.hide();
     if (this.animations) {
       this.animations = [];
 
