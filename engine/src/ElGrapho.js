@@ -632,5 +632,4 @@ ElGrapho.layouts = {
   RadialTree: RadialTree
 };
 
-// node.js export
 module.exports = ElGrapho;

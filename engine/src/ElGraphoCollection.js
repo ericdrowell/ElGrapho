@@ -115,7 +115,3 @@ let ElGraphoCollection = {
 };
 
 module.exports = ElGraphoCollection;
-
-if (window) {
-  window.ElGraphoCollection = ElGraphoCollection;
-}
