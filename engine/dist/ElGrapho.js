@@ -1,5 +1,5 @@
 /*
- * El Grapho v2.1.0
+ * El Grapho v2.1.1
  * A high performance WebGL graph data visualization engine
  * Release Date: 04-06-2019
  * https://github.com/ericdrowell/elgrapho
@@ -1467,8 +1467,8 @@ ElGrapho.layouts = {
   RadialTree: RadialTree
 };
 
-// node.js export
 module.exports = ElGrapho;
+
 
 /***/ }),
 
@@ -1597,9 +1597,6 @@ let ElGraphoCollection = {
 
 module.exports = ElGraphoCollection;
 
-if (window) {
-  window.ElGraphoCollection = ElGraphoCollection;
-}
 
 /***/ }),
 
