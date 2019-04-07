@@ -602,14 +602,7 @@ ElGrapho.prototype = {
     this.viewport.destroy();
 
     // remove from collection
-    let graphs = ElGraphoCollection.graphs;
-    let len = graphs.length;
-    for (let n=0; n<len; n++) {
-      if (graphs[n].id === this.id) {
-        graphs.splice(n, 1);
-        break;
-      }
-    }  
+    ElGraphoCollection.remove(this);
   }
 };
 
