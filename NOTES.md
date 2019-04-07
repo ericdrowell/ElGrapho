@@ -10,6 +10,7 @@
 * having a dedicated layer per shader program does not help with performance
 
 ## Related Projects
-* d3
-* cola
+* d3-force
+* webcola
 * cytoscape
+* pygraphistry - https://www.graphistry.com/, https://github.com/graphistry/pygraphistry
