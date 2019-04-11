@@ -1,30 +1,3 @@
-/*
- * El Grapho v2.1.1
- * A high performance WebGL graph data visualization engine
- * Release Date: 04-06-2019
- * https://github.com/ericdrowell/elgrapho
- * Licensed under the MIT or GPL Version 2 licenses.
- *
- * Copyright (C) 2019 Eric Rowell @ericdrowell
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -420,16 +393,18 @@ module.exports = `
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `attribute vec4 aVertexPosition;
+module.exports = `#version 300 es
 
-attribute float aVertexIndex;
+in vec4 aVertexPosition;
+
+in float aVertexIndex;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 // unsigned rIntValue = (u_color / 256 / 256) % 256;
 // unsigned gIntValue = (u_color / 256      ) % 256;
@@ -469,9 +444,12 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+module.exports = `#version 300 es
+
+//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 precision mediump float;
-varying vec4 vVertexColor;
+in vec4 vVertexColor;
+out vec4 fragColor;
 
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
@@ -480,7 +458,7 @@ void main(void) {
   if (r > 1.0) {
     discard;
   }
-  gl_FragColor = vVertexColor * (alpha);
+  fragColor = vVertexColor * (alpha);
 }`;
 
 /***/ }),
@@ -492,16 +470,17 @@ void main(void) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `attribute vec4 aVertexPosition;
-attribute float aVertexColor;
-attribute float aVertexFocused;
+module.exports = `#version 300 es
+
+in vec4 aVertexPosition;
+in float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 // const PALETTE_HEX = [
 //   '3366CC',
@@ -539,7 +518,7 @@ void main() {
   float validColor = mod(aVertexColor, 8.0);
 
   // normal color
-  if (aVertexFocused == 0.0) {
+  if (gl_VertexID >= 0) {
     if (validColor == 0.0) {
       vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
     }
@@ -565,10 +544,8 @@ void main() {
       vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
     }
   }
-  // focused color
   else {
-    // pink for now
-    vVertexColor = vec4(255.0/255.0, 105.0/255.0, 147.0/255.0, 1.0); 
+    vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
   }
 }`;
 
@@ -581,14 +558,16 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `attribute vec4 aVertexPosition;
+module.exports = `#version 300 es
+
+in vec4 aVertexPosition;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 const float POINT_STROKE_WIDTH_FACTOR = 1.5;
 
@@ -616,13 +595,16 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `// use lowp for solid colors to improve perf
+module.exports = `#version 300 es
+
+// use lowp for solid colors to improve perf
 // https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean
 precision mediump float;
-varying vec4 vVertexColor;
+in vec4 vVertexColor;
+out vec4 fragColor;
 
 void main(void) {
-  gl_FragColor = vVertexColor;
+  fragColor = vVertexColor;
 }`;
 
 /***/ }),
@@ -634,9 +616,11 @@ void main(void) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `attribute vec4 aVertexPosition;
-attribute vec4 normal;
-attribute float aVertexColor;
+module.exports = `#version 300 es
+
+in vec4 aVertexPosition;
+in vec4 normal;
+in float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -646,7 +630,7 @@ uniform float nodeSize;
 float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 vec2 rotate(vec2 v, float a) {
 	float s = sin(a);
@@ -930,7 +914,7 @@ ElGrapho.prototype = {
     });
 
     let mainLayer = new Concrete.Layer({
-      contextType: 'webgl'
+      contextType: 'webgl2'
     });
 
     let labelsLayer = this.labelsLayer = new Concrete.Layer({
@@ -962,12 +946,7 @@ ElGrapho.prototype = {
     //this.model = config.model;
 
     let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
-
-    // need to add focused array to the vertices object here because we need to be able to
-    // modify the focused array by reference, which is passed into webgl buffers
-    let numPoints = vertices.points.positions.length/2;
-    vertices.points.focused = new Float32Array(numPoints);
-
+ 
     this.webgl.initBuffers(vertices);
     
 
@@ -1172,13 +1151,13 @@ ElGrapho.prototype = {
 
         // change point state
         if (dataIndex !== that.hoveredDataIndex) {
-          if (that.hoveredDataIndex > -1) {
-            that.vertices.points.focused[that.hoveredDataIndex] = 0;
-          }
+          // if (that.hoveredDataIndex > -1) {
+          //   that.vertices.points.focused[that.hoveredDataIndex] = 0;
+          // }
 
-          that.vertices.points.focused[dataIndex] = 1;
-          that.webgl.initBuffers(that.vertices);
-          that.dirty = true;
+          // that.vertices.points.focused[dataIndex] = 1;
+          // that.webgl.initBuffers(that.vertices);
+          // that.dirty = true;
 
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOUT, {
@@ -2005,9 +1984,6 @@ WebGL.prototype = {
     shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
     gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
-    shaderProgram.vertexFocusedAttribute = gl.getAttribLocation(shaderProgram, 'aVertexFocused');
-    gl.enableVertexAttribArray(shaderProgram.vertexFocusedAttribute);
-
     // uniform constants for all data points
     shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
@@ -2127,7 +2103,6 @@ WebGL.prototype = {
       this.buffers.points = {
         positions: this.createBuffer(vertices.points.positions, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.points.colors, 1, this.layer.scene.context),
-        focused: this.createBuffer(vertices.points.focused, 1, this.layer.scene.context),
 
         // unfortunately, have to have dedicated hitPositions because these buffers need to be bound
         // to a specific context.  Would be nice if I could work around this so that we aren't wasting so much buffer memory
@@ -2169,7 +2144,6 @@ WebGL.prototype = {
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
-    this.bindBuffer(buffers.focused, shaderProgram.vertexFocusedAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },

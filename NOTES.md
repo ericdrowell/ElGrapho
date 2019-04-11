@@ -14,3 +14,4 @@
 * webcola
 * cytoscape
 * pygraphistry - https://www.graphistry.com/, https://github.com/graphistry/pygraphistry
+* Sigma

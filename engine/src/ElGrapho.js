@@ -95,7 +95,7 @@ ElGrapho.prototype = {
     });
 
     let mainLayer = new Concrete.Layer({
-      contextType: 'webgl'
+      contextType: 'webgl2'
     });
 
     let labelsLayer = this.labelsLayer = new Concrete.Layer({
@@ -127,12 +127,7 @@ ElGrapho.prototype = {
     //this.model = config.model;
 
     let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
-
-    // need to add focused array to the vertices object here because we need to be able to
-    // modify the focused array by reference, which is passed into webgl buffers
-    let numPoints = vertices.points.positions.length/2;
-    vertices.points.focused = new Float32Array(numPoints);
-
+ 
     this.webgl.initBuffers(vertices);
     
 
@@ -337,13 +332,13 @@ ElGrapho.prototype = {
 
         // change point state
         if (dataIndex !== that.hoveredDataIndex) {
-          if (that.hoveredDataIndex > -1) {
-            that.vertices.points.focused[that.hoveredDataIndex] = 0;
-          }
+          // if (that.hoveredDataIndex > -1) {
+          //   that.vertices.points.focused[that.hoveredDataIndex] = 0;
+          // }
 
-          that.vertices.points.focused[dataIndex] = 1;
-          that.webgl.initBuffers(that.vertices);
-          that.dirty = true;
+          // that.vertices.points.focused[dataIndex] = 1;
+          // that.webgl.initBuffers(that.vertices);
+          // that.dirty = true;
 
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOUT, {

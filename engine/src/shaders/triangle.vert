@@ -1,6 +1,8 @@
-attribute vec4 aVertexPosition;
-attribute vec4 normal;
-attribute float aVertexColor;
+#version 300 es
+
+in vec4 aVertexPosition;
+in vec4 normal;
+in float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -10,7 +12,7 @@ uniform float nodeSize;
 float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 vec2 rotate(vec2 v, float a) {
 	float s = sin(a);

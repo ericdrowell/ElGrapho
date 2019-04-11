@@ -1,6 +1,9 @@
+#version 300 es
+
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 precision mediump float;
-varying vec4 vVertexColor;
+in vec4 vVertexColor;
+out vec4 fragColor;
 
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
@@ -9,5 +12,5 @@ void main(void) {
   if (r > 1.0) {
     discard;
   }
-  gl_FragColor = vVertexColor * (alpha);
+  fragColor = vVertexColor * (alpha);
 }

@@ -1,5 +1,9 @@
 # Changlog
 
+## v2.2.0
+* super fast tooltips for large graphs
+* upgraded to webgl2 and GLSL v3.0
+
 ## v2.1.1
 * fixed bug related to events firing multiple times when creating multiple graphs
 * fixed Concrete dependency issue

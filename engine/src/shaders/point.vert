@@ -1,13 +1,14 @@
-attribute vec4 aVertexPosition;
-attribute float aVertexColor;
-attribute float aVertexFocused;
+#version 300 es
+
+in vec4 aVertexPosition;
+in float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 // const PALETTE_HEX = [
 //   '3366CC',
@@ -45,7 +46,7 @@ void main() {
   float validColor = mod(aVertexColor, 8.0);
 
   // normal color
-  if (aVertexFocused == 0.0) {
+  if (gl_VertexID >= 0) {
     if (validColor == 0.0) {
       vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
     }
@@ -71,9 +72,7 @@ void main() {
       vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
     }
   }
-  // focused color
   else {
-    // pink for now
-    vVertexColor = vec4(255.0/255.0, 105.0/255.0, 147.0/255.0, 1.0); 
+    vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
   }
 }

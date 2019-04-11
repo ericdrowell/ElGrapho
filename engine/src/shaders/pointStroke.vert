@@ -1,11 +1,13 @@
-attribute vec4 aVertexPosition;
+#version 300 es
+
+in vec4 aVertexPosition;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-varying vec4 vVertexColor;
+out vec4 vVertexColor;
 
 const float POINT_STROKE_WIDTH_FACTOR = 1.5;
 
