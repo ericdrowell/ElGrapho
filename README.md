@@ -85,7 +85,7 @@ let graph = new ElGrapho({
 
 ### Layouts
 
-Determining the positions of the nodes for your graph can be alot of work!  While it's nice to have the power to construct custom graph layouts, most El Grapho users will want to leverage the provided El Grapho layouts which will generate node positions for you.  Currently, El Grapho supports ```ForceDirected```, ```Tree```, ```RadialTree```, ```Hairball```, ```Chord```, and ```Cluster```
+Determining the positions of the nodes for your graph can be a lot of work!  While it's nice to have the power to construct custom graph layouts, most El Grapho users will want to leverage the provided El Grapho layouts which will generate node positions for you.  Currently, El Grapho supports ```ForceDirected```, ```Tree```, ```RadialTree```, ```Hairball```, ```Chord```, and ```Cluster```
 
 #### ForceDirected Layout
 
@@ -293,7 +293,7 @@ Because the El Grapho layouts are fully decoupled from the rendering engine itse
 
 ## Controls
 
-El Grapho has controls in the upper right corner of the visualization that enable users to navigate large and complex graphs.  These controls appear when you mouseover the visualizztion.  There are three modes:
+El Grapho has controls in the upper right corner of the visualization that enable users to navigate large and complex graphs.  These controls appear when you mouseover the visualization.  There are three modes:
 
 * __select__ - use this mode to select nodes
 * __zoom__ - use this mode to draw zoom boxes around areas of interest or to zoom into a particular region of the graph
@@ -317,7 +317,7 @@ graph.tooltipTemplate = function(index, el) {
 };
 ```
 
-This means that your tooltips can be anything!  You can show lots of information about the node, insert images, etc.  The tooltip template is decoupled from the El Grapho config in order to ensure that the config is serializable and thus transferrable over http.
+This means that your tooltips can be anything!  You can show lots of information about the node, insert images, etc.  The tooltip template is decoupled from the El Grapho config in order to ensure that the config is serializable and thus transferable over http.
 
 ## Events
 
