@@ -160,7 +160,7 @@ ElGrapho.prototype = {
       this.count.update(model.nodes.length, model.edges.length, model.steps);
     }
   },
-  renderLabels: function() {
+  renderLabels: function(scale) {
     let that = this;
 
     // build labels view model
@@ -176,9 +176,9 @@ ElGrapho.prototype = {
     let labelsContext = labelsScene.context;
 
     labelsContext.save();
-    
+
     labelsContext.translate(this.width/2, this.height/2);
-    //labelsContext.scale(this.zoomX, this.zoomY);
+    labelsContext.scale(scale, scale);
     labelsContext.textAlign = 'center'; 
     
 
@@ -189,8 +189,8 @@ ElGrapho.prototype = {
     labelsContext.lineJoin = 'round';
 
     this.labels.labelsAdded.forEach(function(label) {
-      let x = label.x * that.zoomX + that.panX;
-      let y = label.y * -1 * that.zoomY - that.panY - 10;
+      let x = (label.x * that.zoomX + that.panX) / scale;
+      let y = (label.y * -1 * that.zoomY - that.panY) / scale - 10;
       labelsContext.beginPath();
       labelsContext.strokeText(label.str, x, y);
       labelsContext.fillText(label.str, x, y);

@@ -2,6 +2,7 @@
 
 ## v2.2.0
 * super fast tooltips for large graphs
+* smart label zooming
 * upgraded to webgl2 and GLSL v3.0
 
 ## v2.1.1
@@ -43,7 +44,7 @@
 * better Count aesthetics
 
 ## v1.4.0
-* All models will now have the same schema.  This enables polymorphism.  Tree model schema has changed
+* all models will now have the same schema.  This enables polymorphism.  Tree model schema has changed
 * width and height properties moved to model level
 * fixed box zoom for scrolled pages
 * auto magic zoom

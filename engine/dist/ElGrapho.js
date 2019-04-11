@@ -1,3 +1,30 @@
+/*
+ * El Grapho v2.1.2
+ * A high performance WebGL graph data visualization engine
+ * Release Date: 04-10-2019
+ * https://github.com/ericdrowell/elgrapho
+ * Licensed under the MIT or GPL Version 2 licenses.
+ *
+ * Copyright (C) 2019 Eric Rowell @ericdrowell
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -979,7 +1006,7 @@ ElGrapho.prototype = {
       this.count.update(model.nodes.length, model.edges.length, model.steps);
     }
   },
-  renderLabels: function() {
+  renderLabels: function(scale) {
     let that = this;
 
     // build labels view model
@@ -995,9 +1022,9 @@ ElGrapho.prototype = {
     let labelsContext = labelsScene.context;
 
     labelsContext.save();
-    
+
     labelsContext.translate(this.width/2, this.height/2);
-    //labelsContext.scale(this.zoomX, this.zoomY);
+    labelsContext.scale(scale, scale);
     labelsContext.textAlign = 'center'; 
     
 
@@ -1008,8 +1035,8 @@ ElGrapho.prototype = {
     labelsContext.lineJoin = 'round';
 
     this.labels.labelsAdded.forEach(function(label) {
-      let x = label.x * that.zoomX + that.panX;
-      let y = label.y * -1 * that.zoomY - that.panY - 10;
+      let x = (label.x * that.zoomX + that.panX) / scale;
+      let y = (label.y * -1 * that.zoomY - that.panY) / scale - 10;
       labelsContext.beginPath();
       labelsContext.strokeText(label.str, x, y);
       labelsContext.fillText(label.str, x, y);
@@ -1534,8 +1561,8 @@ let ElGraphoCollection = {
 
         let hasLabels = graph.model.nodes[0].label !== undefined;
         
-        if (hasLabels && magicZoom) {
-          graph.renderLabels();
+        if (hasLabels/* && magicZoom*/) {
+          graph.renderLabels(graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1);
         }
         graph.viewport.render(); // render composite
         graph.dirty = false;

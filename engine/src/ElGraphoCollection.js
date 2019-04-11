@@ -74,8 +74,8 @@ let ElGraphoCollection = {
 
         let hasLabels = graph.model.nodes[0].label !== undefined;
         
-        if (hasLabels && magicZoom) {
-          graph.renderLabels();
+        if (hasLabels/* && magicZoom*/) {
+          graph.renderLabels(graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1);
         }
         graph.viewport.render(); // render composite
         graph.dirty = false;
