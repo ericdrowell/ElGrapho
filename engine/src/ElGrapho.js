@@ -62,6 +62,7 @@ ElGrapho.prototype = {
     this.steps = config.model.steps;
     this.nodeSize = config.nodeSize || 1;
     this.nodeSize *= MAX_NODE_SIZE;
+    this.focusedGroup = -1;
     
     this.animations = [];
     this.wrapper = document.createElement('div');
@@ -340,6 +341,7 @@ ElGrapho.prototype = {
           // that.webgl.initBuffers(that.vertices);
           // that.dirty = true;
 
+
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOUT, {
               dataIndex: that.hoveredDataIndex
@@ -441,11 +443,18 @@ ElGrapho.prototype = {
         let mousePos = that.getMousePosition(evt);
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
-        if (dataIndex !== -1) {
+        if (dataIndex === -1) {
+          that.focusedGroup = -1;
+        }
+        else {
+          that.focusedGroup = that.vertices.points.colors[dataIndex];
+
           that.fire(Enums.events.NODE_CLICK, {
             dataIndex: dataIndex
           });  
         } 
+
+        that.dirty = true;
       }
 
       if (that.interactionMode === Enums.interactionMode.PAN) {

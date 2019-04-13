@@ -64,9 +64,43 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
 
     return shaderProgram;
   },
+
+  getPointStrokeShaderProgram: function() {
+    let gl = this.layer.scene.context;
+    let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let shaderProgram = gl.createProgram();
+
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Could not initialise shaders');
+    }
+
+    gl.useProgram(shaderProgram);
+
+    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+    shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
+    gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+    // uniform constants for all data points
+    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+
+    return shaderProgram;
+  },
+
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
@@ -99,33 +133,7 @@ WebGL.prototype = {
     return shaderProgram;
   },
 
-  getPointStrokeShaderProgram: function() {
-    let gl = this.layer.scene.context;
-    let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
-    let fragmentShader = this.getShader('fragment', pointFrag, gl);
-    let shaderProgram = gl.createProgram();
 
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      console.error('Could not initialise shaders');
-    }
-
-    gl.useProgram(shaderProgram);
-
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-    // uniform constants for all data points
-    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
-    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
-    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
-    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
-
-    return shaderProgram;
-  },
 
   getTriangleShaderProgram: function() {
     let gl = this.layer.scene.context;
@@ -158,6 +166,7 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
 
     return shaderProgram;
   },
@@ -206,7 +215,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -216,13 +225,14 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -232,12 +242,14 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
+    this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -247,6 +259,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
@@ -257,7 +270,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -272,28 +285,27 @@ WebGL.prototype = {
     let right = layer.width/2;
     let bottom = layer.height/2 *-1;
     let top = layer.height/2;
-    let near = 0.01;
-    let far = 100000.0;
+    let near = -1.0;
+    let far = 11.0;
 
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
-    mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
+    mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, 0]);
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
 
     // each draw instruction is layered beneath current bitmap, so have to do them in reverse
     if (this.buffers.points) {
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
       
       
     }
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene

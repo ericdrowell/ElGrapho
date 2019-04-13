@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.1.2
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-10-2019
+ * Release Date: 04-12-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -500,12 +500,15 @@ void main(void) {
 module.exports = `#version 300 es
 
 in vec4 aVertexPosition;
+// TODO: this should be an int
 in float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
+// TODO: focusedGroup and group should change to int
+uniform float focusedGroup;
 
 out vec4 vVertexColor;
 
@@ -544,36 +547,45 @@ void main() {
 
   float validColor = mod(aVertexColor, 8.0);
 
-  // normal color
-  if (gl_VertexID >= 0) {
-    if (validColor == 0.0) {
-      vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
-    }
-    else if (validColor == 1.0) {
-      vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
-    }
-    else if (validColor == 2.0) {
-      vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
-    }
-    else if (validColor == 3.0) {
-      vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
-    }
-    else if (validColor == 4.0) {
-      vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
-    }
-    else if (validColor == 5.0) {
-      vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
-    }
-    else if (validColor == 6.0) {
-      vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
-    }
-    else if (validColor == 7.0) {
-      vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
-    }
+  // gl_VertexID
+
+  float alpha;
+
+  if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
+    alpha = 1.0;
+    // must be between -1 and 1
+    gl_Position.z = -0.5;
   }
   else {
-    vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
+    alpha = 0.5;
+    gl_Position.z = -0.2;
   }
+
+  if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, alpha); // 3366CC
+  }
+  else if (validColor == 1.0) {
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, alpha); // DC3912
+  }
+  else if (validColor == 2.0) {
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, alpha); // FF9900
+  }
+  else if (validColor == 3.0) {
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, alpha); // 109618
+  }
+  else if (validColor == 4.0) {
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, alpha); // 990099
+  }
+  else if (validColor == 5.0) {
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, alpha); // 3B3EAC
+  }
+  else if (validColor == 6.0) {
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, alpha); // 0099C6
+  }
+  else if (validColor == 7.0) {
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, alpha); // DD4477
+  }
+
 }`;
 
 /***/ }),
@@ -588,11 +600,13 @@ void main() {
 module.exports = `#version 300 es
 
 in vec4 aVertexPosition;
+in float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
+uniform float focusedGroup;
 
 out vec4 vVertexColor;
 
@@ -600,6 +614,7 @@ const float POINT_STROKE_WIDTH_FACTOR = 1.5;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  //gl_Position.z = 0.0;
 
   if (magicZoom) {
     gl_PointSize = nodeSize * POINT_STROKE_WIDTH_FACTOR; 
@@ -608,6 +623,13 @@ void main() {
     gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
   }
 
+  
+  if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
+    gl_Position.z = -0.4;
+  }
+  else {
+    gl_Position.z = -0.1;
+  }
 
   vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
 
@@ -653,6 +675,7 @@ uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
+uniform float focusedGroup;
 
 float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
@@ -688,32 +711,45 @@ void main() {
     newNormal.y = newNormal.y * zoomY * nodeSize / MAX_NODE_SIZE;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
+
+  //gl_Position.z = 0.0;
   
+  float alpha;
+
+  if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
+    alpha = 1.0;
+    gl_Position.z = -0.3;
+  }
+  else {
+    alpha = 0.5;
+    gl_Position.z = 0.0;
+  }
+
   float validColor = mod(aVertexColor, 8.0);
 
   if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, alpha); // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, alpha); // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, alpha); // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, alpha); // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, alpha); // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, alpha); // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, alpha); // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, alpha); // DD4477
   }
 }`;
 
@@ -908,6 +944,7 @@ ElGrapho.prototype = {
     this.steps = config.model.steps;
     this.nodeSize = config.nodeSize || 1;
     this.nodeSize *= MAX_NODE_SIZE;
+    this.focusedGroup = -1;
     
     this.animations = [];
     this.wrapper = document.createElement('div');
@@ -1186,6 +1223,7 @@ ElGrapho.prototype = {
           // that.webgl.initBuffers(that.vertices);
           // that.dirty = true;
 
+
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOUT, {
               dataIndex: that.hoveredDataIndex
@@ -1287,11 +1325,18 @@ ElGrapho.prototype = {
         let mousePos = that.getMousePosition(evt);
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
-        if (dataIndex !== -1) {
+        if (dataIndex === -1) {
+          that.focusedGroup = -1;
+        }
+        else {
+          that.focusedGroup = that.vertices.points.colors[dataIndex];
+
           that.fire(Enums.events.NODE_CLICK, {
             dataIndex: dataIndex
           });  
         } 
+
+        that.dirty = true;
       }
 
       if (that.interactionMode === Enums.interactionMode.PAN) {
@@ -1555,7 +1600,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup);
 
         graph.labelsLayer.scene.clear();
 
@@ -2016,9 +2061,43 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
 
     return shaderProgram;
   },
+
+  getPointStrokeShaderProgram: function() {
+    let gl = this.layer.scene.context;
+    let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
+    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let shaderProgram = gl.createProgram();
+
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Could not initialise shaders');
+    }
+
+    gl.useProgram(shaderProgram);
+
+    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+    shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
+    gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+    // uniform constants for all data points
+    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+
+    return shaderProgram;
+  },
+
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
@@ -2051,33 +2130,7 @@ WebGL.prototype = {
     return shaderProgram;
   },
 
-  getPointStrokeShaderProgram: function() {
-    let gl = this.layer.scene.context;
-    let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
-    let fragmentShader = this.getShader('fragment', pointFrag, gl);
-    let shaderProgram = gl.createProgram();
 
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      console.error('Could not initialise shaders');
-    }
-
-    gl.useProgram(shaderProgram);
-
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-    // uniform constants for all data points
-    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
-    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
-    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
-    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
-
-    return shaderProgram;
-  },
 
   getTriangleShaderProgram: function() {
     let gl = this.layer.scene.context;
@@ -2110,6 +2163,7 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
 
     return shaderProgram;
   },
@@ -2158,7 +2212,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -2168,13 +2222,14 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -2184,12 +2239,14 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
+    this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -2199,6 +2256,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
@@ -2209,7 +2267,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -2224,28 +2282,27 @@ WebGL.prototype = {
     let right = layer.width/2;
     let bottom = layer.height/2 *-1;
     let top = layer.height/2;
-    let near = 0.01;
-    let far = 100000.0;
+    let near = -1.0;
+    let far = 11.0;
 
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
-    mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
+    mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, 0]);
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
 
     // each draw instruction is layered beneath current bitmap, so have to do them in reverse
     if (this.buffers.points) {
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
       
       
     }
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
