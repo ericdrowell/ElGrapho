@@ -15,7 +15,6 @@
 * when creating lots of el grapho graphs, concrete throws error about too many webgl contexts
 * lines get fat sometimes when viz stretched.  arrows don't point in right direction when viz is stretched.  this is the same problem
 * tests and github CI
-* tooltips are slow in big network graph.
 * antialiased nodes - seems to require APIs in webgl2.  Currently using webgl1.
 * new chart controls - expand/shrink along x or y
 * can I use ints in glsl where appropriate? Right now using all floats

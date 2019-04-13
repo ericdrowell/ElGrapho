@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.1.2
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-12-2019
+ * Release Date: 04-13-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -1326,17 +1326,15 @@ ElGrapho.prototype = {
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
         if (dataIndex === -1) {
-          that.focusedGroup = -1;
+          that.deselectGroup();
         }
         else {
-          that.focusedGroup = that.vertices.points.colors[dataIndex];
+          that.selectGroup(that.vertices.points.colors[dataIndex]);
 
           that.fire(Enums.events.NODE_CLICK, {
             dataIndex: dataIndex
           });  
         } 
-
-        that.dirty = true;
       }
 
       if (that.interactionMode === Enums.interactionMode.PAN) {
@@ -1501,6 +1499,14 @@ ElGrapho.prototype = {
 
     // remove from collection
     ElGraphoCollection.remove(this);
+  },
+  selectGroup: function(group) {
+    this.focusedGroup = group;
+    this.dirty = true;
+  },
+  deselectGroup: function() {
+    this.focusedGroup = -1;
+    this.dirty = true;
   }
 };
 

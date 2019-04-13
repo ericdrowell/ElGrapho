@@ -444,17 +444,15 @@ ElGrapho.prototype = {
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
         if (dataIndex === -1) {
-          that.focusedGroup = -1;
+          that.deselectGroup();
         }
         else {
-          that.focusedGroup = that.vertices.points.colors[dataIndex];
+          that.selectGroup(that.vertices.points.colors[dataIndex]);
 
           that.fire(Enums.events.NODE_CLICK, {
             dataIndex: dataIndex
           });  
         } 
-
-        that.dirty = true;
       }
 
       if (that.interactionMode === Enums.interactionMode.PAN) {
@@ -619,6 +617,14 @@ ElGrapho.prototype = {
 
     // remove from collection
     ElGraphoCollection.remove(this);
+  },
+  selectGroup: function(group) {
+    this.focusedGroup = group;
+    this.dirty = true;
+  },
+  deselectGroup: function() {
+    this.focusedGroup = -1;
+    this.dirty = true;
   }
 };
 
