@@ -342,13 +342,16 @@ ElGrapho.prototype = {
           // that.dirty = true;
 
 
+
+
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOUT, {
               dataIndex: that.hoveredDataIndex
             });  
           }
           
-          that.hoveredDataIndex = dataIndex; 
+          that.hoveredDataIndex = dataIndex;
+          //that.dirty = true; 
 
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOVER, {

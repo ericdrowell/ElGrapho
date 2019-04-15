@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.1.2
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-13-2019
+ * Release Date: 04-14-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -474,6 +474,9 @@ void main() {
 module.exports = `#version 300 es
 
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+//#extension GL_OES_standard_derivatives : enable
+
+//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 precision mediump float;
 in vec4 vVertexColor;
 out vec4 fragColor;
@@ -481,11 +484,22 @@ out vec4 fragColor;
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
   vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+
   r = dot(cxy, cxy);
   if (r > 1.0) {
     discard;
   }
-  fragColor = vVertexColor * (alpha);
+
+  // r = dot(cxy, cxy);
+  // delta = fwidth(r);
+  // alpha = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);
+  // if (r > 1.0) {
+  //   discard;
+  // }
+
+
+
+  fragColor = vVertexColor * alpha;
 }`;
 
 /***/ }),
@@ -590,6 +604,33 @@ void main() {
 
 /***/ }),
 
+/***/ "./engine/dist/shaders/pointHit.frag.js":
+/*!**********************************************!*\
+  !*** ./engine/dist/shaders/pointHit.frag.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `#version 300 es
+
+//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+precision mediump float;
+in vec4 vVertexColor;
+out vec4 fragColor;
+
+void main(void) {
+  float r = 0.0, delta = 0.0, alpha = 1.0;
+  vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+  r = dot(cxy, cxy);
+  if (r > 1.0) {
+    discard;
+  }
+
+  fragColor = vVertexColor * alpha;
+}`;
+
+/***/ }),
+
 /***/ "./engine/dist/shaders/pointStroke.vert.js":
 /*!*************************************************!*\
   !*** ./engine/dist/shaders/pointStroke.vert.js ***!
@@ -607,6 +648,7 @@ uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 uniform float focusedGroup;
+uniform int hoverNode;
 
 out vec4 vVertexColor;
 
@@ -631,7 +673,15 @@ void main() {
     gl_Position.z = -0.1;
   }
 
+  // if (gl_VertexID == hoverNode) {
+    
+  //   vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
+  // }
+  // else {
   vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+  //}
+
+  
 
 }`;
 
@@ -1224,13 +1274,16 @@ ElGrapho.prototype = {
           // that.dirty = true;
 
 
+
+
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOUT, {
               dataIndex: that.hoveredDataIndex
             });  
           }
           
-          that.hoveredDataIndex = dataIndex; 
+          that.hoveredDataIndex = dataIndex;
+          //that.dirty = true; 
 
           if (that.hoveredDataIndex !== -1) {
             that.fire(Enums.events.NODE_MOUSEOVER, {
@@ -1606,7 +1659,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex);
 
         graph.labelsLayer.scene.clear();
 
@@ -2010,6 +2063,7 @@ const hitPointVert = __webpack_require__(/*! ../dist/shaders/hitPoint.vert */ ".
 const triangleVert = __webpack_require__(/*! ../dist/shaders/triangle.vert */ "./engine/dist/shaders/triangle.vert.js");
 const triangleFrag = __webpack_require__(/*! ../dist/shaders/triangle.frag */ "./engine/dist/shaders/triangle.frag.js");
 const pointFrag = __webpack_require__(/*! ../dist/shaders/point.frag */ "./engine/dist/shaders/point.frag.js");
+const pointHitFrag = __webpack_require__(/*! ../dist/shaders/pointHit.frag */ "./engine/dist/shaders/pointHit.frag.js");
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 
 let WebGL = function(config) {
@@ -2019,6 +2073,7 @@ let WebGL = function(config) {
 
   gl.clearColor(1.0, 1.0, 1.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  //gl.getExtension('OES_standard_derivatives');
 
   hitGl.clearColor(1.0, 1.0, 1.0, 1.0);
   hitGl.enable(hitGl.DEPTH_TEST); 
@@ -2068,6 +2123,7 @@ WebGL.prototype = {
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    
 
     return shaderProgram;
   },
@@ -2100,6 +2156,7 @@ WebGL.prototype = {
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    shaderProgram.hoverNode = gl.getUniformLocation(shaderProgram, 'hoverNode');
 
     return shaderProgram;
   },
@@ -2107,7 +2164,7 @@ WebGL.prototype = {
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
-    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointHitFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -2235,7 +2292,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -2246,6 +2303,7 @@ WebGL.prototype = {
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
+    gl.uniform1i(shaderProgram.hoverNode, hoverNode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -2273,7 +2331,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -2302,7 +2360,7 @@ WebGL.prototype = {
     // each draw instruction is layered beneath current bitmap, so have to do them in reverse
     if (this.buffers.points) {
       this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode);
       
       
     }

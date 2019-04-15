@@ -8,6 +8,7 @@ uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 uniform float focusedGroup;
+uniform int hoverNode;
 
 out vec4 vVertexColor;
 
@@ -32,6 +33,14 @@ void main() {
     gl_Position.z = -0.1;
   }
 
+  // if (gl_VertexID == hoverNode) {
+    
+  //   vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
+  // }
+  // else {
   vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+  //}
+
+  
 
 }

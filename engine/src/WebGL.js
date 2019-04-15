@@ -7,6 +7,7 @@ const hitPointVert = require('../dist/shaders/hitPoint.vert');
 const triangleVert = require('../dist/shaders/triangle.vert');
 const triangleFrag = require('../dist/shaders/triangle.frag');
 const pointFrag = require('../dist/shaders/point.frag');
+const pointHitFrag = require('../dist/shaders/pointHit.frag');
 const Profiler = require('./Profiler');
 
 let WebGL = function(config) {
@@ -16,6 +17,7 @@ let WebGL = function(config) {
 
   gl.clearColor(1.0, 1.0, 1.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  //gl.getExtension('OES_standard_derivatives');
 
   hitGl.clearColor(1.0, 1.0, 1.0, 1.0);
   hitGl.enable(hitGl.DEPTH_TEST); 
@@ -65,6 +67,7 @@ WebGL.prototype = {
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    
 
     return shaderProgram;
   },
@@ -97,6 +100,7 @@ WebGL.prototype = {
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    shaderProgram.hoverNode = gl.getUniformLocation(shaderProgram, 'hoverNode');
 
     return shaderProgram;
   },
@@ -104,7 +108,7 @@ WebGL.prototype = {
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
-    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointHitFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -232,7 +236,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -243,6 +247,7 @@ WebGL.prototype = {
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
+    gl.uniform1i(shaderProgram.hoverNode, hoverNode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -270,7 +275,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let modelViewMatrix = mat4.create();
@@ -299,7 +304,7 @@ WebGL.prototype = {
     // each draw instruction is layered beneath current bitmap, so have to do them in reverse
     if (this.buffers.points) {
       this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode);
       
       
     }
