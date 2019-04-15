@@ -476,7 +476,8 @@ module.exports = `#version 300 es
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 //#extension GL_OES_standard_derivatives : enable
 
-//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+// https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+// https://www.desultoryquest.com/blog/downloads/code/points.js
 precision mediump float;
 in vec4 vVertexColor;
 out vec4 fragColor;
@@ -484,18 +485,15 @@ out vec4 fragColor;
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
   vec2 cxy = 2.0 * gl_PointCoord - 1.0;
-
   r = dot(cxy, cxy);
+
   if (r > 1.0) {
     discard;
   }
 
-  // r = dot(cxy, cxy);
   // delta = fwidth(r);
   // alpha = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);
-  // if (r > 1.0) {
-  //   discard;
-  // }
+
 
 
 
@@ -2071,11 +2069,9 @@ let WebGL = function(config) {
   let gl = layer.scene.context;
   let hitGl = layer.hit.context;
 
-  gl.clearColor(1.0, 1.0, 1.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  //gl.getExtension('OES_standard_derivatives');
+  //gl.enable(gl.BLEND);
 
-  hitGl.clearColor(1.0, 1.0, 1.0, 1.0);
   hitGl.enable(hitGl.DEPTH_TEST); 
 };
 
@@ -2334,8 +2330,13 @@ WebGL.prototype = {
   drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode) {
     let layer = this.layer;
     let gl = layer.scene.context;
+
+    
+
+
     let modelViewMatrix = mat4.create();
     let projectionMatrix = mat4.create();
+
 
     // const fieldOfView = 45 * Math.PI / 180;   // in radians
     // const aspect = layer.width / layer.height;
@@ -2350,29 +2351,33 @@ WebGL.prototype = {
     let far = 11.0;
 
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
+
+    gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // To disable the background color of the canvas element
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, 0]);
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
 
-    // each draw instruction is layered beneath current bitmap, so have to do them in reverse
-    if (this.buffers.points) {
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode);
-      
-      
-    }
-
     if (this.buffers.triangles) {
       this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+    }
+
+    if (this.buffers.points) {
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode);
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
   drawHit: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.hit.context;
+
+    
+
+
     let modelViewMatrix = mat4.create();
     let projectionMatrix = mat4.create();
     //let shaderProgram = this.shaderPrograms.hit;
@@ -2393,6 +2398,7 @@ WebGL.prototype = {
     let far = 100000.0;
 
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
+    gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
