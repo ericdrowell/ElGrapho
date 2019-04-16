@@ -342,6 +342,12 @@ graph.on('node-mouseover', function(evt) {
 });
 ```
 
+## Methods
+
+* ```graph.selectGroup(groupIndex)``` - select a group by groupIndex, which is an integer
+* ```graph.deselectGroup()``` - deselect the currently selected group
+
+
 ## About the Name and Logo
 
 Why is this called El Grapho? - *Why not?*

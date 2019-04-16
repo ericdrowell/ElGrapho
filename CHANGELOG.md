@@ -1,7 +1,7 @@
 # Changlog
 
 ## v2.2.0
-* super fast tooltips for large graphs
+* fast tooltips for large graphs
 * smart label zooming
 * group focusing on node click, or via graph.selectGroup()
 * upgraded to webgl2 and GLSL v3.0

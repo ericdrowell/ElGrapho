@@ -1,7 +1,7 @@
 /*
- * El Grapho v2.1.2
+ * El Grapho v2.2.0
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-14-2019
+ * Release Date: 04-15-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
