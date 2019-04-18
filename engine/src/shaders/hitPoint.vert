@@ -1,15 +1,14 @@
-#version 300 es
+//#version 300 es
 
-in vec4 aVertexPosition;
-
-in float aVertexIndex;
+attribute vec4 aVertexPosition;
+attribute float aVertexIndex;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 // unsigned rIntValue = (u_color / 256 / 256) % 256;
 // unsigned gIntValue = (u_color / 256      ) % 256;

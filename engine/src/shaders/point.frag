@@ -1,4 +1,4 @@
-#version 300 es
+//#version 300 es
 
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 //#extension GL_OES_standard_derivatives : enable
@@ -6,8 +6,7 @@
 // https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 // https://www.desultoryquest.com/blog/downloads/code/points.js
 precision mediump float;
-in vec4 vVertexColor;
-out vec4 fragColor;
+varying vec4 vVertexColor;
 
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
@@ -24,5 +23,5 @@ void main(void) {
 
 
 
-  fragColor = vVertexColor * alpha;
+  gl_FragColor = vVertexColor * alpha;
 }

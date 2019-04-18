@@ -1,7 +1,7 @@
 /*
- * El Grapho v2.2.0
+ * El Grapho v2.2.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-15-2019
+ * Release Date: 04-17-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -420,18 +420,17 @@ module.exports = `
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
-in vec4 aVertexPosition;
-
-in float aVertexIndex;
+attribute vec4 aVertexPosition;
+attribute float aVertexIndex;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 // unsigned rIntValue = (u_color / 256 / 256) % 256;
 // unsigned gIntValue = (u_color / 256      ) % 256;
@@ -471,7 +470,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 //#extension GL_OES_standard_derivatives : enable
@@ -479,8 +478,7 @@ module.exports = `#version 300 es
 // https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 // https://www.desultoryquest.com/blog/downloads/code/points.js
 precision mediump float;
-in vec4 vVertexColor;
-out vec4 fragColor;
+varying vec4 vVertexColor;
 
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
@@ -497,7 +495,7 @@ void main(void) {
 
 
 
-  fragColor = vVertexColor * alpha;
+  gl_FragColor = vVertexColor * alpha;
 }`;
 
 /***/ }),
@@ -509,11 +507,11 @@ void main(void) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
-in vec4 aVertexPosition;
+attribute vec4 aVertexPosition;
 // TODO: this should be an int
-in float aVertexColor;
+attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -522,7 +520,7 @@ uniform float nodeSize;
 // TODO: focusedGroup and group should change to int
 uniform float focusedGroup;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 // const PALETTE_HEX = [
 //   '3366CC',
@@ -561,41 +559,44 @@ void main() {
 
   // gl_VertexID
 
-  float alpha;
+  bool isGray;
 
   if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    alpha = 1.0;
+    isGray = false;
     // must be between -1 and 1
     gl_Position.z = -0.5;
   }
   else {
-    alpha = 0.5;
+    isGray = true;
     gl_Position.z = -0.2;
   }
 
-  if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, alpha); // 3366CC
+  if (isGray) {
+    vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, 1.0); 
+  }
+  else if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, alpha); // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, alpha); // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, alpha); // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, alpha); // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, alpha); // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, alpha); // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, alpha); // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
   }
 
 }`;
@@ -609,12 +610,11 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
 precision mediump float;
-in vec4 vVertexColor;
-out vec4 fragColor;
+varying vec4 vVertexColor;
 
 void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
@@ -624,7 +624,7 @@ void main(void) {
     discard;
   }
 
-  fragColor = vVertexColor * alpha;
+  gl_FragColor = vVertexColor * alpha;
 }`;
 
 /***/ }),
@@ -636,10 +636,10 @@ void main(void) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
-in vec4 aVertexPosition;
-in float aVertexColor;
+attribute vec4 aVertexPosition;
+attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -648,7 +648,7 @@ uniform float nodeSize;
 uniform float focusedGroup;
 uniform int hoverNode;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 const float POINT_STROKE_WIDTH_FACTOR = 1.5;
 
@@ -692,16 +692,15 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
 // use lowp for solid colors to improve perf
 // https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean
 precision mediump float;
-in vec4 vVertexColor;
-out vec4 fragColor;
+varying vec4 vVertexColor;
 
 void main(void) {
-  fragColor = vVertexColor;
+  gl_FragColor = vVertexColor;
 }`;
 
 /***/ }),
@@ -713,11 +712,11 @@ void main(void) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `#version 300 es
+module.exports = `//#version 300 es
 
-in vec4 aVertexPosition;
-in vec4 normal;
-in float aVertexColor;
+attribute vec4 aVertexPosition;
+attribute vec4 normal;
+attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -728,7 +727,7 @@ uniform float focusedGroup;
 float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 vec2 rotate(vec2 v, float a) {
 	float s = sin(a);
@@ -762,42 +761,45 @@ void main() {
 
   //gl_Position.z = 0.0;
   
-  float alpha;
+  bool isGray;
 
   if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    alpha = 1.0;
+    isGray = false;
     gl_Position.z = -0.3;
   }
   else {
-    alpha = 0.5;
+    isGray = true;
     gl_Position.z = 0.0;
   }
 
   float validColor = mod(aVertexColor, 8.0);
 
-  if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, alpha); // 3366CC
+  if (isGray) {
+    vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, 1.0); 
+  }
+  else if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, alpha); // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, alpha); // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, alpha); // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, alpha); // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, alpha); // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, alpha); // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, alpha); // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
   }
 }`;
 
@@ -1026,7 +1028,7 @@ ElGrapho.prototype = {
     });
 
     let mainLayer = new Concrete.Layer({
-      contextType: 'webgl2'
+      contextType: 'webgl'
     });
 
     let labelsLayer = this.labelsLayer = new Concrete.Layer({

@@ -1,7 +1,7 @@
-#version 300 es
+//#version 300 es
 
-in vec4 aVertexPosition;
-in float aVertexColor;
+attribute vec4 aVertexPosition;
+attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -10,7 +10,7 @@ uniform float nodeSize;
 uniform float focusedGroup;
 uniform int hoverNode;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 const float POINT_STROKE_WIDTH_FACTOR = 1.5;
 

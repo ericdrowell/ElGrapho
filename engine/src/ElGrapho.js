@@ -96,7 +96,7 @@ ElGrapho.prototype = {
     });
 
     let mainLayer = new Concrete.Layer({
-      contextType: 'webgl2'
+      contextType: 'webgl'
     });
 
     let labelsLayer = this.labelsLayer = new Concrete.Layer({

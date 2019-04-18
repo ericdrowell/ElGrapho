@@ -1,8 +1,8 @@
-#version 300 es
+//#version 300 es
 
-in vec4 aVertexPosition;
-in vec4 normal;
-in float aVertexColor;
+attribute vec4 aVertexPosition;
+attribute vec4 normal;
+attribute float aVertexColor;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -13,7 +13,7 @@ uniform float focusedGroup;
 float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
-out vec4 vVertexColor;
+varying vec4 vVertexColor;
 
 vec2 rotate(vec2 v, float a) {
 	float s = sin(a);
@@ -47,41 +47,44 @@ void main() {
 
   //gl_Position.z = 0.0;
   
-  float alpha;
+  bool isGray;
 
   if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    alpha = 1.0;
+    isGray = false;
     gl_Position.z = -0.3;
   }
   else {
-    alpha = 0.5;
+    isGray = true;
     gl_Position.z = 0.0;
   }
 
   float validColor = mod(aVertexColor, 8.0);
 
-  if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, alpha); // 3366CC
+  if (isGray) {
+    vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, 1.0); 
+  }
+  else if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, alpha); // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, alpha); // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, alpha); // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, alpha); // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, alpha); // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, alpha); // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, alpha); // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
   }
 }
