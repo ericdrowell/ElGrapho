@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.2.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-17-2019
+ * Release Date: 04-19-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -1059,6 +1059,8 @@ ElGrapho.prototype = {
 
     //this.model = config.model;
 
+    this.setHasLabels();
+
     let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
  
     this.webgl.initBuffers(vertices);
@@ -1068,9 +1070,23 @@ ElGrapho.prototype = {
 
     this.labels = new Labels();
 
+
+
     this.listen();
 
     ElGraphoCollection.graphs.push(this);
+  },
+  setHasLabels: function() {
+    this.hasLabels = false;
+    
+    let nodes = this.model.nodes;
+    for (let n=0; n<nodes.length; n++) {
+      let label = nodes[n].label;
+      if (label !== undefined && label !== null) {
+        this.hasLabels = true;
+        break;
+      }
+    }
   },
   initComponents: function() {
     let model = this.model;
@@ -1101,7 +1117,9 @@ ElGrapho.prototype = {
     let positions = this.vertices.points.positions;
     this.model.nodes.forEach(function(node, n) {
       let index = n * 2;
-      that.labels.addLabel(node.label, positions[index], positions[index+1]);
+      if (node.label !== undefined && node.label !== null) {
+        that.labels.addLabel(node.label, positions[index], positions[index+1]);
+      }
     });
     
     // render
@@ -1662,10 +1680,8 @@ let ElGraphoCollection = {
         graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex);
 
         graph.labelsLayer.scene.clear();
-
-        let hasLabels = graph.model.nodes[0].label !== undefined;
         
-        if (hasLabels/* && magicZoom*/) {
+        if (graph.hasLabels) {
           graph.renderLabels(graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1);
         }
         graph.viewport.render(); // render composite
