@@ -1,7 +1,6 @@
 # TODOS
 
 ## P0
-* tooltips: false to disable tooltips
 * fixed bug with tooltips interfering with chart controls
 * dynamic viewport resizing
 

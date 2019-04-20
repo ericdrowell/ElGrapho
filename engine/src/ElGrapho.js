@@ -62,6 +62,7 @@ ElGrapho.prototype = {
     this.nodeSize = config.nodeSize || 1; // 0 - 1
     this.edgeSize = config.edgeSize || 0.25; // 0 - 1
     this.focusedGroup = -1;
+    this.tooltips = config.tooltips === undefined ? true : config.tooltips;
     
     this.animations = [];
     this.wrapper = document.createElement('div');
@@ -345,7 +346,9 @@ ElGrapho.prototype = {
           Tooltip.hide();
         }
         else {
-          Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+          if (that.tooltips) {
+            Tooltip.render(dataIndex, evt.clientX, evt.clientY, that.tooltipTemplate);
+          }
         }
 
         // change point state

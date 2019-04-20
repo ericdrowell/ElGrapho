@@ -2,6 +2,7 @@
 
 ## v2.3.0
 * new edgeSize property
+* tooltips:false to disable tooltips
 * now supporting usecases where some nodes have labels and some nodes do not
 
 ## v2.2.1
