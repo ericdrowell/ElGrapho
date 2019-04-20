@@ -13,16 +13,17 @@ uniform int hoverNode;
 varying vec4 vVertexColor;
 
 const float POINT_STROKE_WIDTH_FACTOR = 1.5;
+const float MAX_NODE_SIZE = 16.0;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
   //gl_Position.z = 0.0;
 
   if (magicZoom) {
-    gl_PointSize = nodeSize * POINT_STROKE_WIDTH_FACTOR; 
+    gl_PointSize = MAX_NODE_SIZE * POINT_STROKE_WIDTH_FACTOR; 
   }
   else {
-    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
   }
 
   

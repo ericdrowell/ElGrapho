@@ -168,6 +168,7 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
 
     return shaderProgram;
@@ -252,7 +253,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -262,6 +263,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.edgeSize, edgeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
@@ -273,7 +275,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
 
@@ -308,7 +310,7 @@ WebGL.prototype = {
     //console.log(modelViewMatrix);
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize);
     }
 
     if (this.buffers.points) {

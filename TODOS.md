@@ -1,10 +1,8 @@
 # TODOS
 
 ## P0
-* new edgeSize property
 * tooltips: false to disable tooltips
 * fixed bug with tooltips interfering with chart controls
-* now supporting usecases where some nodes have labels and some nodes do not
 * dynamic viewport resizing
 
 ## P1

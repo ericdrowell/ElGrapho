@@ -10,6 +10,8 @@ uniform float nodeSize;
 
 varying vec4 vVertexColor;
 
+const float MAX_NODE_SIZE = 16.0;
+
 // unsigned rIntValue = (u_color / 256 / 256) % 256;
 // unsigned gIntValue = (u_color / 256      ) % 256;
 // unsigned bIntValue = (u_color            ) % 256;
@@ -29,10 +31,10 @@ void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
 
   if (magicZoom) {
-    gl_PointSize = nodeSize; 
+    gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    float size = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    float size = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
     gl_PointSize = max(size, 5.0);
   }
 

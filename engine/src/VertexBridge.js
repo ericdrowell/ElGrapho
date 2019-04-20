@@ -1,7 +1,7 @@
 const Profiler = require('./Profiler');
 const glMatrix = require('gl-matrix');
 const vec2 = glMatrix.vec2;
-const MAX_NODE_SIZE = 16;
+//const MAX_NODE_SIZE = 16;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
  
 const VertexBridge = {
@@ -42,7 +42,6 @@ const VertexBridge = {
     for (let n=0; n<numEdges; n++) {
       let pointIndex0 = edges[n].from;
       let pointIndex1 = edges[n].to;
-      let normalDistance = MAX_NODE_SIZE*0.08;
 
       let x0 = nodes[pointIndex0].x;
       let x1 = nodes[pointIndex1].x;
@@ -53,7 +52,7 @@ const VertexBridge = {
       let vector = vec2.fromValues(vectorX, vectorY);
       let normalizedVector = vec2.normalize(vec2.create(), vector);
       let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
-      let offsetVector = vec2.scale(vec2.create(), perpVector, normalDistance);
+      let offsetVector = perpVector; // vec2.scale(vec2.create(), perpVector, normalDistance);
       let xOffset = -1 * offsetVector[0];
       let yOffset = offsetVector[1];
 

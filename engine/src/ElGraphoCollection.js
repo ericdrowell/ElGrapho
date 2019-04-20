@@ -2,8 +2,6 @@ const EasingFunctions = require('./EasingFunctions');
 const styles = require('../dist/styles/ElGrapho.min.css.js');
 const Enums = require('./Enums');
 
-const MAX_NODE_SIZE = 16;
-
 let ElGraphoCollection = {
   graphs: [],
   initialized: false,
@@ -57,9 +55,9 @@ let ElGraphoCollection = {
       let zoom = Math.min(graph.zoomX, graph.zoomY);
       
 
-      if (graph.nodeSize * zoom >= MAX_NODE_SIZE) {
+      if (graph.nodeSize * zoom >= 1) {
         magicZoom = true;
-        nodeSize = MAX_NODE_SIZE;
+        nodeSize = 1;
       }
       else {
         magicZoom = false;
@@ -68,7 +66,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
 
         graph.labelsLayer.scene.clear();
         

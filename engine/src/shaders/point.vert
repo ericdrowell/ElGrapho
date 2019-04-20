@@ -13,6 +13,8 @@ uniform float focusedGroup;
 
 varying vec4 vVertexColor;
 
+const float MAX_NODE_SIZE = 16.0;
+
 // const PALETTE_HEX = [
 //   '3366CC',
 //   'DC3912',
@@ -40,10 +42,10 @@ void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
 
   if (magicZoom) {
-    gl_PointSize = nodeSize; 
+    gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
   }
 
   float validColor = mod(aVertexColor, 8.0);

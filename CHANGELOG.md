@@ -1,5 +1,9 @@
 # Changlog
 
+## v2.3.0
+* new edgeSize property
+* now supporting usecases where some nodes have labels and some nodes do not
+
 ## v2.2.1
 * oops, mobile devices don't support webgl2 yet.  Rolled back to webgl
 * now using gray color channels, rather than alpha, to focus on groups when clicking.  Results are much nicer.

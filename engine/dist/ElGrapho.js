@@ -432,6 +432,8 @@ uniform float nodeSize;
 
 varying vec4 vVertexColor;
 
+const float MAX_NODE_SIZE = 16.0;
+
 // unsigned rIntValue = (u_color / 256 / 256) % 256;
 // unsigned gIntValue = (u_color / 256      ) % 256;
 // unsigned bIntValue = (u_color            ) % 256;
@@ -451,10 +453,10 @@ void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
 
   if (magicZoom) {
-    gl_PointSize = nodeSize; 
+    gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    float size = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    float size = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
     gl_PointSize = max(size, 5.0);
   }
 
@@ -522,6 +524,8 @@ uniform float focusedGroup;
 
 varying vec4 vVertexColor;
 
+const float MAX_NODE_SIZE = 16.0;
+
 // const PALETTE_HEX = [
 //   '3366CC',
 //   'DC3912',
@@ -549,10 +553,10 @@ void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
 
   if (magicZoom) {
-    gl_PointSize = nodeSize; 
+    gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
   }
 
   float validColor = mod(aVertexColor, 8.0);
@@ -651,16 +655,17 @@ uniform int hoverNode;
 varying vec4 vVertexColor;
 
 const float POINT_STROKE_WIDTH_FACTOR = 1.5;
+const float MAX_NODE_SIZE = 16.0;
 
 void main() {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
   //gl_Position.z = 0.0;
 
   if (magicZoom) {
-    gl_PointSize = nodeSize * POINT_STROKE_WIDTH_FACTOR; 
+    gl_PointSize = MAX_NODE_SIZE * POINT_STROKE_WIDTH_FACTOR; 
   }
   else {
-    gl_PointSize = nodeSize * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
   }
 
   
@@ -721,10 +726,11 @@ attribute float aVertexColor;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
-uniform float nodeSize;
+uniform float nodeSize; // 0 - 1
 uniform float focusedGroup;
+uniform float edgeSize; // 0 - 1
 
-float MAX_NODE_SIZE = 16.0;
+const float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
 varying vec4 vVertexColor;
@@ -748,14 +754,15 @@ void main() {
   // vec2 rotatedNormal = rotate(vec2Normal, zoomAngle);
   // vec4 newNormal = vec4(rotatedNormal.x, rotatedNormal.y, 0.0, 0.0);
 
-  vec4 newNormal = vec4(normal.x, normal.y, 0.0, 0.0);
+  vec4 newNormal = MAX_NODE_SIZE * 0.25 * edgeSize * vec4(normal.x, normal.y, 0.0, 0.0);
+
 
   if (magicZoom) {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * zoomX * nodeSize / MAX_NODE_SIZE;
-    newNormal.y = newNormal.y * zoomY * nodeSize / MAX_NODE_SIZE;
+    newNormal.x = newNormal.x * zoomX * nodeSize;
+    newNormal.y = newNormal.y * zoomY * nodeSize;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
 
@@ -959,7 +966,6 @@ const RadialTree = __webpack_require__(/*! ./layouts/RadialTree */ "./engine/src
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
-const MAX_NODE_SIZE = 16;
 
 let ElGrapho = function(config) {
   let that = this;
@@ -992,8 +998,8 @@ ElGrapho.prototype = {
     this.width = config.model.width;
     this.height = config.model.height;
     this.steps = config.model.steps;
-    this.nodeSize = config.nodeSize || 1;
-    this.nodeSize *= MAX_NODE_SIZE;
+    this.nodeSize = config.nodeSize || 1; // 0 - 1
+    this.edgeSize = config.edgeSize || 0.25; // 0 - 1
     this.focusedGroup = -1;
     
     this.animations = [];
@@ -1078,7 +1084,7 @@ ElGrapho.prototype = {
   },
   setHasLabels: function() {
     this.hasLabels = false;
-    
+
     let nodes = this.model.nodes;
     for (let n=0; n<nodes.length; n++) {
       let label = nodes[n].label;
@@ -1611,8 +1617,6 @@ const EasingFunctions = __webpack_require__(/*! ./EasingFunctions */ "./engine/s
 const styles = __webpack_require__(/*! ../dist/styles/ElGrapho.min.css.js */ "./engine/dist/styles/ElGrapho.min.css.js");
 const Enums = __webpack_require__(/*! ./Enums */ "./engine/src/Enums.js");
 
-const MAX_NODE_SIZE = 16;
-
 let ElGraphoCollection = {
   graphs: [],
   initialized: false,
@@ -1666,9 +1670,9 @@ let ElGraphoCollection = {
       let zoom = Math.min(graph.zoomX, graph.zoomY);
       
 
-      if (graph.nodeSize * zoom >= MAX_NODE_SIZE) {
+      if (graph.nodeSize * zoom >= 1) {
         magicZoom = true;
-        nodeSize = MAX_NODE_SIZE;
+        nodeSize = 1;
       }
       else {
         magicZoom = false;
@@ -1677,7 +1681,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex);
+        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
 
         graph.labelsLayer.scene.clear();
         
@@ -1917,7 +1921,7 @@ module.exports = UUID;
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const vec2 = glMatrix.vec2;
-const MAX_NODE_SIZE = 16;
+//const MAX_NODE_SIZE = 16;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
  
 const VertexBridge = {
@@ -1958,7 +1962,6 @@ const VertexBridge = {
     for (let n=0; n<numEdges; n++) {
       let pointIndex0 = edges[n].from;
       let pointIndex1 = edges[n].to;
-      let normalDistance = MAX_NODE_SIZE*0.08;
 
       let x0 = nodes[pointIndex0].x;
       let x1 = nodes[pointIndex1].x;
@@ -1969,7 +1972,7 @@ const VertexBridge = {
       let vector = vec2.fromValues(vectorX, vectorY);
       let normalizedVector = vec2.normalize(vec2.create(), vector);
       let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
-      let offsetVector = vec2.scale(vec2.create(), perpVector, normalDistance);
+      let offsetVector = perpVector; // vec2.scale(vec2.create(), perpVector, normalDistance);
       let xOffset = -1 * offsetVector[0];
       let yOffset = offsetVector[1];
 
@@ -2240,6 +2243,7 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
 
     return shaderProgram;
@@ -2324,7 +2328,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -2334,6 +2338,7 @@ WebGL.prototype = {
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.edgeSize, edgeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
@@ -2345,7 +2350,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode) {
+  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
 
@@ -2380,7 +2385,7 @@ WebGL.prototype = {
     //console.log(modelViewMatrix);
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize);
     }
 
     if (this.buffers.points) {

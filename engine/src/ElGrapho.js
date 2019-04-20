@@ -27,7 +27,6 @@ const RadialTree = require('./layouts/RadialTree');
 
 const ZOOM_FACTOR = 2;
 const START_SCALE = 1;
-const MAX_NODE_SIZE = 16;
 
 let ElGrapho = function(config) {
   let that = this;
@@ -60,8 +59,8 @@ ElGrapho.prototype = {
     this.width = config.model.width;
     this.height = config.model.height;
     this.steps = config.model.steps;
-    this.nodeSize = config.nodeSize || 1;
-    this.nodeSize *= MAX_NODE_SIZE;
+    this.nodeSize = config.nodeSize || 1; // 0 - 1
+    this.edgeSize = config.edgeSize || 0.25; // 0 - 1
     this.focusedGroup = -1;
     
     this.animations = [];
@@ -146,7 +145,7 @@ ElGrapho.prototype = {
   },
   setHasLabels: function() {
     this.hasLabels = false;
-    
+
     let nodes = this.model.nodes;
     for (let n=0; n<nodes.length; n++) {
       let label = nodes[n].label;

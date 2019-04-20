@@ -7,10 +7,11 @@ attribute float aVertexColor;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
-uniform float nodeSize;
+uniform float nodeSize; // 0 - 1
 uniform float focusedGroup;
+uniform float edgeSize; // 0 - 1
 
-float MAX_NODE_SIZE = 16.0;
+const float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
 varying vec4 vVertexColor;
@@ -34,14 +35,15 @@ void main() {
   // vec2 rotatedNormal = rotate(vec2Normal, zoomAngle);
   // vec4 newNormal = vec4(rotatedNormal.x, rotatedNormal.y, 0.0, 0.0);
 
-  vec4 newNormal = vec4(normal.x, normal.y, 0.0, 0.0);
+  vec4 newNormal = MAX_NODE_SIZE * 0.25 * edgeSize * vec4(normal.x, normal.y, 0.0, 0.0);
+
 
   if (magicZoom) {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * zoomX * nodeSize / MAX_NODE_SIZE;
-    newNormal.y = newNormal.y * zoomY * nodeSize / MAX_NODE_SIZE;
+    newNormal.x = newNormal.x * zoomX * nodeSize;
+    newNormal.y = newNormal.y * zoomY * nodeSize;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
 
