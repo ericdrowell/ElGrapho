@@ -320,7 +320,7 @@ ElGrapho.prototype = {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
-      console.log(mousePos.x, mousePos.y, dataIndex);
+      //console.log(mousePos.x, mousePos.y, dataIndex);
 
       if (that.interactionMode === Enums.interactionMode.PAN) {
         if (that.panStart) {
@@ -508,7 +508,7 @@ ElGrapho.prototype = {
       }
     });
 
-    this.addListener(viewport.container, 'mouseleave', function() {
+    this.addListener(viewport.container, 'mouseout', function() {
       Tooltip.hide();
     });
   },

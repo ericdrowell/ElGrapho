@@ -1447,7 +1447,7 @@ ElGrapho.prototype = {
       }
     });
 
-    this.addListener(viewport.container, 'mouseleave', function() {
+    this.addListener(viewport.container, 'mouseout', function() {
       Tooltip.hide();
     });
   },
