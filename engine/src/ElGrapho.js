@@ -161,8 +161,7 @@ ElGrapho.prototype = {
 
     this.controls = new Controls({
       container: this.wrapper,
-      graph: this,
-      showStepControls: true
+      graph: this
     });
 
     this.loading = new Loading({
@@ -321,6 +320,8 @@ ElGrapho.prototype = {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
+      console.log(mousePos.x, mousePos.y, dataIndex);
+
       if (that.interactionMode === Enums.interactionMode.PAN) {
         if (that.panStart) {
           let mouseDiff = {
@@ -338,6 +339,11 @@ ElGrapho.prototype = {
       // if panning or zoom boxing hide tooltip
       if (that.panStart || that.zoomBoxAnchor) {
         Tooltip.hide();
+      }
+
+      // we should not register mousemove events for nodes when we are hovering over controls
+      if (Dom.closest(evt.target, '.el-grapho-controls')) {
+        return;
       }
 
       // don't show tooltips if actively panning or zoom boxing
@@ -379,8 +385,9 @@ ElGrapho.prototype = {
             });  
           }       
         }
-      }      
-    }, 17));
+      }    
+    // need trailing false because we hide the tooltip on mouseleave.  without trailing false, the tooltip sometimes would render afterwards  
+    }, 17, {trailing: false})); 
 
 
     this.addListener(document, 'mouseup', function(evt) {
@@ -501,9 +508,9 @@ ElGrapho.prototype = {
       }
     });
 
-    this.addListener(viewport.container, 'mouseout', _.throttle(function() {
+    this.addListener(viewport.container, 'mouseleave', function() {
       Tooltip.hide();
-    }));
+    });
   },
   // stepUp: function() {
   //   console.log('step up');
