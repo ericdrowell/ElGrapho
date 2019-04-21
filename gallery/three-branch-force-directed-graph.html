@@ -51,14 +51,14 @@ let model = {
     {from: 12, to: 13},
     {from: 13, to: 14},
     {from: 14, to: 15},
-  ],
-  width: 500,
-  height: 500
+  ]
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.ForceDirected(model),
+  width: 500,
+  height: 500,
   debug: true
 });
     </script>

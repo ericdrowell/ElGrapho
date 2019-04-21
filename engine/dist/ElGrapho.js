@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.2.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-19-2019
+ * Release Date: 04-21-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -429,6 +429,7 @@ uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
+uniform float zoom;
 
 varying vec4 vVertexColor;
 
@@ -456,7 +457,7 @@ void main() {
     gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    float size = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    float size = nodeSize * MAX_NODE_SIZE * zoom;
     gl_PointSize = max(size, 5.0);
   }
 
@@ -521,6 +522,7 @@ uniform bool magicZoom;
 uniform float nodeSize;
 // TODO: focusedGroup and group should change to int
 uniform float focusedGroup;
+uniform float zoom;
 
 varying vec4 vVertexColor;
 
@@ -556,7 +558,7 @@ void main() {
     gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * zoom;
   }
 
   float validColor = mod(aVertexColor, 8.0);
@@ -651,6 +653,7 @@ uniform bool magicZoom;
 uniform float nodeSize;
 uniform float focusedGroup;
 uniform int hoverNode;
+uniform float zoom;
 
 varying vec4 vVertexColor;
 
@@ -665,7 +668,7 @@ void main() {
     gl_PointSize = MAX_NODE_SIZE * POINT_STROKE_WIDTH_FACTOR; 
   }
   else {
-    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * zoom * POINT_STROKE_WIDTH_FACTOR;
   }
 
   
@@ -729,6 +732,7 @@ uniform bool magicZoom;
 uniform float nodeSize; // 0 - 1
 uniform float focusedGroup;
 uniform float edgeSize; // 0 - 1
+uniform float zoom;
 
 const float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
@@ -745,8 +749,8 @@ vec2 rotate(vec2 v, float a) {
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
-  float zoomX = length(uModelViewMatrix[0]);
-  float zoomY = length(uModelViewMatrix[1]);
+  //float zoomX = length(uModelViewMatrix[0]);
+  //float zoomY = length(uModelViewMatrix[1]);
   // vec2 standardZoomVector = normalize(vec2(1.0, 0.0));
   // vec2 zoomVector = normalize(vec2(zoomX, zoomY));
   // float zoomAngle = dot(standardZoomVector, zoomVector);
@@ -761,8 +765,8 @@ void main() {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * zoomX * nodeSize;
-    newNormal.y = newNormal.y * zoomY * nodeSize;
+    newNormal.x = newNormal.x * zoom * nodeSize;
+    newNormal.y = newNormal.y * zoom * nodeSize;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
 
@@ -995,8 +999,11 @@ ElGrapho.prototype = {
     this.panY = 0;
     this.events = new Events();
     this.model = config.model;
-    this.width = config.model.width;
-    this.height = config.model.height;
+
+    this.fitToViewport(false);
+
+    this.width = config.width || 500;
+    this.height = config.height || 500;
     this.steps = config.model.steps;
     this.nodeSize = config.nodeSize || 1; // 0 - 1
     this.edgeSize = config.edgeSize || 0.25; // 0 - 1
@@ -1068,7 +1075,7 @@ ElGrapho.prototype = {
 
     this.setHasLabels();
 
-    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
+    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.showArrows);
  
     this.webgl.initBuffers(vertices);
     
@@ -1082,6 +1089,55 @@ ElGrapho.prototype = {
     this.listen();
 
     ElGraphoCollection.graphs.push(this);
+  },
+  setSize: function(width, height) {
+    this.width = width;
+    this.height = height;
+    this.wrapper.style.width = this.width + 'px';
+    this.wrapper.style.height = this.height + 'px';
+    this.viewport.setSize(width, height);
+    this.dirty = true;
+    this.hitDirty = true;
+  },
+  fitToViewport: function(maintainAspectRatio) {
+    let nodes = this.model.nodes;
+
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+
+    nodes.forEach(function(node) {
+      let nodeX = node.x;
+      let nodeY = node.y;
+
+      minX = Math.min(minX, nodeX);
+      minY = Math.min(minY, nodeY);
+      maxX = Math.max(maxX, nodeX);
+      maxY = Math.max(maxY, nodeY);
+    });
+
+    // normalized width is 2 and height is 2.  Thus, to give a little padding,
+    // using 1.9
+    let diffX = maxX - minX;
+    let diffY = maxY - minY;
+    let xOffset = minX + diffX / 2;
+    let yOffset = minY + diffY / 2;
+    let xFactor = 1.9 / diffX;
+    let yFactor = 1.9 / diffY;
+
+    // we want to adjust the x and y equally to preserve ratio
+
+    if (maintainAspectRatio) {
+      let factor = Math.min(xFactor, yFactor);
+      xFactor = factor;
+      yFactor = factor;
+    }
+
+    nodes.forEach(function(node) {
+      node.x = (node.x - xOffset) * xFactor;
+      node.y = (node.y - yOffset) * yFactor;
+    });
   },
   setHasLabels: function() {
     this.hasLabels = false;
@@ -1117,6 +1173,8 @@ ElGrapho.prototype = {
   },
   renderLabels: function(scale) {
     let that = this;
+    let halfWidth = this.width/2;
+    let halfHeight = this.height/2;
 
     // build labels view model
     this.labels.clear();
@@ -1146,8 +1204,8 @@ ElGrapho.prototype = {
     labelsContext.lineJoin = 'round';
 
     this.labels.labelsAdded.forEach(function(label) {
-      let x = (label.x * that.zoomX + that.panX) / scale;
-      let y = (label.y * -1 * that.zoomY - that.panY) / scale - 10;
+      let x = (label.x * halfWidth * that.zoomX + that.panX) / scale;
+      let y = (label.y * -1 * halfHeight * that.zoomY - that.panY) / scale - 10;
       labelsContext.beginPath();
       labelsContext.strokeText(label.str, x, y);
       labelsContext.fillText(label.str, x, y);
@@ -1259,7 +1317,7 @@ ElGrapho.prototype = {
       let mousePos = that.getMousePosition(evt);
       let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
-      console.log(mousePos.x, mousePos.y, dataIndex);
+      //console.log(mousePos.x, mousePos.y, dataIndex);
 
       if (that.interactionMode === Enums.interactionMode.PAN) {
         if (that.panStart) {
@@ -1691,7 +1749,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
+        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
 
         graph.labelsLayer.scene.clear();
         
@@ -1704,7 +1762,7 @@ let ElGraphoCollection = {
 
       if (graph.hitDirty) {
         idle = false;
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+        graph.webgl.drawHit(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.hitDirty = false; 
       }
 
@@ -1935,20 +1993,20 @@ const vec2 = glMatrix.vec2;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
  
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.length*2);
-    let halfWidth = width/2;
-    let halfHeight = height/2;
+    //let halfWidth = width/2;
+    //let halfHeight = height/2;
     let colors = new Float32Array(nodes.length);
 
     
     let positionCounter = 0;
     nodes.forEach(function(node, n) {
       // convert normalized x and y to pixel values
-      node.x *= halfWidth;
-      node.y *= halfHeight;
+      //node.x *= halfWidth;
+      //node.y *= halfHeight;
 
       positions[positionCounter++] = node.x;
       positions[positionCounter++] = node.y;
@@ -2150,6 +2208,7 @@ WebGL.prototype = {
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
     
 
     return shaderProgram;
@@ -2184,6 +2243,7 @@ WebGL.prototype = {
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.hoverNode = gl.getUniformLocation(shaderProgram, 'hoverNode');
+    shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
 
     return shaderProgram;
   },
@@ -2216,6 +2276,7 @@ WebGL.prototype = {
     shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
 
     return shaderProgram;
   },
@@ -2255,6 +2316,7 @@ WebGL.prototype = {
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
 
     return shaderProgram;
   },
@@ -2303,7 +2365,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -2314,13 +2376,14 @@ WebGL.prototype = {
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
+    gl.uniform1f(shaderProgram.zoom, zoom);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -2332,13 +2395,14 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1i(shaderProgram.hoverNode, hoverNode);
+    gl.uniform1f(shaderProgram.zoom, zoom);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -2350,6 +2414,7 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.edgeSize, edgeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
+    gl.uniform1f(shaderProgram.zoom, zoom);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
@@ -2360,9 +2425,10 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
+  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
+    let zoom = Math.min(zoomX, zoomY);
 
     
 
@@ -2383,30 +2449,36 @@ WebGL.prototype = {
     let near = -1.0;
     let far = 11.0;
 
+    //console.log(layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
+
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
 
     gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // To disable the background color of the canvas element
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
+
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, 0]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [width/2, height/2, 1]);
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
 
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);
     }
 
     if (this.buffers.points) {
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode);
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom);
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom);
     }
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
-  drawHit: function(panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
+  drawHit: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
     let layer = this.layer;
     let gl = layer.hit.context;
+
+    let zoom = Math.min(zoomX, zoomY);
 
     
 
@@ -2436,12 +2508,14 @@ WebGL.prototype = {
     //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
     mat4.translate(modelViewMatrix, modelViewMatrix, [panX, panY, -1]);
+    mat4.scale(modelViewMatrix, modelViewMatrix, [width/2, height/2, 1]);
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
     gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
     gl.uniform1i(shaderProgram.magicZoom, magicZoom);
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.zoom, zoom);
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
@@ -2743,9 +2817,9 @@ module.exports = NumberFormatter;
   !*** ./engine/src/layouts/Chord.js ***!
   \*************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+//const fitToViewport = require('./utils/fitToViewport');
 
 const Chord = function(model) {
   let numNodes = model.nodes.length;
@@ -2755,7 +2829,7 @@ const Chord = function(model) {
     node.y = Math.sin(angle);
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -2769,24 +2843,24 @@ module.exports = Chord;
   !*** ./engine/src/layouts/Cluster.js ***!
   \***************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+//const fitToViewport = require('./utils/fitToViewport');
 
 const Cluster = function(model) {
-  let width = model.width;
-  let height = model.height;
+  // let width = model.width;
+  // let height = model.height;
 
   let xFactor, yFactor;
 
-  if (width > height) {
-    xFactor = height/width;
-    yFactor = 1;
-  }
-  else {
-    xFactor = 1;
-    yFactor = width/height;
-  }
+  // if (width > height) {
+  //   xFactor = height/width;
+  yFactor = 1;
+  // }
+  // else {
+  xFactor = 1;
+  //   yFactor = width/height;
+  // }
 
   // keys are color integers, values are arrays.  The arrays contain node indices
   let groups = {};
@@ -2844,7 +2918,7 @@ const Cluster = function(model) {
     groupIndex++;
   }
 
-  fitToViewport(model.nodes, true);
+  //fitToViewport(model.nodes, true);
 
   return model;
 };
@@ -2860,7 +2934,7 @@ module.exports = Cluster;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+//const fitToViewport = require('./utils/fitToViewport');
 const d3 = __webpack_require__(/*! d3-force */ "./node_modules/d3-force/src/index.js");
 const DEFAULT_STEPS = 30;
 
@@ -2901,7 +2975,7 @@ const ForceDirected = function(model) {
     model.nodes[n].y = node.y;
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -2915,9 +2989,9 @@ module.exports = ForceDirected;
   !*** ./engine/src/layouts/Hairball.js ***!
   \****************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+//const fitToViewport = require('./utils/fitToViewport');
 const DEFAULT_STEPS = 20;
 const POSITION_FACTOR = 0.3;
 const ATTRACT_FACTOR = 0.1;
@@ -3002,7 +3076,7 @@ const Hairball = function(model) {
     attractNodes(nodes, edges);
   }
 
-  fitToViewport(nodes, false);
+  //fitToViewport(nodes, false);
 
   return model;
 };
@@ -3018,7 +3092,7 @@ module.exports = Hairball;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+//const fitToViewport = require('./utils/fitToViewport');
 const buildTreeLevels = __webpack_require__(/*! ./utils/buildTreeLevels */ "./engine/src/layouts/utils/buildTreeLevels.js");
 
 const RadialTree = function(model) {
@@ -3036,7 +3110,7 @@ const RadialTree = function(model) {
     });
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -3052,7 +3126,7 @@ module.exports = RadialTree;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const fitToViewport = __webpack_require__(/*! ./utils/fitToViewport */ "./engine/src/layouts/utils/fitToViewport.js");
+//const fitToViewport = require('./utils/fitToViewport');
 const buildTreeLevels = __webpack_require__(/*! ./utils/buildTreeLevels */ "./engine/src/layouts/utils/buildTreeLevels.js");
 
 const Tree = function(model) {
@@ -3073,7 +3147,7 @@ const Tree = function(model) {
     });
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };
@@ -3206,54 +3280,6 @@ module.exports = function(model) {
 
 /***/ }),
 
-/***/ "./engine/src/layouts/utils/fitToViewport.js":
-/*!***************************************************!*\
-  !*** ./engine/src/layouts/utils/fitToViewport.js ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = function(nodes, maintainAspectRatio) {
-  let minX = Number.POSITIVE_INFINITY;
-  let minY = Number.POSITIVE_INFINITY;
-  let maxX = Number.NEGATIVE_INFINITY;
-  let maxY = Number.NEGATIVE_INFINITY;
-
-  nodes.forEach(function(node) {
-    let nodeX = node.x;
-    let nodeY = node.y;
-
-    minX = Math.min(minX, nodeX);
-    minY = Math.min(minY, nodeY);
-    maxX = Math.max(maxX, nodeX);
-    maxY = Math.max(maxY, nodeY);
-  });
-
-  // normalized width is 2 and height is 2.  Thus, to give a little padding,
-  // using 1.9
-  let diffX = maxX - minX;
-  let diffY = maxY - minY;
-  let xOffset = minX + diffX / 2;
-  let yOffset = minY + diffY / 2;
-  let xFactor = 1.9 / diffX;
-  let yFactor = 1.9 / diffY;
-
-  // we want to adjust the x and y equally to preserve ratio
-
-  if (maintainAspectRatio) {
-    let factor = Math.min(xFactor, yFactor);
-    xFactor = factor;
-    yFactor = factor;
-  }
-
-  nodes.forEach(function(node) {
-    node.x = (node.x - xOffset) * xFactor;
-    node.y = (node.y - yOffset) * yFactor;
-  });
-};
-
-/***/ }),
-
 /***/ "./node_modules/concretejs/build/concrete.min.js":
 /*!*******************************************************!*\
   !*** ./node_modules/concretejs/build/concrete.min.js ***!
@@ -3262,10 +3288,10 @@ module.exports = function(nodes, maintainAspectRatio) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*
- * Concrete v3.0.2
+ * Concrete v3.0.4
  * A lightweight Html5 Canvas framework that enables hit detection, layering, multi buffering, 
  * pixel ratio management, exports, and image downloads
- * Release Date: 4-19-2019
+ * Release Date: 4-21-2019
  * https://github.com/ericdrowell/concrete
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -3289,7 +3315,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-var Concrete={},idCounter=0;Concrete.PIXEL_RATIO=window&&window.navigator&&window.navigator.userAgent&&!/PhantomJS/.test(window.navigator.userAgent)?2:1,Concrete.viewports=[],Concrete.Viewport=function(t){t||(t={}),this.container=t.container,this.layers=[],this.id=idCounter++,this.scene=new Concrete.Scene,this.setSize(t.width||0,t.height||0),t.container.innerHTML="",t.container.appendChild(this.scene.canvas),Concrete.viewports.push(this)},Concrete.Viewport.prototype={add:function(t){return this.layers.push(t),t.setSize(t.width||this.width,t.height||this.height),t.viewport=this},setSize:function(t,e){return this.width=t,this.height=e,this.scene.setSize(t,e),this},getIntersection:function(t,e){var i,n,s=this.layers;for(i=s.length-1;0<=i;i--)if(0<=(n=s[i].hit.getIntersection(t,e)))return n;return-1},getIndex:function(){var t,e=Concrete.viewports,i=e.length,n=0;for(n=0;n<i;n++)if(t=e[n],this.id===t.id)return n;return null},destroy:function(){this.layers.forEach(function(t){t.destroy()}),this.container.innerHTML="",Concrete.viewports.splice(this.getIndex(),1)},render:function(){var e=this.scene;e.clear(),this.layers.forEach(function(t){t.visible&&e.context.drawImage(t.scene.canvas,0,0,t.width,t.height)})}},Concrete.Layer=function(t){t||(t={}),this.x=0,this.y=0,this.width=0,this.height=0,this.visible=!0,this.id=idCounter++,this.hit=new Concrete.Hit({contextType:t.contextType}),this.scene=new Concrete.Scene({contextType:t.contextType}),t.x&&t.y&&this.setPosition(t.x,t.y),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Layer.prototype={setPosition:function(t,e){return this.x=t,this.y=e,this},setSize:function(t,e){return this.width=t,this.height=e,this.scene.setSize(t,e),this.hit.setSize(t,e),this},moveUp:function(){var t=this.getIndex(),e=this.viewport.layers;return t<e.length-1&&(e[t]=e[t+1],e[t+1]=this),this},moveDown:function(){var t=this.getIndex(),e=this.viewport.layers;return 0<t&&(e[t]=e[t-1],e[t-1]=this),this},moveToTop:function(){var t=this.getIndex(),e=this.viewport.layers;e.splice(t,1),e.push(this)},moveToBottom:function(){var t=this.getIndex(),e=this.viewport.layers;return e.splice(t,1),e.unshift(this),this},getIndex:function(){var t,e=this.viewport.layers,i=e.length,n=0;for(n=0;n<i;n++)if(t=e[n],this.id===t.id)return n;return null},destroy:function(){this.viewport.layers.splice(this.getIndex(),1)}},Concrete.Scene=function(t){t||(t={}),this.width=0,this.height=0,this.contextType=t.contextType||"2d",this.id=idCounter++,this.canvas=document.createElement("canvas"),this.canvas.className="concrete-scene-canvas",this.canvas.style.display="inline-block",this.context=this.canvas.getContext(this.contextType),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Scene.prototype={setSize:function(t,e){return this.width=t,this.height=e,this.id=idCounter++,this.canvas.width=t*Concrete.PIXEL_RATIO,this.canvas.style.width=t+"px",this.canvas.height=e*Concrete.PIXEL_RATIO,this.canvas.style.height=e+"px","2d"===this.contextType&&1!==Concrete.PIXEL_RATIO&&this.context.scale(Concrete.PIXEL_RATIO,Concrete.PIXEL_RATIO),this},clear:function(){var t=this.context;return"2d"===this.contextType?t.clearRect(0,0,this.width*Concrete.PIXEL_RATIO,this.height*Concrete.PIXEL_RATIO):t.clear(t.COLOR_BUFFER_BIT|t.DEPTH_BUFFER_BIT),this},toImage:function(t){var e=this,i=new Image,n=this.canvas.toDataURL("image/png");i.onload=function(){i.width=e.width,i.height=e.height,t(i)},i.src=n},download:function(h){this.canvas.toBlob(function(t){var e,i=document.createElement("a"),n=URL.createObjectURL(t),s=h.fileName||"canvas.png";i.setAttribute("href",n),i.setAttribute("target","_blank"),i.setAttribute("download",s),document.createEvent?((e=document.createEvent("MouseEvents")).initEvent("click",!0,!0),i.dispatchEvent(e)):i.click&&i.click()})}},Concrete.Hit=function(t){t||(t={}),this.width=0,this.height=0,this.contextType=t.contextType||"2d",this.canvas=document.createElement("canvas"),this.canvas.className="concrete-hit-canvas",this.canvas.style.display="none",this.canvas.style.position="relative",this.context=this.canvas.getContext(this.contextType,{preserveDrawingBuffer:!0,antialias:!1}),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Hit.prototype={setSize:function(t,e){return this.width=t,this.height=e,this.canvas.width=t*Concrete.PIXEL_RATIO,this.canvas.style.width=t+"px",this.canvas.height=e*Concrete.PIXEL_RATIO,this.canvas.style.height=e+"px",this},clear:function(){var t=this.context;return"2d"===this.contextType?t.clearRect(0,0,this.width*Concrete.PIXEL_RATIO,this.height*Concrete.PIXEL_RATIO):t.clear(t.COLOR_BUFFER_BIT|t.DEPTH_BUFFER_BIT),this},getIntersection:function(t,e){var i,n=this.context;if(t=Math.round(t),e=Math.round(e),t<0||e<0||t>this.width||e>this.height)return-1;if("2d"===this.contextType){if(0===(i=n.getImageData(t,e,1,1).data)[3])return-1}else if(i=new Uint8Array(4),n.readPixels(t*Concrete.PIXEL_RATIO,(this.height-e-1)*Concrete.PIXEL_RATIO,1,1,n.RGBA,n.UNSIGNED_BYTE,i),255===i[0]&&255===i[1]&&255===i[2])return-1;return this.rgbToInt(i)},getColorFromIndex:function(t){var e=this.intToRGB(t);return"rgb("+e[0]+", "+e[1]+", "+e[2]+")"},rgbToInt:function(t){return(t[0]<<16)+(t[1]<<8)+t[2]},intToRGB:function(t){return[(16711680&t)>>16,(65280&t)>>8,255&t]}},function(t){"use strict"; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Concrete}).call(exports, __webpack_require__, exports, module),
+var Concrete={},idCounter=0;Concrete.PIXEL_RATIO=window&&window.navigator&&window.navigator.userAgent&&!/PhantomJS/.test(window.navigator.userAgent)?2:1,Concrete.viewports=[],Concrete.Viewport=function(t){t||(t={}),this.container=t.container,this.layers=[],this.id=idCounter++,this.scene=new Concrete.Scene,this.setSize(t.width||0,t.height||0),t.container.innerHTML="",t.container.appendChild(this.scene.canvas),Concrete.viewports.push(this)},Concrete.Viewport.prototype={add:function(t){return this.layers.push(t),t.setSize(t.width||this.width,t.height||this.height),t.viewport=this},setSize:function(e,i){return this.width=e,this.height=i,this.scene.setSize(e,i),this.layers.forEach(function(t){t.setSize(e,i)}),this},getIntersection:function(t,e){var i,n,s=this.layers;for(i=s.length-1;0<=i;i--)if(0<=(n=s[i].hit.getIntersection(t,e)))return n;return-1},getIndex:function(){var t,e=Concrete.viewports,i=e.length,n=0;for(n=0;n<i;n++)if(t=e[n],this.id===t.id)return n;return null},destroy:function(){this.layers.forEach(function(t){t.destroy()}),this.container.innerHTML="",Concrete.viewports.splice(this.getIndex(),1)},render:function(){var e=this.scene;e.clear(),this.layers.forEach(function(t){t.visible&&e.context.drawImage(t.scene.canvas,0,0,t.width,t.height)})}},Concrete.Layer=function(t){t||(t={}),this.x=0,this.y=0,this.width=0,this.height=0,this.visible=!0,this.id=idCounter++,this.hit=new Concrete.Hit({contextType:t.contextType}),this.scene=new Concrete.Scene({contextType:t.contextType}),t.x&&t.y&&this.setPosition(t.x,t.y),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Layer.prototype={setPosition:function(t,e){return this.x=t,this.y=e,this},setSize:function(t,e){return this.width=t,this.height=e,this.scene.setSize(t,e),this.hit.setSize(t,e),this},moveUp:function(){var t=this.getIndex(),e=this.viewport.layers;return t<e.length-1&&(e[t]=e[t+1],e[t+1]=this),this},moveDown:function(){var t=this.getIndex(),e=this.viewport.layers;return 0<t&&(e[t]=e[t-1],e[t-1]=this),this},moveToTop:function(){var t=this.getIndex(),e=this.viewport.layers;e.splice(t,1),e.push(this)},moveToBottom:function(){var t=this.getIndex(),e=this.viewport.layers;return e.splice(t,1),e.unshift(this),this},getIndex:function(){var t,e=this.viewport.layers,i=e.length,n=0;for(n=0;n<i;n++)if(t=e[n],this.id===t.id)return n;return null},destroy:function(){this.viewport.layers.splice(this.getIndex(),1)}},Concrete.Scene=function(t){t||(t={}),this.width=0,this.height=0,this.contextType=t.contextType||"2d",this.id=idCounter++,this.canvas=document.createElement("canvas"),this.canvas.className="concrete-scene-canvas",this.canvas.style.display="inline-block",this.context=this.canvas.getContext(this.contextType),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Scene.prototype={setSize:function(t,e){return this.width=t,this.height=e,this.id=idCounter++,this.canvas.width=t*Concrete.PIXEL_RATIO,this.canvas.style.width=t+"px",this.canvas.height=e*Concrete.PIXEL_RATIO,this.canvas.style.height=e+"px","2d"===this.contextType&&1!==Concrete.PIXEL_RATIO&&this.context.scale(Concrete.PIXEL_RATIO,Concrete.PIXEL_RATIO),this},clear:function(){var t=this.context;return"2d"===this.contextType?t.clearRect(0,0,this.width*Concrete.PIXEL_RATIO,this.height*Concrete.PIXEL_RATIO):t.clear(t.COLOR_BUFFER_BIT|t.DEPTH_BUFFER_BIT),this},toImage:function(t){var e=this,i=new Image,n=this.canvas.toDataURL("image/png");i.onload=function(){i.width=e.width,i.height=e.height,t(i)},i.src=n},download:function(h){this.canvas.toBlob(function(t){var e,i=document.createElement("a"),n=URL.createObjectURL(t),s=h.fileName||"canvas.png";i.setAttribute("href",n),i.setAttribute("target","_blank"),i.setAttribute("download",s),document.createEvent?((e=document.createEvent("MouseEvents")).initEvent("click",!0,!0),i.dispatchEvent(e)):i.click&&i.click()})}},Concrete.Hit=function(t){t||(t={}),this.width=0,this.height=0,this.contextType=t.contextType||"2d",this.canvas=document.createElement("canvas"),this.canvas.className="concrete-hit-canvas",this.canvas.style.display="none",this.canvas.style.position="relative",this.context=this.canvas.getContext(this.contextType,{preserveDrawingBuffer:!0,antialias:!1}),t.width&&t.height&&this.setSize(t.width,t.height)},Concrete.Hit.prototype={setSize:function(t,e){return this.width=t,this.height=e,this.canvas.width=t*Concrete.PIXEL_RATIO,this.canvas.style.width=t+"px",this.canvas.height=e*Concrete.PIXEL_RATIO,this.canvas.style.height=e+"px",this},clear:function(){var t=this.context;return"2d"===this.contextType?t.clearRect(0,0,this.width*Concrete.PIXEL_RATIO,this.height*Concrete.PIXEL_RATIO):t.clear(t.COLOR_BUFFER_BIT|t.DEPTH_BUFFER_BIT),this},getIntersection:function(t,e){var i,n=this.context;if(t=Math.round(t),e=Math.round(e),t<0||e<0||t>this.width||e>this.height)return-1;if("2d"===this.contextType){if(0===(i=n.getImageData(t,e,1,1).data)[3])return-1}else if(i=new Uint8Array(4),n.readPixels(t*Concrete.PIXEL_RATIO,(this.height-e-1)*Concrete.PIXEL_RATIO,1,1,n.RGBA,n.UNSIGNED_BYTE,i),255===i[0]&&255===i[1]&&255===i[2])return-1;return this.rgbToInt(i)},getColorFromIndex:function(t){var e=this.intToRGB(t);return"rgb("+e[0]+", "+e[1]+", "+e[2]+")"},rgbToInt:function(t){return(t[0]<<16)+(t[1]<<8)+t[2]},intToRGB:function(t){return[(16711680&t)>>16,(65280&t)>>8,255&t]}},function(t){"use strict"; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Concrete}).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):undefined}(this);
 
 /***/ }),

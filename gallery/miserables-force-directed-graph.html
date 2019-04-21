@@ -361,9 +361,7 @@ let data = {
 
 let model = {
   nodes: [],
-  edges: [],
-  width: 500,
-  height: 500
+  edges: []
 };
 
 data.nodes.forEach(function(node, n) {
@@ -387,6 +385,8 @@ data.links.forEach(function(link) {
 graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.ForceDirected(model),
+  width: 500,
+  height: 500,
   debug: true
 });
 

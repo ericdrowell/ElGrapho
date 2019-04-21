@@ -1,4 +1,4 @@
-const fitToViewport = require('./utils/fitToViewport');
+//const fitToViewport = require('./utils/fitToViewport');
 const buildTreeLevels = require('./utils/buildTreeLevels');
 
 const Tree = function(model) {
@@ -19,7 +19,7 @@ const Tree = function(model) {
     });
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };

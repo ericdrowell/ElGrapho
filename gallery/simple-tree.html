@@ -43,6 +43,8 @@
       let graph = new ElGrapho({
         container: document.getElementById('container'),
         model: ElGrapho.layouts.Tree(model),
+        width: 500,
+        height: 500,
         arrows: true,
         debug: true
       });
@@ -89,14 +91,14 @@
           {from: 1, to: 4},
           {from: 2, to: 5},
           {from: 2, to: 6}
-        ],
-        width: 500,
-        height: 500
+        ]
       };
 
       let graph2 = new ElGrapho({
         container: document.getElementById('container2'),
         model: ElGrapho.layouts.Tree(model),
+        width: 500,
+        height: 500,
         arrows: true,
         debug: true
       });

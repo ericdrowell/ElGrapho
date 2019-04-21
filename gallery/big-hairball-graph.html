@@ -21,9 +21,7 @@ const NUM_CHILDREN = 3;
 
 let model = {
   nodes: [],
-  edges: [],
-  width: 500,
-  height: 500
+  edges: []
 };
 
 // https://en.wikipedia.org/wiki/K-ary_tree
@@ -57,6 +55,8 @@ addChildren(0, 0);
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Hairball(model),
+  width: 500,
+  height: 500,
   debug: true
 });
 

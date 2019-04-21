@@ -66,7 +66,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
+        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
 
         graph.labelsLayer.scene.clear();
         
@@ -79,7 +79,7 @@ let ElGraphoCollection = {
 
       if (graph.hitDirty) {
         idle = false;
-        graph.webgl.drawHit(graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
+        graph.webgl.drawHit(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.hitDirty = false; 
       }
 

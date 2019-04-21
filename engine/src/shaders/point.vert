@@ -10,6 +10,7 @@ uniform bool magicZoom;
 uniform float nodeSize;
 // TODO: focusedGroup and group should change to int
 uniform float focusedGroup;
+uniform float zoom;
 
 varying vec4 vVertexColor;
 
@@ -45,7 +46,7 @@ void main() {
     gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * zoom;
   }
 
   float validColor = mod(aVertexColor, 8.0);

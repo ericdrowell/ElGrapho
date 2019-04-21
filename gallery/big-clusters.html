@@ -18,9 +18,7 @@ const NUM_NODES = 10000;
 
 let model = {
   nodes: [],
-  edges: [],
-  width: 1000,
-  height: 500
+  edges: []
 };
 
 for (let n=0; n<NUM_NODES; n++) {
@@ -45,8 +43,11 @@ for (let n=0; n<NUM_NODES; n++) {
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Cluster(model),
+  width: 500,
+  height: 500,
   magicZoom: false,
   nodeSize: 0.25,
+  edgeSize: 0.1,
   debug: true
 });
 

@@ -20,9 +20,7 @@ let MAX_LEVEL_MULTIPLIER = 5;
 
 let model = {
   nodes: [],
-  edges: [],
-  width: 1000,
-  height: 500
+  edges: []
 };
 
 let edgeIndex = 0;
@@ -81,6 +79,8 @@ for (let j=0; j<NUM_LEVELS; j++) {
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Tree(model),
+  width: 1000,
+  height: 500,
   debug: false
 });
     </script>

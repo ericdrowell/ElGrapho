@@ -9,6 +9,7 @@ uniform bool magicZoom;
 uniform float nodeSize;
 uniform float focusedGroup;
 uniform int hoverNode;
+uniform float zoom;
 
 varying vec4 vVertexColor;
 
@@ -23,7 +24,7 @@ void main() {
     gl_PointSize = MAX_NODE_SIZE * POINT_STROKE_WIDTH_FACTOR; 
   }
   else {
-    gl_PointSize = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1])) * POINT_STROKE_WIDTH_FACTOR;
+    gl_PointSize = nodeSize * MAX_NODE_SIZE * zoom * POINT_STROKE_WIDTH_FACTOR;
   }
 
   

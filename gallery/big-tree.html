@@ -21,9 +21,7 @@ const NUM_CHILDREN = 3;
 
 let model = {
   nodes: [],
-  edges: [],
-  width: 500,
-  height: 500
+  edges: []
 };
 
 // https://en.wikipedia.org/wiki/K-ary_tree
@@ -42,7 +40,8 @@ for (let n=0; n<numNodes; n++) {
     group = 2;
   }
   model.nodes.push({
-    group: group
+    group: group,
+    label: n
   })
 }
 
@@ -77,7 +76,9 @@ let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Tree(model),
   debug: true,
-  edgeSize: 0.1
+  edgeSize: 0.1,
+  width: 500,
+  height: 500
 });
 
     </script>

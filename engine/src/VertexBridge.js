@@ -5,20 +5,20 @@ const vec2 = glMatrix.vec2;
 const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
  
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, width, height, showArrows) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, showArrows) {
     let nodes = model.nodes;
     let edges = model.edges;
     let positions = new Float32Array(nodes.length*2);
-    let halfWidth = width/2;
-    let halfHeight = height/2;
+    //let halfWidth = width/2;
+    //let halfHeight = height/2;
     let colors = new Float32Array(nodes.length);
 
     
     let positionCounter = 0;
     nodes.forEach(function(node, n) {
       // convert normalized x and y to pixel values
-      node.x *= halfWidth;
-      node.y *= halfHeight;
+      //node.x *= halfWidth;
+      //node.y *= halfHeight;
 
       positions[positionCounter++] = node.x;
       positions[positionCounter++] = node.y;

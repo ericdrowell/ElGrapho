@@ -1,4 +1,4 @@
-const fitToViewport = require('./utils/fitToViewport');
+//const fitToViewport = require('./utils/fitToViewport');
 const d3 = require('d3-force');
 const DEFAULT_STEPS = 30;
 
@@ -39,7 +39,7 @@ const ForceDirected = function(model) {
     model.nodes[n].y = node.y;
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };

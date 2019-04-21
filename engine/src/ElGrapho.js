@@ -56,8 +56,11 @@ ElGrapho.prototype = {
     this.panY = 0;
     this.events = new Events();
     this.model = config.model;
-    this.width = config.model.width;
-    this.height = config.model.height;
+
+    this.fitToViewport(false);
+
+    this.width = config.width || 500;
+    this.height = config.height || 500;
     this.steps = config.model.steps;
     this.nodeSize = config.nodeSize || 1; // 0 - 1
     this.edgeSize = config.edgeSize || 0.25; // 0 - 1
@@ -129,7 +132,7 @@ ElGrapho.prototype = {
 
     this.setHasLabels();
 
-    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.width, this.height, this.showArrows);
+    let vertices = this.vertices = VertexBridge.modelToVertices(config.model, this.showArrows);
  
     this.webgl.initBuffers(vertices);
     
@@ -143,6 +146,55 @@ ElGrapho.prototype = {
     this.listen();
 
     ElGraphoCollection.graphs.push(this);
+  },
+  setSize: function(width, height) {
+    this.width = width;
+    this.height = height;
+    this.wrapper.style.width = this.width + 'px';
+    this.wrapper.style.height = this.height + 'px';
+    this.viewport.setSize(width, height);
+    this.dirty = true;
+    this.hitDirty = true;
+  },
+  fitToViewport: function(maintainAspectRatio) {
+    let nodes = this.model.nodes;
+
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+
+    nodes.forEach(function(node) {
+      let nodeX = node.x;
+      let nodeY = node.y;
+
+      minX = Math.min(minX, nodeX);
+      minY = Math.min(minY, nodeY);
+      maxX = Math.max(maxX, nodeX);
+      maxY = Math.max(maxY, nodeY);
+    });
+
+    // normalized width is 2 and height is 2.  Thus, to give a little padding,
+    // using 1.9
+    let diffX = maxX - minX;
+    let diffY = maxY - minY;
+    let xOffset = minX + diffX / 2;
+    let yOffset = minY + diffY / 2;
+    let xFactor = 1.9 / diffX;
+    let yFactor = 1.9 / diffY;
+
+    // we want to adjust the x and y equally to preserve ratio
+
+    if (maintainAspectRatio) {
+      let factor = Math.min(xFactor, yFactor);
+      xFactor = factor;
+      yFactor = factor;
+    }
+
+    nodes.forEach(function(node) {
+      node.x = (node.x - xOffset) * xFactor;
+      node.y = (node.y - yOffset) * yFactor;
+    });
   },
   setHasLabels: function() {
     this.hasLabels = false;
@@ -178,6 +230,8 @@ ElGrapho.prototype = {
   },
   renderLabels: function(scale) {
     let that = this;
+    let halfWidth = this.width/2;
+    let halfHeight = this.height/2;
 
     // build labels view model
     this.labels.clear();
@@ -207,8 +261,8 @@ ElGrapho.prototype = {
     labelsContext.lineJoin = 'round';
 
     this.labels.labelsAdded.forEach(function(label) {
-      let x = (label.x * that.zoomX + that.panX) / scale;
-      let y = (label.y * -1 * that.zoomY - that.panY) / scale - 10;
+      let x = (label.x * halfWidth * that.zoomX + that.panX) / scale;
+      let y = (label.y * -1 * halfHeight * that.zoomY - that.panY) / scale - 10;
       labelsContext.beginPath();
       labelsContext.strokeText(label.str, x, y);
       labelsContext.fillText(label.str, x, y);

@@ -10,6 +10,7 @@ uniform bool magicZoom;
 uniform float nodeSize; // 0 - 1
 uniform float focusedGroup;
 uniform float edgeSize; // 0 - 1
+uniform float zoom;
 
 const float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
@@ -26,8 +27,8 @@ vec2 rotate(vec2 v, float a) {
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
 void main() {
-  float zoomX = length(uModelViewMatrix[0]);
-  float zoomY = length(uModelViewMatrix[1]);
+  //float zoomX = length(uModelViewMatrix[0]);
+  //float zoomY = length(uModelViewMatrix[1]);
   // vec2 standardZoomVector = normalize(vec2(1.0, 0.0));
   // vec2 zoomVector = normalize(vec2(zoomX, zoomY));
   // float zoomAngle = dot(standardZoomVector, zoomVector);
@@ -42,8 +43,8 @@ void main() {
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
   else {
-    newNormal.x = newNormal.x * zoomX * nodeSize;
-    newNormal.y = newNormal.y * zoomY * nodeSize;
+    newNormal.x = newNormal.x * zoom * nodeSize;
+    newNormal.y = newNormal.y * zoom * nodeSize;
     gl_Position = uProjectionMatrix * ((uModelViewMatrix * aVertexPosition) + newNormal);
   }
 

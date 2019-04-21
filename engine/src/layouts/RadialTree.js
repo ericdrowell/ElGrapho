@@ -1,4 +1,4 @@
-const fitToViewport = require('./utils/fitToViewport');
+//const fitToViewport = require('./utils/fitToViewport');
 const buildTreeLevels = require('./utils/buildTreeLevels');
 
 const RadialTree = function(model) {
@@ -16,7 +16,7 @@ const RadialTree = function(model) {
     });
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };

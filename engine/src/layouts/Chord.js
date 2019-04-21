@@ -1,4 +1,4 @@
-const fitToViewport = require('./utils/fitToViewport');
+//const fitToViewport = require('./utils/fitToViewport');
 
 const Chord = function(model) {
   let numNodes = model.nodes.length;
@@ -8,7 +8,7 @@ const Chord = function(model) {
     node.y = Math.sin(angle);
   });
 
-  fitToViewport(model.nodes, false);
+  //fitToViewport(model.nodes, false);
 
   return model;
 };

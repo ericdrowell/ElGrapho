@@ -22,8 +22,6 @@ const NUM_CHILDREN = 3;
 let model = {
   nodes: [],
   edges: [],
-  width: 500,
-  height: 500,
   steps: 100
 };
 
@@ -77,6 +75,8 @@ addChildren(0, 0);
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.ForceDirected(model),
+  width: 500,
+  height: 500,
   debug: true
 });
 

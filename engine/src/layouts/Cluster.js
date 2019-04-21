@@ -1,19 +1,19 @@
-const fitToViewport = require('./utils/fitToViewport');
+//const fitToViewport = require('./utils/fitToViewport');
 
 const Cluster = function(model) {
-  let width = model.width;
-  let height = model.height;
+  // let width = model.width;
+  // let height = model.height;
 
   let xFactor, yFactor;
 
-  if (width > height) {
-    xFactor = height/width;
-    yFactor = 1;
-  }
-  else {
-    xFactor = 1;
-    yFactor = width/height;
-  }
+  // if (width > height) {
+  //   xFactor = height/width;
+  yFactor = 1;
+  // }
+  // else {
+  xFactor = 1;
+  //   yFactor = width/height;
+  // }
 
   // keys are color integers, values are arrays.  The arrays contain node indices
   let groups = {};
@@ -71,7 +71,7 @@ const Cluster = function(model) {
     groupIndex++;
   }
 
-  fitToViewport(model.nodes, true);
+  //fitToViewport(model.nodes, true);
 
   return model;
 };

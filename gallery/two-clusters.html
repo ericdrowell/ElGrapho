@@ -19,9 +19,7 @@
 
       let model = {
         nodes: [],
-        edges: [],
-        width: 500,
-        height: 500
+        edges: []
       };
 
       for (let n=0; n<NUM_NODES; n++) {
@@ -37,7 +35,9 @@
 
       let graph = new ElGrapho({
         container: document.getElementById('container'),
-        model: ElGrapho.layouts.Cluster(model)
+        model: ElGrapho.layouts.Cluster(model),
+        width: 1000,
+        height: 500
       });
 
     </script>

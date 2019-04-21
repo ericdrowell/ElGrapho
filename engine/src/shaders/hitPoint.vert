@@ -7,6 +7,7 @@ uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
 uniform float nodeSize;
+uniform float zoom;
 
 varying vec4 vVertexColor;
 
@@ -34,7 +35,7 @@ void main() {
     gl_PointSize = MAX_NODE_SIZE; 
   }
   else {
-    float size = nodeSize * MAX_NODE_SIZE * min(length(uModelViewMatrix[0]), length(uModelViewMatrix[1]));
+    float size = nodeSize * MAX_NODE_SIZE * zoom;
     gl_PointSize = max(size, 5.0);
   }
 

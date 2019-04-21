@@ -1,4 +1,4 @@
-const fitToViewport = require('./utils/fitToViewport');
+//const fitToViewport = require('./utils/fitToViewport');
 const DEFAULT_STEPS = 20;
 const POSITION_FACTOR = 0.3;
 const ATTRACT_FACTOR = 0.1;
@@ -83,7 +83,7 @@ const Hairball = function(model) {
     attractNodes(nodes, edges);
   }
 
-  fitToViewport(nodes, false);
+  //fitToViewport(nodes, false);
 
   return model;
 };

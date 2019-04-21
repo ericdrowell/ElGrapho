@@ -34,7 +34,7 @@
     "lodash": "^4.17.10",
     "node-sass": "^4.9.0",
     "gl-matrix": "^2.6.1",
-    "concretejs": "^3.0.3",
+    "concretejs": "^3.0.4",
     "d3-force": "^2.0.1"
   },
   "watch": {
