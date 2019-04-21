@@ -6,7 +6,7 @@
 * lines get fat sometimes when viz stretched.  arrows don't point in right direction when viz is stretched.  this is the same problem
 * tests and github CI
 
-## P2
+## P1
 * new hover effects.  Highlight upstream and downstream edges and nodes
 * node events should include x,y mouse position, or at least mouse event object
 * events should return the node or edge directly, with an index, function(node, index, evt)
