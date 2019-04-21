@@ -5,12 +5,22 @@
     <meta content="utf-8" http-equiv="encoding">
     <style>
       html, body {
-        background-color: #f8f8f8;
+ 
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #container {
+        width: 100%;
+        height: 100%;
       }
     </style>
   </head>
   <body>
-    <h1>El Grapho Network Hairball Graph</h1>
+    <!--<h1>El Grapho Network Hairball Graph</h1> -->
     <div id="container"></div>
 
     <script src="../engine/dist/ElGrapho.js"></script>
@@ -36,10 +46,9 @@ for (let n=0; n<NUM_NODES; n++) {
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Hairball(model),
-  width: 500,
-  height: 500,
   debug: true,
-  nodeSize: 0.5
+  nodeSize: 0.5,
+  fillContainer: true
 });
     </script>
   </body>

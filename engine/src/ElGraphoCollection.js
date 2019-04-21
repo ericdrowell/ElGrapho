@@ -64,6 +64,16 @@ let ElGraphoCollection = {
         nodeSize = graph.nodeSize;
       }
 
+      if (graph.fillContainer) {
+        let containerRect = graph.container.getBoundingClientRect();
+        let width = containerRect.width;
+        let height = containerRect.height;
+
+        if (graph.width !== width || graph.height !== height) {
+          graph.setSize(width, height);
+        }
+      }
+
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);

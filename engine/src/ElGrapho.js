@@ -66,6 +66,7 @@ ElGrapho.prototype = {
     this.edgeSize = config.edgeSize || 0.25; // 0 - 1
     this.focusedGroup = -1;
     this.tooltips = config.tooltips === undefined ? true : config.tooltips;
+    this.fillContainer = config.fillContainer === undefined ? false : config.fillContainer;
     
     this.animations = [];
     this.wrapper = document.createElement('div');
