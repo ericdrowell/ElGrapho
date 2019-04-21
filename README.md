@@ -113,14 +113,14 @@ let model = {
     {from: 1, to: 4},
     {from: 2, to: 5},
   ],
-  width: 500,
-  height: 500,
   steps: 30
 };
 
 graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.layouts.ForceDirected(model)
+  model: ElGrapho.layouts.ForceDirected(model),
+  width: 500,
+  height: 500
 });
 ```
 
