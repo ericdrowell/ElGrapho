@@ -4,9 +4,10 @@
 * new edgeSize property
 * default edgeSize has been changed from 0.5 to 0.25
 * new setSize() method to resize a graph
+* new fillContainer property that auto expands/shrinks a graph to fill its container
 * width and height properties moved from model to the root level of the config
-* tooltips:false to disable tooltips
-* now supporting usecases where some nodes have labels and some nodes do not
+* new tooltips property to disable tooltips
+* some nodes can have labels while others do not
 * fixed several tooltip hide/show issues
 
 ## v2.2.1

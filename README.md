@@ -58,10 +58,10 @@ let graph = new ElGrapho({
       {from: 1, to: 4},
       {from: 2, to: 5},
       {from: 2, to: 6}
-    ],
-    width: 500,
-    height: 500
-  }
+    ]
+  },
+  width: 500,
+  height: 500
 });
 ```
 
@@ -71,17 +71,24 @@ let graph = new ElGrapho({
 
 * ```model.edges``` - object that defines the edges between nodes based on their indices.  Each edge is defined by a from-node-index and a to-node-index.  In the example above, the first edge begins at node ```0``` and ends at node ```1```.  For non directed graphs, or bi-directional graphs, ```from``` and ```to``` are interchangeable. 
 
-* ```model.width``` - number that defines the width of the El Grapho viewport in pixels.
+* ```width``` - number that defines the width of the El Grapho viewport in pixels.  The default is 500;
 
-* ```model.height``` - number defines the height of the El Grapho viewport in pixels.
+* ```height``` - number defines the height of the El Grapho viewport in pixels.  The default is 500;
+
+* ```nodeSize``` - number between 0 and 1 which defines the node size.  The default is 1.
+
+* ```edgeSize``` - number between 0 and 1 which defines the edge size.  Edge sizes are relative to the connecting node size.  The default is 0.25. 
+
+* ```fillContainer``` - boolean that enables or disables auto filling the container.  When true, El Grapho will automatically detect anytime its container has changed shape, and will auto resize itself.  The default is false.
+
+* ```tooltips``` - boolean that enables or disables tooltips.  The default is true.
+
+* ```arrows``` - boolean that enables or disables edge arrows. The default is false.  For non directed or bi-directional graphs, you should keep ```arrows``` as ```false```.
 
 * ```animations``` - boolean that defines animation strategy.  When animations is true, zoom and pan transitions will be animated.  Otherwise the transitions will be immediate.  Although animations utilize requestAnimationFrame for dynamic frame rates, in some situations you may prefer to set animations to false to improve transition performance for very high cardinality graphs with millions of nodes and edges.  The default is true.
 
 * ```debug``` - boolean that can be used to enable debug mode.  Debug mode will show the node and edge count in the bottom right corner of the visualization.  The default is false.
 
-* ```arrows``` - boolean that enables or disables edge arrows. The default is false.  For non directed or bi-directional graphs, you should keep ```arrows``` as ```false```.
-
-* ```nodeSize``` - number between 0 and 1 which defines the node size.  The default is 1.
 
 ### Layouts
 
@@ -141,15 +148,14 @@ let model = {
     {from: 1, to: 4},
     {from: 2, to: 5},
     {from: 2, to: 6}
-  ],
-  width: 500,
-  height: 500
+  ]
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Tree(model),
-  arrows: true
+  width: 500,
+  height: 500
 });
 ```
 
@@ -174,14 +180,14 @@ let model = {
     {from: 1, to: 4},
     {from: 2, to: 5},
     {from: 2, to: 6}
-  ],
-  width: 500,
-  height: 500
+  ]
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.layouts.RadialTree(model)
+  model: ElGrapho.layouts.RadialTree(model),
+  width: 500,
+  height: 500
 });
 ```
 
@@ -205,14 +211,14 @@ let model = {
     {from: 1, to: 4},
     {from: 2, to: 5},
     {from: 2, to: 6}
-  ],
-  width: 500,
-  height: 500
+  ]
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.layouts.Hairball(model)
+  model: ElGrapho.layouts.Hairball(model),
+  width: 500,
+  height: 500
 });
 ```
 
@@ -238,15 +244,15 @@ let model = {
     {from: 1, to: 4},
     {from: 2, to: 5},
     {from: 2, to: 6}
-  ],
-  width: 500,
-  height: 500
+  ]
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
   model: ElGrapho.layouts.Cluster(model),
-  arrows: true
+  arrows: true,
+  width: 500,
+  height: 500
 });
 ```
 
@@ -272,14 +278,14 @@ let model = {
     {from: 1, to: 4},
     {from: 2, to: 5},
     {from: 2, to: 6}
-  ],
-  width: 500,
-  height: 500
+  ]
 };
 
 let graph = new ElGrapho({
   container: document.getElementById('container'),
-  model: ElGrapho.layouts.Chord(model)
+  model: ElGrapho.layouts.Chord(model),
+  width: 500,
+  height: 500
 });
 ```
 
@@ -319,6 +325,8 @@ graph.tooltipTemplate = function(index, el) {
 
 This means that your tooltips can be anything!  You can show lots of information about the node, insert images, etc.  The tooltip template is decoupled from the El Grapho config in order to ensure that the config is serializable and thus transferable over http.
 
+To disable tooltips entirely, you can set the ```tooltips``` property to false in the graph config.
+
 ## Events
 
 El Grapho also has a built in event bus.  Currently, the supported events are:
@@ -345,8 +353,10 @@ graph.on('node-mouseover', function(evt) {
 ## Methods
 
 * ```graph.selectGroup(groupIndex)``` - select a group by groupIndex, which is an integer
+
 * ```graph.deselectGroup()``` - deselect the currently selected group
 
+* ```graph.setSize(width, height)``` - set the graph size in pixels
 
 ## About the Name and Logo
 
