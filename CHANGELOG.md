@@ -2,8 +2,12 @@
 
 ## v2.3.0
 * new edgeSize property
+* default edgeSize has been changed from 0.5 to 0.25
+* new setSize() method to resize a graph
+* width and height properties moved from model to the root level of the config
 * tooltips:false to disable tooltips
 * now supporting usecases where some nodes have labels and some nodes do not
+* fixed several tooltip hide/show issues
 
 ## v2.2.1
 * oops, mobile devices don't support webgl2 yet.  Rolled back to webgl
