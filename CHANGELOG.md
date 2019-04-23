@@ -1,5 +1,8 @@
 # Changlog
 
+## v2.3.1
+* fixed concretejs pixel ratio issue
+
 ## v2.3.0
 * new edgeSize property
 * default edgeSize has been changed from 0.5 to 0.25

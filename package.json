@@ -1,6 +1,6 @@
 {
   "name": "elgrapho",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "main": "engine/dist/ElGrapho.min.js",
   "author": "Eric Rowell",
   "license": "MIT",
@@ -34,7 +34,7 @@
     "lodash": "^4.17.10",
     "node-sass": "^4.9.0",
     "gl-matrix": "^2.6.1",
-    "concretejs": "^3.0.4",
+    "concretejs": "^3.0.5",
     "d3-force": "^2.0.1"
   },
   "watch": {
