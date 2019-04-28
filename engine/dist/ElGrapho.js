@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.3.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 04-22-2019
+ * Release Date: 04-28-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -413,6 +413,32 @@ module.exports = `
 
 /***/ }),
 
+/***/ "./engine/dist/shaders/hitPoint.frag.js":
+/*!**********************************************!*\
+  !*** ./engine/dist/shaders/hitPoint.frag.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `//#version 300 es
+
+//https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+precision mediump float;
+varying vec4 vVertexColor;
+
+void main(void) {
+  float r = 0.0, delta = 0.0, alpha = 1.0;
+  vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+  r = dot(cxy, cxy);
+  if (r > 1.0) {
+    discard;
+  }
+
+  gl_FragColor = vVertexColor * alpha;
+}`;
+
+/***/ }),
+
 /***/ "./engine/dist/shaders/hitPoint.vert.js":
 /*!**********************************************!*\
   !*** ./engine/dist/shaders/hitPoint.vert.js ***!
@@ -487,16 +513,9 @@ void main(void) {
   float r = 0.0, delta = 0.0, alpha = 1.0;
   vec2 cxy = 2.0 * gl_PointCoord - 1.0;
   r = dot(cxy, cxy);
-
   if (r > 1.0) {
     discard;
   }
-
-  // delta = fwidth(r);
-  // alpha = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);
-
-
-
 
   gl_FragColor = vVertexColor * alpha;
 }`;
@@ -609,16 +628,20 @@ void main() {
 
 /***/ }),
 
-/***/ "./engine/dist/shaders/pointHit.frag.js":
-/*!**********************************************!*\
-  !*** ./engine/dist/shaders/pointHit.frag.js ***!
-  \**********************************************/
+/***/ "./engine/dist/shaders/pointStroke.frag.js":
+/*!*************************************************!*\
+  !*** ./engine/dist/shaders/pointStroke.frag.js ***!
+  \*************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
 module.exports = `//#version 300 es
 
 //https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+//#extension GL_OES_standard_derivatives : enable
+
+// https://www.desultoryquest.com/blog/drawing-anti-aliased-circular-points-using-opengl-slash-webgl/
+// https://www.desultoryquest.com/blog/downloads/code/points.js
 precision mediump float;
 varying vec4 vVertexColor;
 
@@ -689,6 +712,161 @@ void main() {
 
   
 
+}`;
+
+/***/ }),
+
+/***/ "./engine/dist/shaders/quad.frag.js":
+/*!******************************************!*\
+  !*** ./engine/dist/shaders/quad.frag.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `//#version 300 es
+
+// use lowp for solid colors to improve perf
+// https://stackoverflow.com/questions/13780609/what-does-precision-mediump-float-mean
+precision mediump float;
+varying vec4 vVertexColor;
+
+void main(void) {
+  gl_FragColor = vVertexColor;
+}`;
+
+/***/ }),
+
+/***/ "./engine/dist/shaders/quad.vert.js":
+/*!******************************************!*\
+  !*** ./engine/dist/shaders/quad.vert.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = `//#version 300 es
+
+
+// globals
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform bool magicZoom;
+uniform float nodeSize; // 0 - 1
+uniform float focusedGroup;
+uniform float edgeSize; // 0 - 1
+uniform float zoom;
+
+attribute vec2 start;
+attribute vec2 end;
+attribute vec2 control;
+attribute float group;
+
+const float MAX_NODE_SIZE = 16.0;
+const float PI = 3.1415926535897932384626433832795;
+const float subdivisions = 10.0;
+const float thickness = 5.0;
+
+varying vec4 vVertexColor;
+varying vec2 vCoord;
+
+//https://observablehq.com/@mattdesl/2d-quadratic-curves-on-the-gpu
+vec3 sample (float t) {
+  // We can also adjust the per-vertex curve thickness by modifying this 0..1 number
+  float volume = 1.0;
+
+  // Try replacing the above with:
+  // float volume = 1.0 * sin(t * PI);
+
+  // Solve the quadratic curve with the start, control and end points:
+  float dt = (1.0 - t);
+  float dtSq = dt * dt;
+  float tSq = t * t;
+  float x = dtSq * start.x + 2.0 * dt * t * control.x + tSq * end.x;
+  float y = dtSq * start.y + 2.0 * dt * t * control.y + tSq * end.y;
+  return vec3(x, y, volume);
+
+  // Alternatively, you can replace the above with a linear mix() operation
+  // This will produce a straight line between the start and end points
+  // return vec3(mix(start, end, t), volume);
+}
+
+void main() {
+
+  // Get the "arc length" in 0..1 space
+  float arclen = (position.x * 0.5 + 0.5);
+
+  // How far to offset the line thickness for this vertex in -1..1 space
+  float extrusion = position.y;
+
+  // Find next sample along curve
+  float nextArclen = arclen + (1.0 / subdivisions);
+
+  // Sample the curve in two places
+  // XY is the 2D position, and the Z component is the thickness at that vertex
+  vec3 current = sample(arclen);
+  vec3 next = sample(nextArclen);
+
+  // Now find the 2D perpendicular to form our line segment
+  vec2 direction = normalize(next.xy - current.xy);
+  vec2 perpendicular = vec2(-direction.y, direction.x);
+
+  // Extrude
+  float computedExtrusion = extrusion * (thickness / 2.0) * current.z;
+  vec3 offset = current.xyz + vec3(perpendicular.xy, 0.0) * computedExtrusion;
+
+  // Compute final position
+  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(offset.xyz, 1.0);
+
+  // Pass along the coordinates for texturing/effects
+  vCoord = position.xy;
+
+
+
+
+
+
+
+
+  
+  bool isGray;
+
+  if (focusedGroup == -1.0 || group == focusedGroup) {
+    isGray = false;
+    gl_Position.z = -0.3;
+  }
+  else {
+    isGray = true;
+    gl_Position.z = 0.0;
+  }
+
+  float validColor = mod(group, 8.0);
+
+  if (isGray) {
+    vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, 1.0); 
+  }
+  else if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
+  }
+  else if (validColor == 1.0) {
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
+  }
+  else if (validColor == 2.0) {
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
+  }
+  else if (validColor == 3.0) {
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
+  }
+  else if (validColor == 4.0) {
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
+  }
+  else if (validColor == 5.0) {
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
+  }
+  else if (validColor == 6.0) {
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
+  }
+  else if (validColor == 7.0) {
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
+  }
 }`;
 
 /***/ }),
@@ -1998,19 +2176,19 @@ module.exports = UUID;
 /***/ (function(module, exports, __webpack_require__) {
 
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
-const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
-const vec2 = glMatrix.vec2;
+//const glMatrix = require('gl-matrix');
+//const vec2 = glMatrix.vec2;
 //const MAX_NODE_SIZE = 16;
-const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
+//const ARROW_WIDTH_MULTIPLIER = 4; // edge width times this number equals arrow width
  
 const VertexBridge = {
-  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model, showArrows) {
+  modelToVertices: Profiler('VertexBridges.modelToVertices', function(model/*, showArrows*/) {
     let nodes = model.nodes;
     let edges = model.edges;
-    let positions = new Float32Array(nodes.length*2);
+    let pointPositions = new Float32Array(nodes.length*2);
     //let halfWidth = width/2;
     //let halfHeight = height/2;
-    let colors = new Float32Array(nodes.length);
+    let pointColors = new Float32Array(nodes.length);
 
     
     let positionCounter = 0;
@@ -2019,24 +2197,34 @@ const VertexBridge = {
       //node.x *= halfWidth;
       //node.y *= halfHeight;
 
-      positions[positionCounter++] = node.x;
-      positions[positionCounter++] = node.y;
+      pointPositions[positionCounter++] = node.x;
+      pointPositions[positionCounter++] = node.y;
 
-      colors[n] = node.group;
+      pointColors[n] = node.group;
     });
 
 
     // one edge is defined by two elements (from and to).  each edge requires 2 triangles.  Each triangle has 3 positions, with an x and y for each
     let numEdges = edges.length;
-    let numArrows = showArrows ? numEdges : 0;
+    //let numArrows = showArrows ? numEdges : 0;
 
-    let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
-    let triangleNormals = new Float32Array(numEdges * 12 + numArrows * 6);
-    let triangleColors = new Float32Array(numEdges * 6 + numArrows * 6);
+    // let trianglePositions = new Float32Array(numEdges * 12 + numArrows * 6);
+    // let triangleNormals = new Float32Array(numEdges * 12 + numArrows * 6);
+    // let triangleColors = new Float32Array(numEdges * 6 + numArrows * 6);
 
-    let trianglePositionsIndex = 0;
-    let triangleNormalsIndex = 0;
-    let triangleColorsIndex = 0;
+    // let trianglePositionsIndex = 0;
+    // let triangleNormalsIndex = 0;
+    // let triangleColorsIndex = 0;
+
+    let quadStarts = new Float32Array(numEdges * 2);
+    let quadControls = new Float32Array(numEdges * 2);
+    let quadEnds = new Float32Array(numEdges * 2);
+    let quadGroups = new Float32Array(numEdges);
+
+    let startCounter = 0;
+    let endCounter = 0;
+    let controlCounter = 0;
+    let groupCounter = 0;
 
     for (let n=0; n<numEdges; n++) {
       let pointIndex0 = edges[n].from;
@@ -2046,93 +2234,116 @@ const VertexBridge = {
       let x1 = nodes[pointIndex1].x;
       let y0 = nodes[pointIndex0].y;
       let y1 = nodes[pointIndex1].y;
-      let vectorX = x1 - x0;
-      let vectorY = y1 - y0;
-      let vector = vec2.fromValues(vectorX, vectorY);
-      let normalizedVector = vec2.normalize(vec2.create(), vector);
-      let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
-      let offsetVector = perpVector; // vec2.scale(vec2.create(), perpVector, normalDistance);
-      let xOffset = -1 * offsetVector[0];
-      let yOffset = offsetVector[1];
+      let controlX = 0;
+      let controlY = 0;
 
-      let arrowVector = vec2.scale(vec2.create(), normalizedVector, 16);
-      let arrowOffsetX = arrowVector[0];
-      let arrowOffsetY = arrowVector[1];
+      quadStarts[startCounter++] = x0;
+      quadStarts[startCounter++] = y0;
 
-      let color0 = colors[pointIndex0];
-      let color1 = colors[pointIndex1];
+      quadEnds[endCounter++] = x1;
+      quadEnds[endCounter++] = y1;
+
+      quadControls[controlCounter++] = controlX;
+      quadControls[controlCounter++] = controlY;
+
+      quadGroups[groupCounter++] = 0;
+
+ 
+
+
+      // let vectorX = x1 - x0;
+      // let vectorY = y1 - y0;
+      // let vector = vec2.fromValues(vectorX, vectorY);
+      // let normalizedVector = vec2.normalize(vec2.create(), vector);
+      // let perpVector = vec2.rotate(vec2.create(), normalizedVector, vec2.create(), Math.PI/2);
+      // let offsetVector = perpVector; // vec2.scale(vec2.create(), perpVector, normalDistance);
+      // let xOffset = -1 * offsetVector[0];
+      // let yOffset = offsetVector[1];
+
+      // let arrowVector = vec2.scale(vec2.create(), normalizedVector, 16);
+      // let arrowOffsetX = arrowVector[0];
+      // let arrowOffsetY = arrowVector[1];
+
+      // let color0 = colors[pointIndex0];
+      // let color1 = colors[pointIndex1];
  
       // first triangle of line
-      trianglePositions[trianglePositionsIndex++] = x0;
-      trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = color0;
+      // trianglePositions[trianglePositionsIndex++] = x0;
+      // trianglePositions[trianglePositionsIndex++] = y0;
+      // triangleNormals[triangleNormalsIndex++] = xOffset * -1;
+      // triangleNormals[triangleNormalsIndex++] = yOffset;
+      // triangleColors[triangleColorsIndex++] = color0;
 
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = color1;
+      // trianglePositions[trianglePositionsIndex++] = x1;
+      // trianglePositions[trianglePositionsIndex++] = y1;
+      // triangleNormals[triangleNormalsIndex++] = xOffset * -1;
+      // triangleNormals[triangleNormalsIndex++] = yOffset;
+      // triangleColors[triangleColorsIndex++] = color1;
 
-      trianglePositions[trianglePositionsIndex++] = x0;
-      trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset;
-      triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = color0;
+      // trianglePositions[trianglePositionsIndex++] = x0;
+      // trianglePositions[trianglePositionsIndex++] = y0;
+      // triangleNormals[triangleNormalsIndex++] = xOffset;
+      // triangleNormals[triangleNormalsIndex++] = yOffset * -1;
+      // triangleColors[triangleColorsIndex++] = color0;
 
-      // second triangle of line
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset;
-      triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = color1;
+      // // second triangle of line
+      // trianglePositions[trianglePositionsIndex++] = x1;
+      // trianglePositions[trianglePositionsIndex++] = y1;
+      // triangleNormals[triangleNormalsIndex++] = xOffset;
+      // triangleNormals[triangleNormalsIndex++] = yOffset * -1;
+      // triangleColors[triangleColorsIndex++] = color1;
 
-      trianglePositions[trianglePositionsIndex++] = x0;
-      trianglePositions[trianglePositionsIndex++] = y0;
-      triangleNormals[triangleNormalsIndex++] = xOffset;
-      triangleNormals[triangleNormalsIndex++] = yOffset * -1;
-      triangleColors[triangleColorsIndex++] = color0;
+      // trianglePositions[trianglePositionsIndex++] = x0;
+      // trianglePositions[trianglePositionsIndex++] = y0;
+      // triangleNormals[triangleNormalsIndex++] = xOffset;
+      // triangleNormals[triangleNormalsIndex++] = yOffset * -1;
+      // triangleColors[triangleColorsIndex++] = color0;
 
-      trianglePositions[trianglePositionsIndex++] = x1;
-      trianglePositions[trianglePositionsIndex++] = y1;
-      triangleNormals[triangleNormalsIndex++] = xOffset * -1;
-      triangleNormals[triangleNormalsIndex++] = yOffset;
-      triangleColors[triangleColorsIndex++] = color1;
+      // trianglePositions[trianglePositionsIndex++] = x1;
+      // trianglePositions[trianglePositionsIndex++] = y1;
+      // triangleNormals[triangleNormalsIndex++] = xOffset * -1;
+      // triangleNormals[triangleNormalsIndex++] = yOffset;
+      // triangleColors[triangleColorsIndex++] = color1;
 
 
-      if (showArrows) {
-        // triangle for arrow
-        trianglePositions[trianglePositionsIndex++] = x1;
-        trianglePositions[trianglePositionsIndex++] = y1;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleNormals[triangleNormalsIndex++] = 0;
-        triangleColors[triangleColorsIndex++] = color1;
+      // if (showArrows) {
+      //   // triangle for arrow
+      //   trianglePositions[trianglePositionsIndex++] = x1;
+      //   trianglePositions[trianglePositionsIndex++] = y1;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleNormals[triangleNormalsIndex++] = 0;
+      //   triangleColors[triangleColorsIndex++] = color1;
 
-        trianglePositions[trianglePositionsIndex++] = x1;
-        trianglePositions[trianglePositionsIndex++] = y1;
-        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
-        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = color1;
+      //   trianglePositions[trianglePositionsIndex++] = x1;
+      //   trianglePositions[trianglePositionsIndex++] = y1;
+      //   triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * ARROW_WIDTH_MULTIPLIER;
+      //   triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+      //   triangleColors[triangleColorsIndex++] = color1;
 
-        trianglePositions[trianglePositionsIndex++] = x1;
-        trianglePositions[trianglePositionsIndex++] = y1;
-        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
-        triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
-        triangleColors[triangleColorsIndex++] = color1;
-      }
+      //   trianglePositions[trianglePositionsIndex++] = x1;
+      //   trianglePositions[trianglePositionsIndex++] = y1;
+      //   triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetX + xOffset * -1 * ARROW_WIDTH_MULTIPLIER;
+      //   triangleNormals[triangleNormalsIndex++] = -1 * arrowOffsetY + yOffset * ARROW_WIDTH_MULTIPLIER;
+      //   triangleColors[triangleColorsIndex++] = color1;
+      // }
     }
 
     return {
       points: {
-        positions: positions,
-        colors: colors
+        positions: pointPositions,
+        colors: pointColors
       },
-      triangles: {
-        positions: trianglePositions,
-        normals: triangleNormals,
-        colors: triangleColors
+      quads: {
+        starts: quadStarts,
+        ends: quadEnds,
+        controls: quadControls,
+        groups: quadGroups
       }
+      // triangles: {
+      //   positions: trianglePositions,
+      //   normals: triangleNormals,
+      //   colors: triangleColors
+      // }
     };
   })
 };
@@ -2155,13 +2366,22 @@ module.exports = VertexBridge;
 const glMatrix = __webpack_require__(/*! gl-matrix */ "./node_modules/gl-matrix/lib/gl-matrix.js");
 const mat4 = glMatrix.mat4;
 const Concrete = __webpack_require__(/*! concretejs */ "./node_modules/concretejs/build/concrete.min.js");
+
 const pointVert = __webpack_require__(/*! ../dist/shaders/point.vert */ "./engine/dist/shaders/point.vert.js");
+const pointFrag = __webpack_require__(/*! ../dist/shaders/point.frag */ "./engine/dist/shaders/point.frag.js");
+
 const pointStrokeVert = __webpack_require__(/*! ../dist/shaders/pointStroke.vert */ "./engine/dist/shaders/pointStroke.vert.js");
+const pointStrokeFrag = __webpack_require__(/*! ../dist/shaders/pointStroke.frag */ "./engine/dist/shaders/pointStroke.frag.js");
+
 const hitPointVert = __webpack_require__(/*! ../dist/shaders/hitPoint.vert */ "./engine/dist/shaders/hitPoint.vert.js");
+const hitPointFrag = __webpack_require__(/*! ../dist/shaders/hitPoint.frag */ "./engine/dist/shaders/hitPoint.frag.js");
+
 const triangleVert = __webpack_require__(/*! ../dist/shaders/triangle.vert */ "./engine/dist/shaders/triangle.vert.js");
 const triangleFrag = __webpack_require__(/*! ../dist/shaders/triangle.frag */ "./engine/dist/shaders/triangle.frag.js");
-const pointFrag = __webpack_require__(/*! ../dist/shaders/point.frag */ "./engine/dist/shaders/point.frag.js");
-const pointHitFrag = __webpack_require__(/*! ../dist/shaders/pointHit.frag */ "./engine/dist/shaders/pointHit.frag.js");
+
+const quadVert = __webpack_require__(/*! ../dist/shaders/quad.vert */ "./engine/dist/shaders/quad.vert.js");
+const quadFrag = __webpack_require__(/*! ../dist/shaders/quad.frag */ "./engine/dist/shaders/quad.frag.js");
+
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 
 let WebGL = function(config) {
@@ -2228,7 +2448,7 @@ WebGL.prototype = {
   getPointStrokeShaderProgram: function() {
     let gl = this.layer.scene.context;
     let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
-    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointStrokeFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -2262,7 +2482,7 @@ WebGL.prototype = {
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
-    let fragmentShader = this.getShader('fragment', pointHitFrag, gl);
+    let fragmentShader = this.getShader('fragment', hitPointFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -2332,6 +2552,48 @@ WebGL.prototype = {
     return shaderProgram;
   },
 
+
+  getQuadShaderProgram: function() {
+    let gl = this.layer.scene.context;
+    let vertexShader = this.getShader('vertex', quadVert, gl);
+    let fragmentShader = this.getShader('fragment', quadFrag, gl);
+    let shaderProgram = gl.createProgram();
+
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Could not initialise shaders');
+    }
+
+    gl.useProgram(shaderProgram);
+
+    // attribute variables per data point
+    shaderProgram.startAttribute = gl.getAttribLocation(shaderProgram, 'start');
+    gl.enableVertexAttribArray(shaderProgram.startAttribute);
+
+    shaderProgram.endAttribute = gl.getAttribLocation(shaderProgram, 'end');
+    gl.enableVertexAttribArray(shaderProgram.endAttribute);
+
+    shaderProgram.controlAttribute = gl.getAttribLocation(shaderProgram, 'control');
+    gl.enableVertexAttribArray(shaderProgram.controlAttribute);
+
+    shaderProgram.groupAttribute = gl.getAttribLocation(shaderProgram, 'group');
+    gl.enableVertexAttribArray(shaderProgram.groupAttribute);
+
+    // uniform constants for all data points
+    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+
+    return shaderProgram;
+  },
+
   createIndices: function(size) {
     let arr = new Float32Array(size);
     arr.forEach(function(index, n) {
@@ -2362,6 +2624,15 @@ WebGL.prototype = {
         normals: this.createBuffer(vertices.triangles.normals, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.triangles.colors, 1, this.layer.scene.context)
       };
+    }
+
+    if (vertices.quads) {
+      this.buffers.quads = {
+        starts: this.createBuffer(vertices.quads.starts, 2, this.layer.scene.context),
+        ends: this.createBuffer(vertices.quads.ends, 2, this.layer.scene.context),
+        controls: this.createBuffer(vertices.quads.controls, 2, this.layer.scene.context),
+        groups: this.createBuffer(vertices.quads.groups, 1, this.layer.scene.context)
+      }; 
     }
   }),
   createBuffer: function(vertices, itemSize, gl) {
@@ -2436,6 +2707,30 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
+  drawSceneQuads: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom) {
+    let layer = this.layer;
+    let gl = layer.scene.context;
+    let shaderProgram = this.getQuadShaderProgram();
+    let buffers = this.buffers.quads;
+ 
+    gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
+    gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.edgeSize, edgeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
+    gl.uniform1f(shaderProgram.zoom, zoom);
+
+    this.bindBuffer(buffers.starts, shaderProgram.startAttribute, gl);
+    this.bindBuffer(buffers.ends, shaderProgram.endAttribute, gl);
+    this.bindBuffer(buffers.controls, shaderProgram.controlAttribute, gl);
+    this.bindBuffer(buffers.groups, shaderProgram.groupAttribute, gl);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
+    gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
+  },
   drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
@@ -2474,6 +2769,10 @@ WebGL.prototype = {
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
+
+    if (this.buffers.quads) {
+       this.drawSceneQuads(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);
+    }
 
     if (this.buffers.triangles) {
       this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);

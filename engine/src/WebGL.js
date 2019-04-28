@@ -1,13 +1,22 @@
 const glMatrix = require('gl-matrix');
 const mat4 = glMatrix.mat4;
 const Concrete = require('concretejs');
+
 const pointVert = require('../dist/shaders/point.vert');
+const pointFrag = require('../dist/shaders/point.frag');
+
 const pointStrokeVert = require('../dist/shaders/pointStroke.vert');
+const pointStrokeFrag = require('../dist/shaders/pointStroke.frag');
+
 const hitPointVert = require('../dist/shaders/hitPoint.vert');
+const hitPointFrag = require('../dist/shaders/hitPoint.frag');
+
 const triangleVert = require('../dist/shaders/triangle.vert');
 const triangleFrag = require('../dist/shaders/triangle.frag');
-const pointFrag = require('../dist/shaders/point.frag');
-const pointHitFrag = require('../dist/shaders/pointHit.frag');
+
+const quadVert = require('../dist/shaders/quad.vert');
+const quadFrag = require('../dist/shaders/quad.frag');
+
 const Profiler = require('./Profiler');
 
 let WebGL = function(config) {
@@ -74,7 +83,7 @@ WebGL.prototype = {
   getPointStrokeShaderProgram: function() {
     let gl = this.layer.scene.context;
     let vertexShader = this.getShader('vertex', pointStrokeVert, gl);
-    let fragmentShader = this.getShader('fragment', pointFrag, gl);
+    let fragmentShader = this.getShader('fragment', pointStrokeFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -108,7 +117,7 @@ WebGL.prototype = {
   getHitPointShaderProgram: function() {
     let gl = this.layer.hit.context;
     let vertexShader = this.getShader('vertex', hitPointVert, gl);
-    let fragmentShader = this.getShader('fragment', pointHitFrag, gl);
+    let fragmentShader = this.getShader('fragment', hitPointFrag, gl);
     let shaderProgram = gl.createProgram();
 
     gl.attachShader(shaderProgram, vertexShader);
@@ -178,6 +187,48 @@ WebGL.prototype = {
     return shaderProgram;
   },
 
+
+  getQuadShaderProgram: function() {
+    let gl = this.layer.scene.context;
+    let vertexShader = this.getShader('vertex', quadVert, gl);
+    let fragmentShader = this.getShader('fragment', quadFrag, gl);
+    let shaderProgram = gl.createProgram();
+
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Could not initialise shaders');
+    }
+
+    gl.useProgram(shaderProgram);
+
+    // attribute variables per data point
+    shaderProgram.startAttribute = gl.getAttribLocation(shaderProgram, 'start');
+    gl.enableVertexAttribArray(shaderProgram.startAttribute);
+
+    shaderProgram.endAttribute = gl.getAttribLocation(shaderProgram, 'end');
+    gl.enableVertexAttribArray(shaderProgram.endAttribute);
+
+    shaderProgram.controlAttribute = gl.getAttribLocation(shaderProgram, 'control');
+    gl.enableVertexAttribArray(shaderProgram.controlAttribute);
+
+    shaderProgram.groupAttribute = gl.getAttribLocation(shaderProgram, 'group');
+    gl.enableVertexAttribArray(shaderProgram.groupAttribute);
+
+    // uniform constants for all data points
+    shaderProgram.projectionMatrixUniform = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    shaderProgram.modelViewMatrixUniform = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    shaderProgram.magicZoom = gl.getUniformLocation(shaderProgram, 'magicZoom');
+    shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
+    shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
+    shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
+    shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+
+    return shaderProgram;
+  },
+
   createIndices: function(size) {
     let arr = new Float32Array(size);
     arr.forEach(function(index, n) {
@@ -208,6 +259,15 @@ WebGL.prototype = {
         normals: this.createBuffer(vertices.triangles.normals, 2, this.layer.scene.context),
         colors: this.createBuffer(vertices.triangles.colors, 1, this.layer.scene.context)
       };
+    }
+
+    if (vertices.quads) {
+      this.buffers.quads = {
+        starts: this.createBuffer(vertices.quads.starts, 2, this.layer.scene.context),
+        ends: this.createBuffer(vertices.quads.ends, 2, this.layer.scene.context),
+        controls: this.createBuffer(vertices.quads.controls, 2, this.layer.scene.context),
+        groups: this.createBuffer(vertices.quads.groups, 1, this.layer.scene.context)
+      }; 
     }
   }),
   createBuffer: function(vertices, itemSize, gl) {
@@ -282,6 +342,30 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
+  drawSceneQuads: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom) {
+    let layer = this.layer;
+    let gl = layer.scene.context;
+    let shaderProgram = this.getQuadShaderProgram();
+    let buffers = this.buffers.quads;
+ 
+    gl.uniformMatrix4fv(shaderProgram.projectionMatrixUniform, false, projectionMatrix);
+    gl.uniformMatrix4fv(shaderProgram.modelViewMatrixUniform, false, modelViewMatrix);
+    gl.uniform1i(shaderProgram.magicZoom, magicZoom);
+    gl.uniform1f(shaderProgram.nodeSize, nodeSize);
+    gl.uniform1f(shaderProgram.edgeSize, edgeSize);
+    gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
+    gl.uniform1f(shaderProgram.zoom, zoom);
+
+    this.bindBuffer(buffers.starts, shaderProgram.startAttribute, gl);
+    this.bindBuffer(buffers.ends, shaderProgram.endAttribute, gl);
+    this.bindBuffer(buffers.controls, shaderProgram.controlAttribute, gl);
+    this.bindBuffer(buffers.groups, shaderProgram.groupAttribute, gl);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
+    gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
+  },
   drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
     let layer = this.layer;
     let gl = layer.scene.context;
@@ -320,6 +404,10 @@ WebGL.prototype = {
     mat4.scale(modelViewMatrix, modelViewMatrix, [zoomX, zoomY, 1]);
 
     //console.log(modelViewMatrix);
+
+    if (this.buffers.quads) {
+       this.drawSceneQuads(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);
+    }
 
     if (this.buffers.triangles) {
       this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);
