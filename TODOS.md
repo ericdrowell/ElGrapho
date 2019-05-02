@@ -11,8 +11,11 @@
 * node events should include x,y mouse position, or at least mouse event object
 * new optional color attribute to decouple from grouping
 * enable animating between models (mostly for marketing reasons)
+  * to do this, would have to compute the start and end points for each point, re upload the vertices to the GPU, and then would have smooth animations
+  * because the shaders would interpolate between the two points based on a time t
 * new chart controls - expand/shrink along x or y
 * refactor color implementation in shaders
+* chords should have spacing between groups
 
 ## P1
 * mobile friendly (pinch to zoom)
