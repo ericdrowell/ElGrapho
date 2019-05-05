@@ -12,43 +12,13 @@
 
   &.el-grapho-select-interaction-mode {
     cursor: default;
-
-    .el-grapho-controls {
-      .el-grapho-select-control {
-        border-color: #119fe0;
-
-        path, polygon {
-          fill: #119fe0;
-        }
-      }
-    }
   }
 
   &.el-grapho-pan-interaction-mode {
     cursor: move;
-
-    .el-grapho-controls {
-      .el-grapho-pan-control {
-        border-color: #119fe0;
-
-        path, polygon {
-          fill: #119fe0;
-        }
-      }
-    }
   }
 
   &.el-grapho-box-zoom-interaction-mode {
     cursor: zoom-in;
-
-    .el-grapho-controls {
-      .el-grapho-box-zoom-control {
-        border-color: #119fe0;
-
-        path, polygon {
-          fill: #119fe0;
-        }
-      }
-    }
   }
 }

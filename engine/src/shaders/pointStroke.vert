@@ -10,6 +10,7 @@ uniform float nodeSize;
 uniform float focusedGroup;
 uniform int hoverNode;
 uniform float zoom;
+uniform bool darkMode;
 
 varying vec4 vVertexColor;
 
@@ -40,7 +41,14 @@ void main() {
   //   vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
   // }
   // else {
-  vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+
+  if (darkMode) {
+    vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
+  }
+  else {
+    vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+  }
+  
   //}
 
   

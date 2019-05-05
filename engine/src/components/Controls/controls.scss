@@ -23,3 +23,61 @@
 .el-grapho-wrapper:hover .el-grapho-controls {
   opacity: 1;
 }
+
+.el-grapho-wrapper.el-grapho-dark-mode .el-grapho-controls {
+  button {
+    background: black;
+    border-color: white;
+    color: white;
+    border-color: #aaa;
+
+    path, polygon, rect {
+      fill: white;
+    }
+  }
+}
+
+.el-grapho-wrapper.el-grapho-select-interaction-mode {
+  cursor: default;
+
+  .el-grapho-controls {
+    .el-grapho-select-control {
+      border-color: #119fe0;
+
+      path, polygon {
+        fill: #119fe0;
+      }
+    }
+  }
+}
+
+.el-grapho-wrapper.el-grapho-pan-interaction-mode {
+  cursor: move;
+
+  .el-grapho-controls {
+    .el-grapho-pan-control {
+      border-color: #119fe0;
+
+      path, polygon {
+        fill: #119fe0;
+      }
+    }
+  }
+}
+
+.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode {
+  cursor: zoom-in;
+
+  .el-grapho-controls {
+    .el-grapho-box-zoom-control {
+      border-color: #119fe0;
+
+      path, polygon {
+        fill: #119fe0;
+      }
+    }
+  }
+}
+
+
+

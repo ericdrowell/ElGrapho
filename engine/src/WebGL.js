@@ -101,6 +101,7 @@ WebGL.prototype = {
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.hoverNode = gl.getUniformLocation(shaderProgram, 'hoverNode');
     shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+    shaderProgram.darkMode = gl.getUniformLocation(shaderProgram, 'darkMode');
 
     return shaderProgram;
   },
@@ -240,7 +241,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -253,6 +254,7 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1i(shaderProgram.hoverNode, hoverNode);
     gl.uniform1f(shaderProgram.zoom, zoom);
+    gl.uniform1f(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -282,7 +284,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
+  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let zoom = Math.min(zoomX, zoomY);
@@ -310,7 +312,13 @@ WebGL.prototype = {
 
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
 
-    gl.clearColor(1, 1, 1, 1);
+    if (darkMode) {
+      gl.clearColor(0, 0, 0, 1);
+    }
+    else {
+      gl.clearColor(1, 1, 1, 1);
+    }
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // To disable the background color of the canvas element
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
@@ -326,7 +334,7 @@ WebGL.prototype = {
     }
 
     if (this.buffers.points) {
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode);
       this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom);
     }
   },

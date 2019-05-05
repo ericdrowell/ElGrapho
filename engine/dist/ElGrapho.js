@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.3.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 05-01-2019
+ * Release Date: 05-05-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -565,44 +565,41 @@ void main() {
 
   // gl_VertexID
 
-  bool isGray;
+  float alpha;
 
   if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    isGray = false;
+    alpha = 1.0;
     // must be between -1 and 1
     gl_Position.z = -0.5;
   }
   else {
-    isGray = true;
+    alpha = 0.4;
     gl_Position.z = -0.2;
   }
 
-  if (isGray) {
-    vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, 1.0); 
-  }
-  else if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
+  if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0) * alpha; // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0) * alpha; // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0) * alpha; // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0) * alpha; // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0) * alpha; // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0) * alpha; // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0) * alpha; // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0) * alpha; // DD4477
   }
 
 }`;
@@ -654,6 +651,7 @@ uniform float nodeSize;
 uniform float focusedGroup;
 uniform int hoverNode;
 uniform float zoom;
+uniform bool darkMode;
 
 varying vec4 vVertexColor;
 
@@ -684,7 +682,14 @@ void main() {
   //   vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
   // }
   // else {
-  vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+
+  if (darkMode) {
+    vVertexColor = vec4(0.0, 0.0, 0.0, 1.0); 
+  }
+  else {
+    vVertexColor = vec4(1.0, 1.0, 1.0, 1.0); 
+  }
+  
   //}
 
   
@@ -772,45 +777,42 @@ void main() {
 
   //gl_Position.z = 0.0;
   
-  bool isGray;
+  float alpha;
 
   if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    isGray = false;
+    alpha = 1.0;
     gl_Position.z = -0.3;
   }
   else {
-    isGray = true;
+    alpha = 0.4;
     gl_Position.z = 0.0;
   }
 
   float validColor = mod(aVertexColor, 8.0);
 
-  if (isGray) {
-    vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, 1.0); 
-  }
-  else if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0); // 3366CC
+  if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0) * alpha; // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0); // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0) * alpha; // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0); // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0) * alpha; // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0); // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0) * alpha; // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0); // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0) * alpha; // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0); // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0) * alpha; // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0); // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0) * alpha; // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0); // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0) * alpha; // DD4477
   }
 }`;
 
@@ -823,7 +825,7 @@ void main() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-controls .el-grapho-step-down-control{transform:scale(1,-1)}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}
+module.exports = `.el-grapho-tooltip{position:fixed;background-color:white;pointer-events:none;padding:10px;border:1px solid #333;border-radius:3px;font-family:verdana;font-size:12px;user-select:none}.el-grapho-controls{position:absolute;right:0;top:5px;opacity:0;transition:opacity .3s ease-in-out}.el-grapho-controls button{background:white;padding:5px;cursor:pointer;outline:0;border:2px solid black;border-radius:3px;margin-right:5px}.el-grapho-controls .el-grapho-step-down-control{transform:scale(1,-1)}.el-grapho-wrapper:hover .el-grapho-controls{opacity:1}.el-grapho-wrapper.el-grapho-dark-mode .el-grapho-controls button{background:black;border-color:white;color:white;border-color:#aaa}.el-grapho-wrapper.el-grapho-dark-mode .el-grapho-controls button path,.el-grapho-wrapper.el-grapho-dark-mode .el-grapho-controls button polygon,.el-grapho-wrapper.el-grapho-dark-mode .el-grapho-controls button rect{fill:white}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control path,.el-grapho-wrapper.el-grapho-select-interaction-mode .el-grapho-controls .el-grapho-select-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control path,.el-grapho-wrapper.el-grapho-pan-interaction-mode .el-grapho-controls .el-grapho-pan-control polygon{fill:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control{border-color:#119fe0}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control path,.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode .el-grapho-controls .el-grapho-box-zoom-control polygon{fill:#119fe0}.el-grapho-count{position:absolute;bottom:5px;right:5px;pointer-events:none;font-family:monospace;background-color:white;border-radius:3px;padding:3px;opacity:.9}.el-grapho-count::selection{background:transparent}.el-grapho-wrapper.el-grapho-dark-mode .el-grapho-count{background-color:black;color:white}.el-grapho-box-zoom-component{position:fixed;border:1px solid #119fe0;background-color:rgba(17,159,224,0.1);pointer-events:none}.el-grapho-loading-component{width:100%;height:100%;background-color:rgba(255,255,255,0.9);position:absolute;top:0;opacity:0;transition:opacity .3s ease-in-out;pointer-events:none}.el-grapho-loading .el-grapho-loading-component{opacity:1}.spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.spinner>div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:sk-bouncedelay 1.4s infinite ease-in-out both;animation:sk-bouncedelay 1.4s infinite ease-in-out both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0)}40%{-webkit-transform:scale(1)}}@keyframes sk-bouncedelay{0%,80%,100%{-webkit-transform:scale(0);transform:scale(0)}40%{-webkit-transform:scale(1);transform:scale(1)}}.el-grapho-wrapper{display:inline-block;position:relative;background-color:white;overflow:hidden}.el-grapho-wrapper.el-grapho-select-interaction-mode{cursor:default}.el-grapho-wrapper.el-grapho-pan-interaction-mode{cursor:move}.el-grapho-wrapper.el-grapho-box-zoom-interaction-mode{cursor:zoom-in}
 `;
 
 /***/ }),
@@ -1000,6 +1002,8 @@ ElGrapho.prototype = {
     this.events = new Events();
     this.model = config.model;
 
+    
+
     this.fitToViewport(false);
 
     this.width = config.width || 500;
@@ -1021,6 +1025,7 @@ ElGrapho.prototype = {
     this.container.appendChild(this.wrapper);
     this.animations = config.animations === undefined ? true : config.animations;
     this.setInteractionMode(Enums.interactionMode.SELECT);
+    this.setDarkMode(config.darkMode === undefined ? false : config.darkMode);
     this.panStart = null;
     this.idle = true;
     this.debug = config.debug === undefined ? false : config.debug;
@@ -1199,8 +1204,16 @@ ElGrapho.prototype = {
     
 
     labelsContext.font = '12px Arial';
-    labelsContext.fillStyle = '#333';
-    labelsContext.strokeStyle = 'white';
+
+    if (this.darkMode) {
+      labelsContext.fillStyle = '#eee';
+      labelsContext.strokeStyle = 'black';
+    }
+    else {
+      labelsContext.fillStyle = '#333';
+      labelsContext.strokeStyle = 'white';      
+    }
+
     labelsContext.lineWidth = 3;
     labelsContext.lineJoin = 'round';
 
@@ -1214,6 +1227,14 @@ ElGrapho.prototype = {
 
 
     labelsContext.restore();
+  },
+  setDarkMode(darkMode) {
+    this.darkMode = darkMode;
+
+    this.wrapper.classList.remove('el-grapho-dark-mode');
+    if (darkMode) {
+      this.wrapper.classList.add('el-grapho-dark-mode');
+    }
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
@@ -1521,7 +1542,12 @@ ElGrapho.prototype = {
   // },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;
-    this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
+
+    for (let key in Enums.interactionMode) {
+      this.wrapper.classList.remove('el-grapho-' + Enums.interactionMode[key] + '-interaction-mode');  
+    }
+
+    this.wrapper.classList.add('el-grapho-' + mode + '-interaction-mode');
   },
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
     Tooltip.hide();
@@ -1760,7 +1786,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize);
+        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode);
 
         graph.labelsLayer.scene.clear();
         
@@ -2282,6 +2308,7 @@ WebGL.prototype = {
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.hoverNode = gl.getUniformLocation(shaderProgram, 'hoverNode');
     shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+    shaderProgram.darkMode = gl.getUniformLocation(shaderProgram, 'darkMode');
 
     return shaderProgram;
   },
@@ -2421,7 +2448,7 @@ WebGL.prototype = {
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom) {
+  drawScenePointStrokes: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointStrokeShaderProgram();
@@ -2434,6 +2461,7 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1i(shaderProgram.hoverNode, hoverNode);
     gl.uniform1f(shaderProgram.zoom, zoom);
+    gl.uniform1f(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -2463,7 +2491,7 @@ WebGL.prototype = {
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize) {
+  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let zoom = Math.min(zoomX, zoomY);
@@ -2491,7 +2519,13 @@ WebGL.prototype = {
 
     gl.viewport(0, 0, layer.width*Concrete.PIXEL_RATIO, layer.height*Concrete.PIXEL_RATIO);
 
-    gl.clearColor(1, 1, 1, 1);
+    if (darkMode) {
+      gl.clearColor(0, 0, 0, 1);
+    }
+    else {
+      gl.clearColor(1, 1, 1, 1);
+    }
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // To disable the background color of the canvas element
     mat4.ortho(projectionMatrix, left, right, bottom, top, near, far);
@@ -2507,7 +2541,7 @@ WebGL.prototype = {
     }
 
     if (this.buffers.points) {
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom);
+      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode);
       this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom);
     }
   },

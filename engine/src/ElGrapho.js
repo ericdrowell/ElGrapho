@@ -57,6 +57,8 @@ ElGrapho.prototype = {
     this.events = new Events();
     this.model = config.model;
 
+    
+
     this.fitToViewport(false);
 
     this.width = config.width || 500;
@@ -78,6 +80,7 @@ ElGrapho.prototype = {
     this.container.appendChild(this.wrapper);
     this.animations = config.animations === undefined ? true : config.animations;
     this.setInteractionMode(Enums.interactionMode.SELECT);
+    this.setDarkMode(config.darkMode === undefined ? false : config.darkMode);
     this.panStart = null;
     this.idle = true;
     this.debug = config.debug === undefined ? false : config.debug;
@@ -256,8 +259,16 @@ ElGrapho.prototype = {
     
 
     labelsContext.font = '12px Arial';
-    labelsContext.fillStyle = '#333';
-    labelsContext.strokeStyle = 'white';
+
+    if (this.darkMode) {
+      labelsContext.fillStyle = '#eee';
+      labelsContext.strokeStyle = 'black';
+    }
+    else {
+      labelsContext.fillStyle = '#333';
+      labelsContext.strokeStyle = 'white';      
+    }
+
     labelsContext.lineWidth = 3;
     labelsContext.lineJoin = 'round';
 
@@ -271,6 +282,14 @@ ElGrapho.prototype = {
 
 
     labelsContext.restore();
+  },
+  setDarkMode(darkMode) {
+    this.darkMode = darkMode;
+
+    this.wrapper.classList.remove('el-grapho-dark-mode');
+    if (darkMode) {
+      this.wrapper.classList.add('el-grapho-dark-mode');
+    }
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
@@ -578,7 +597,12 @@ ElGrapho.prototype = {
   // },
   setInteractionMode: function(mode) {
     this.interactionMode = mode;
-    this.wrapper.className = 'el-grapho-wrapper el-grapho-' + mode + '-interaction-mode';
+
+    for (let key in Enums.interactionMode) {
+      this.wrapper.classList.remove('el-grapho-' + Enums.interactionMode[key] + '-interaction-mode');  
+    }
+
+    this.wrapper.classList.add('el-grapho-' + mode + '-interaction-mode');
   },
   zoomToPoint: function(panX, panY, zoomX, zoomY) {
     Tooltip.hide();
