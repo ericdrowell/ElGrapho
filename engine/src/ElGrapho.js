@@ -69,7 +69,8 @@ ElGrapho.prototype = {
     this.focusedGroup = -1;
     this.tooltips = config.tooltips === undefined ? true : config.tooltips;
     this.fillContainer = config.fillContainer === undefined ? false : config.fillContainer;
-    
+    this.globalAlpha = config.globalAlpha === undefined ? 1 : config.globalAlpha;
+    this.nodeOutline = config.nodeOutline === undefined ? true : config.nodeOutline;
     this.animations = [];
     this.wrapper = document.createElement('div');
     this.wrapper.className = 'el-grapho-wrapper';
@@ -290,6 +291,8 @@ ElGrapho.prototype = {
     if (darkMode) {
       this.wrapper.classList.add('el-grapho-dark-mode');
     }
+
+    this.dirty = true;
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();

@@ -11,14 +11,14 @@ const pointHitFrag = require('../dist/shaders/pointHit.frag');
 const Profiler = require('./Profiler');
 
 let WebGL = function(config) {
-  let layer = this.layer = config.layer;
-  let gl = layer.scene.context;
-  let hitGl = layer.hit.context;
+  this.layer = config.layer;
+  //let gl = layer.scene.context;
+  //let hitGl = layer.hit.context;
 
-  gl.enable(gl.DEPTH_TEST);
+  //gl.enable(gl.DEPTH_TEST);
   //gl.enable(gl.BLEND);
 
-  hitGl.enable(hitGl.DEPTH_TEST); 
+  //hitGl.enable(hitGl.DEPTH_TEST); 
 };
 
 WebGL.prototype = {
@@ -66,6 +66,8 @@ WebGL.prototype = {
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+    shaderProgram.globalAlpha = gl.getUniformLocation(shaderProgram, 'globalAlpha');
+    shaderProgram.darkMode = gl.getUniformLocation(shaderProgram, 'darkMode');
     
 
     return shaderProgram;
@@ -175,6 +177,8 @@ WebGL.prototype = {
     shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+    shaderProgram.globalAlpha = gl.getUniformLocation(shaderProgram, 'globalAlpha');
+    shaderProgram.darkMode = gl.getUniformLocation(shaderProgram, 'darkMode');
 
     return shaderProgram;
   },
@@ -223,7 +227,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom, globalAlpha, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -235,6 +239,8 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1f(shaderProgram.zoom, zoom);
+    gl.uniform1f(shaderProgram.globalAlpha, globalAlpha);
+    gl.uniform1i(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -254,14 +260,14 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1i(shaderProgram.hoverNode, hoverNode);
     gl.uniform1f(shaderProgram.zoom, zoom);
-    gl.uniform1f(shaderProgram.darkMode, darkMode);
+    gl.uniform1i(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom, globalAlpha, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -274,17 +280,16 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.edgeSize, edgeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1f(shaderProgram.zoom, zoom);
+    gl.uniform1f(shaderProgram.globalAlpha, globalAlpha);
+    gl.uniform1i(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
-
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize, darkMode) {
+  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize, darkMode, globalAlpha, nodeOutline) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let zoom = Math.min(zoomX, zoomY);
@@ -329,14 +334,32 @@ WebGL.prototype = {
 
     //console.log(modelViewMatrix);
 
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+
+    if (globalAlpha === 1) {
+      gl.enable(gl.DEPTH_TEST);
+    }
+    else {
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    }
+
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom, globalAlpha, darkMode);
     }
 
     if (this.buffers.points) {
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode);
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom);
+
+      if (nodeOutline) {
+        this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode);
+      }
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom, globalAlpha, darkMode);
     }
+
+
+
+
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
   drawHit: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
@@ -384,6 +407,8 @@ WebGL.prototype = {
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
+
+    gl.enable(gl.DEPTH_TEST); 
 
     // TODO: maybe num items should be stored in a different way?
     gl.drawArrays(gl.POINTS, 0, pointBuffers.positions.numItems);

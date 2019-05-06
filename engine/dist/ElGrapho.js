@@ -523,6 +523,8 @@ uniform float nodeSize;
 // TODO: focusedGroup and group should change to int
 uniform float focusedGroup;
 uniform float zoom;
+uniform float globalAlpha; // 0..1
+uniform bool darkMode;
 
 varying vec4 vVertexColor;
 
@@ -565,41 +567,47 @@ void main() {
 
   // gl_VertexID
 
-  float alpha;
+  bool isFocused = focusedGroup == -1.0 || aVertexColor == focusedGroup;
 
-  if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    alpha = 1.0;
+  if (isFocused) {
     // must be between -1 and 1
     gl_Position.z = -0.5;
   }
   else {
-    alpha = 0.4;
     gl_Position.z = -0.2;
   }
 
-  if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0) * alpha; // 3366CC
+  if (!isFocused) {
+    if (darkMode) {
+      vVertexColor = vec4(60.0/255.0, 60.0/255.0, 60.0/255.0, globalAlpha);  
+    }
+    else {
+      vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, globalAlpha);
+    }
+  }
+  else if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, globalAlpha); // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0) * alpha; // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, globalAlpha); // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0) * alpha; // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, globalAlpha); // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0) * alpha; // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, globalAlpha); // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0) * alpha; // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, globalAlpha); // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0) * alpha; // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, globalAlpha); // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0) * alpha; // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, globalAlpha); // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0) * alpha; // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, globalAlpha); // DD4477
   }
 
 }`;
@@ -734,22 +742,24 @@ attribute float aVertexColor;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 uniform bool magicZoom;
-uniform float nodeSize; // 0 - 1
+uniform float nodeSize; // 0..1
 uniform float focusedGroup;
-uniform float edgeSize; // 0 - 1
+uniform float edgeSize; // 0..1
 uniform float zoom;
+uniform float globalAlpha; // 0..1
+uniform bool darkMode;
 
 const float MAX_NODE_SIZE = 16.0;
 const float PI = 3.1415926535897932384626433832795;
 
 varying vec4 vVertexColor;
 
-vec2 rotate(vec2 v, float a) {
-	float s = sin(a);
-	float c = cos(a);
-	mat2 m = mat2(c, -s, s, c);
-	return m * v;
-}
+// vec2 rotate(vec2 v, float a) {
+// 	float s = sin(a);
+// 	float c = cos(a);
+// 	mat2 m = mat2(c, -s, s, c);
+// 	return m * v;
+// }
 
 // https://mattdesl.svbtle.com/drawing-lines-is-hard
 // https://github.com/mattdesl/three-line-2d/blob/master/shaders/basic.js
@@ -777,42 +787,49 @@ void main() {
 
   //gl_Position.z = 0.0;
   
-  float alpha;
 
-  if (focusedGroup == -1.0 || aVertexColor == focusedGroup) {
-    alpha = 1.0;
+  bool isFocused = focusedGroup == -1.0 || aVertexColor == focusedGroup;
+
+  if (isFocused) {
     gl_Position.z = -0.3;
   }
   else {
-    alpha = 0.4;
     gl_Position.z = 0.0;
   }
 
   float validColor = mod(aVertexColor, 8.0);
 
-  if (validColor == 0.0) {
-    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, 1.0) * alpha; // 3366CC
+  if (!isFocused) {
+    if (darkMode) {
+      vVertexColor = vec4(60.0/255.0, 60.0/255.0, 60.0/255.0, globalAlpha);  
+    }
+    else {
+      vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, globalAlpha);
+    }
+  }
+  else if (validColor == 0.0) {
+    vVertexColor = vec4(51.0/255.0, 102.0/255.0, 204.0/255.0, globalAlpha); // 3366CC
   }
   else if (validColor == 1.0) {
-    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, 1.0) * alpha; // DC3912
+    vVertexColor = vec4(220.0/255.0, 57.0/255.0, 18.0/255.0, globalAlpha); // DC3912
   }
   else if (validColor == 2.0) {
-    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, 1.0) * alpha; // FF9900
+    vVertexColor = vec4(255.0/255.0, 153.0/255.0, 0.0/255.0, globalAlpha); // FF9900
   }
   else if (validColor == 3.0) {
-    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, 1.0) * alpha; // 109618
+    vVertexColor = vec4(16.0/255.0, 150.0/255.0, 24.0/255.0, globalAlpha); // 109618
   }
   else if (validColor == 4.0) {
-    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, 1.0) * alpha; // 990099
+    vVertexColor = vec4(153.0/255.0, 0.0/255.0, 153.0/255.0, globalAlpha); // 990099
   }
   else if (validColor == 5.0) {
-    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, 1.0) * alpha; // 3B3EAC
+    vVertexColor = vec4(59.0/255.0, 62.0/255.0, 172.0/255.0, globalAlpha); // 3B3EAC
   }
   else if (validColor == 6.0) {
-    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, 1.0) * alpha; // 0099C6
+    vVertexColor = vec4(0.0/255.0, 153.0/255.0, 198.0/255.0, globalAlpha); // 0099C6
   }
   else if (validColor == 7.0) {
-    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, 1.0) * alpha; // DD4477
+    vVertexColor = vec4(221.0/255.0, 68.0/255.0, 119.0/255.0, globalAlpha); // DD4477
   }
 }`;
 
@@ -1014,7 +1031,8 @@ ElGrapho.prototype = {
     this.focusedGroup = -1;
     this.tooltips = config.tooltips === undefined ? true : config.tooltips;
     this.fillContainer = config.fillContainer === undefined ? false : config.fillContainer;
-    
+    this.globalAlpha = config.globalAlpha === undefined ? 1 : config.globalAlpha;
+    this.nodeOutline = config.nodeOutline === undefined ? true : config.nodeOutline;
     this.animations = [];
     this.wrapper = document.createElement('div');
     this.wrapper.className = 'el-grapho-wrapper';
@@ -1235,6 +1253,8 @@ ElGrapho.prototype = {
     if (darkMode) {
       this.wrapper.classList.add('el-grapho-dark-mode');
     }
+
+    this.dirty = true;
   },
   getMousePosition(evt) {
     let boundingRect = this.wrapper.getBoundingClientRect();
@@ -1786,7 +1806,7 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode);
+        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, graph.globalAlpha, graph.nodeOutline);
 
         graph.labelsLayer.scene.clear();
         
@@ -2218,14 +2238,14 @@ const pointHitFrag = __webpack_require__(/*! ../dist/shaders/pointHit.frag */ ".
 const Profiler = __webpack_require__(/*! ./Profiler */ "./engine/src/Profiler.js");
 
 let WebGL = function(config) {
-  let layer = this.layer = config.layer;
-  let gl = layer.scene.context;
-  let hitGl = layer.hit.context;
+  this.layer = config.layer;
+  //let gl = layer.scene.context;
+  //let hitGl = layer.hit.context;
 
-  gl.enable(gl.DEPTH_TEST);
+  //gl.enable(gl.DEPTH_TEST);
   //gl.enable(gl.BLEND);
 
-  hitGl.enable(hitGl.DEPTH_TEST); 
+  //hitGl.enable(hitGl.DEPTH_TEST); 
 };
 
 WebGL.prototype = {
@@ -2273,6 +2293,8 @@ WebGL.prototype = {
     shaderProgram.nodeSize = gl.getUniformLocation(shaderProgram, 'nodeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+    shaderProgram.globalAlpha = gl.getUniformLocation(shaderProgram, 'globalAlpha');
+    shaderProgram.darkMode = gl.getUniformLocation(shaderProgram, 'darkMode');
     
 
     return shaderProgram;
@@ -2382,6 +2404,8 @@ WebGL.prototype = {
     shaderProgram.edgeSize = gl.getUniformLocation(shaderProgram, 'edgeSize');
     shaderProgram.focusedGroup = gl.getUniformLocation(shaderProgram, 'focusedGroup');
     shaderProgram.zoom = gl.getUniformLocation(shaderProgram, 'zoom');
+    shaderProgram.globalAlpha = gl.getUniformLocation(shaderProgram, 'globalAlpha');
+    shaderProgram.darkMode = gl.getUniformLocation(shaderProgram, 'darkMode');
 
     return shaderProgram;
   },
@@ -2430,7 +2454,7 @@ WebGL.prototype = {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(attribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
   },
-  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom) {
+  drawScenePoints: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom, globalAlpha, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getPointShaderProgram();
@@ -2442,6 +2466,8 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.nodeSize, nodeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1f(shaderProgram.zoom, zoom);
+    gl.uniform1f(shaderProgram.globalAlpha, globalAlpha);
+    gl.uniform1i(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
@@ -2461,14 +2487,14 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1i(shaderProgram.hoverNode, hoverNode);
     gl.uniform1f(shaderProgram.zoom, zoom);
-    gl.uniform1f(shaderProgram.darkMode, darkMode);
+    gl.uniform1i(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
 
     gl.drawArrays(gl.POINTS, 0, buffers.positions.numItems);
   },
-  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom) {
+  drawSceneTriangles: function(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom, globalAlpha, darkMode) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let shaderProgram = this.getTriangleShaderProgram();
@@ -2481,17 +2507,16 @@ WebGL.prototype = {
     gl.uniform1f(shaderProgram.edgeSize, edgeSize);
     gl.uniform1f(shaderProgram.focusedGroup, focusedGroup);
     gl.uniform1f(shaderProgram.zoom, zoom);
+    gl.uniform1f(shaderProgram.globalAlpha, globalAlpha);
+    gl.uniform1i(shaderProgram.darkMode, darkMode);
 
     this.bindBuffer(buffers.positions, shaderProgram.vertexPositionAttribute, gl);
     this.bindBuffer(buffers.normals, shaderProgram.normalsAttribute, gl);
     this.bindBuffer(buffers.colors, shaderProgram.vertexColorAttribute, gl);
-
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     
     gl.drawArrays(gl.TRIANGLES, 0, buffers.positions.numItems);
   },
-  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize, darkMode) {
+  drawScene: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize, focusedGroup, hoverNode, edgeSize, darkMode, globalAlpha, nodeOutline) {
     let layer = this.layer;
     let gl = layer.scene.context;
     let zoom = Math.min(zoomX, zoomY);
@@ -2536,14 +2561,32 @@ WebGL.prototype = {
 
     //console.log(modelViewMatrix);
 
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+
+    if (globalAlpha === 1) {
+      gl.enable(gl.DEPTH_TEST);
+    }
+    else {
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    }
+
     if (this.buffers.triangles) {
-      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom);
+      this.drawSceneTriangles(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, edgeSize, zoom, globalAlpha, darkMode);
     }
 
     if (this.buffers.points) {
-      this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode);
-      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom);
+
+      if (nodeOutline) {
+        this.drawScenePointStrokes(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, hoverNode, zoom, darkMode);
+      }
+      this.drawScenePoints(projectionMatrix, modelViewMatrix, magicZoom, nodeSize, focusedGroup, zoom, globalAlpha, darkMode);
     }
+
+
+
+
   },
   // TODO: need to abstract most of this away because it's copied from drawScene
   drawHit: function(width, height, panX, panY, zoomX, zoomY, magicZoom, nodeSize) {
@@ -2591,6 +2634,8 @@ WebGL.prototype = {
 
     this.bindBuffer(pointBuffers.hitIndices, shaderProgram.vertexIndexAttribute, gl);
     this.bindBuffer(pointBuffers.hitPositions, shaderProgram.vertexPositionAttribute, gl);
+
+    gl.enable(gl.DEPTH_TEST); 
 
     // TODO: maybe num items should be stored in a different way?
     gl.drawArrays(gl.POINTS, 0, pointBuffers.positions.numItems);
