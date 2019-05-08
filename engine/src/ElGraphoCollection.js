@@ -47,6 +47,8 @@ let ElGraphoCollection = {
           graph.hitDirty = true;
         }
         graph.dirty = true; 
+        graph.hoveredDataIndex = -1;
+        graph.hoverDirty = true;
       }
 
       let magicZoom;
@@ -74,17 +76,30 @@ let ElGraphoCollection = {
         }
       }
 
+      let scale = graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1;
+
+      if (graph.hoverDirty) {
+        graph.hoverLayer.scene.clear();
+
+        graph.renderRings(scale);
+      }
+        
+        
+
+
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, graph.globalAlpha, graph.nodeOutline);
 
         graph.labelsLayer.scene.clear();
-        
+
         if (graph.hasLabels) {
-          graph.renderLabels(graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1);
+          graph.renderLabels(scale);
         }
+      }
+
+      if (graph.dirty || graph.hoverDirty) {
         graph.viewport.render(); // render composite
-        graph.dirty = false;
       }
 
       if (graph.hitDirty) {
@@ -92,6 +107,10 @@ let ElGraphoCollection = {
         graph.webgl.drawHit(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.hitDirty = false; 
       }
+
+      graph.dirty = false;
+      graph.hoverDirty = false;
+      graph.hitDirty = false; 
 
       if (idle && !graph.idle) {
         graph.fire(Enums.events.IDLE);

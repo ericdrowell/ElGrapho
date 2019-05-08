@@ -1,9 +1,13 @@
 # Changlog
 
 ## v2.4.0
+* node hover and selected visual treatments
 * new darkMode property
 * new globalAlpha property
 * new setDarkMode() method
+* new nodeOutline property
+* new selectNode() method
+* new deselectNode() method
 
 ## v2.3.1
 * fixed concretejs pixel ratio issue

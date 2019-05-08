@@ -1,7 +1,6 @@
 # TODOS
 
 ## P0
-* optional alpha effect which builds up color intensity when there's lots of overlapping
 * combine pan mode and select mode
 * hook up scroll to zoom
 * remove zoom in and zoom out buttons

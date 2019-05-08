@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.3.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 05-05-2019
+ * Release Date: 05-07-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -1012,6 +1012,7 @@ ElGrapho.prototype = {
     this.id = UUID.generate();
     this.dirty = true;
     this.hitDirty = true;
+    this.hoverDirty = false;
     this.zoomX = START_SCALE;
     this.zoomY = START_SCALE;
     this.panX = 0;
@@ -1055,6 +1056,7 @@ ElGrapho.prototype = {
       el.innerHTML = ElGrapho.NumberFormatter.addCommas(index);
     };
     this.hoveredDataIndex = -1;
+    this.selectedIndex = -1;
 
     // all Listeners we need to call remove for on cleanup
     this.allListeners = [];
@@ -1069,11 +1071,16 @@ ElGrapho.prototype = {
       contextType: 'webgl'
     });
 
+    let hoverLayer = this.hoverLayer = new Concrete.Layer({
+      contextType: '2d'
+    });
+
     let labelsLayer = this.labelsLayer = new Concrete.Layer({
       contextType: '2d'
     });
 
     viewport.add(mainLayer);
+    viewport.add(hoverLayer);
     viewport.add(labelsLayer);
 
 
@@ -1246,6 +1253,83 @@ ElGrapho.prototype = {
 
     labelsContext.restore();
   },
+  renderRings: function(scale) {
+    let hoverIndex = this.hoveredDataIndex;
+    let selectedIndex = this.selectedIndex;
+
+    if (hoverIndex >= 0 || selectedIndex >= 0) {
+      let halfWidth = this.width/2;
+      let halfHeight = this.height/2;
+
+      
+      // render
+      let scene = this.hoverLayer.scene;
+      let context = scene.context;
+
+
+      context.save();
+      context.translate(this.width/2, this.height/2);
+      context.scale(scale, scale);
+      
+
+      let node, x, y;
+
+      // hover ring
+      if (hoverIndex >= 0) {
+        node = this.model.nodes[hoverIndex];
+        x = (node.x * halfWidth * this.zoomX + this.panX) / scale;
+        y = (node.y * -1 * halfHeight * this.zoomY - this.panY) / scale;
+
+        context.save();
+        if (this.darkMode) {
+          //context.fillStyle = 'rgba(255, 255, 255, 0.4)';   
+          context.strokeStyle = 'white';
+        }
+        else {
+          //context.fillStyle = 'rgba(255, 255, 255, 0.4)';      
+          context.strokeStyle = 'black';
+        }
+
+        context.lineWidth = 3;
+        context.beginPath();
+        context.arc(x, y, 6, 0, 2*Math.PI, false);
+        context.stroke();
+        context.restore();
+      }
+
+      // selected ring
+      if (selectedIndex >= 0) {
+        node = this.model.nodes[selectedIndex];
+        x = (node.x * halfWidth * this.zoomX + this.panX) / scale;
+        y = (node.y * -1 * halfHeight * this.zoomY - this.panY) / scale;
+
+        context.save();
+        if (this.darkMode) {
+          context.strokeStyle = 'white';
+        }
+        else {
+          context.strokeStyle = 'black';      
+        }
+
+        context.lineWidth = 5;
+        context.beginPath();
+        context.arc(x, y, 6, 0, 2*Math.PI, false);
+        context.stroke();
+        context.restore();
+      }
+
+
+
+
+
+      
+      
+
+
+      context.restore();
+    }
+    
+  },
   setDarkMode(darkMode) {
     this.darkMode = darkMode;
 
@@ -1416,6 +1500,7 @@ ElGrapho.prototype = {
           }
           
           that.hoveredDataIndex = dataIndex;
+          that.hoverDirty = true;
           //that.dirty = true; 
 
           if (that.hoveredDataIndex !== -1) {
@@ -1513,9 +1598,11 @@ ElGrapho.prototype = {
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
         if (dataIndex === -1) {
+          that.deselectNode();
           that.deselectGroup();
         }
         else {
+          that.selectNode(dataIndex);
           that.selectGroup(that.vertices.points.colors[dataIndex]);
 
           that.fire(Enums.events.NODE_CLICK, {
@@ -1544,6 +1631,7 @@ ElGrapho.prototype = {
 
         that.dirty = true;
         that.hitDirty = true;
+        that.hoverDirty = true;
       }
     });
 
@@ -1699,6 +1787,14 @@ ElGrapho.prototype = {
   deselectGroup: function() {
     this.focusedGroup = -1;
     this.dirty = true;
+  },
+  selectNode: function(index) {
+    this.selectedIndex = index;
+    this.hoverDirty = true;
+  },
+  deselectNode: function() {
+    this.selectedIndex = -1;
+    this.hoverDirty = true;
   }
 };
 
@@ -1777,6 +1873,8 @@ let ElGraphoCollection = {
           graph.hitDirty = true;
         }
         graph.dirty = true; 
+        graph.hoveredDataIndex = -1;
+        graph.hoverDirty = true;
       }
 
       let magicZoom;
@@ -1804,17 +1902,30 @@ let ElGraphoCollection = {
         }
       }
 
+      let scale = graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1;
+
+      if (graph.hoverDirty) {
+        graph.hoverLayer.scene.clear();
+
+        graph.renderRings(scale);
+      }
+        
+        
+
+
       if (graph.dirty) {
         idle = false;
         graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, graph.globalAlpha, graph.nodeOutline);
 
         graph.labelsLayer.scene.clear();
-        
+
         if (graph.hasLabels) {
-          graph.renderLabels(graph.zoomX < 1 || graph.zoomY < 1 ? Math.min(graph.zoomX, graph.zoomY) : 1);
+          graph.renderLabels(scale);
         }
+      }
+
+      if (graph.dirty || graph.hoverDirty) {
         graph.viewport.render(); // render composite
-        graph.dirty = false;
       }
 
       if (graph.hitDirty) {
@@ -1822,6 +1933,10 @@ let ElGraphoCollection = {
         graph.webgl.drawHit(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize);
         graph.hitDirty = false; 
       }
+
+      graph.dirty = false;
+      graph.hoverDirty = false;
+      graph.hitDirty = false; 
 
       if (idle && !graph.idle) {
         graph.fire(Enums.events.IDLE);
