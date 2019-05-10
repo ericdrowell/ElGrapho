@@ -358,16 +358,17 @@ graph.on('node-mouseover', function(evt) {
 
 ## Methods
 
-* ```graph.selectGroup(groupIndex)``` - select a group by groupIndex, which is an integer
+* ```graph.selectGroup(index)``` - select a group by index, where ```index``` is an ```integer```
 
 * ```graph.deselectGroup()``` - deselect the currently selected group
 
-* ```graph.setSize(width, height)``` - set the graph size in pixels
+* ```graph.setSize(width, height)``` - set the graph size in pixels, where ```width``` and ```height``` is a ```number```
 
-* ```graph.setDarkMode(mode)``` - set dark mode to true or false
+* ```graph.setDarkMode(mode)``` - enable or disable dark mode, where ```mode``` is a ```boolean```
 
-* new selectNode() method
-* new deselectNode() method
+* ```graph.selectNode(index)``` - select node by index, where ```index``` is an ```integer```
+
+* ```graph.deselectNode()``` - deselect a selected node
 
 ## About the Name and Logo
 
