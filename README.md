@@ -71,23 +71,29 @@ let graph = new ElGrapho({
 
 * ```model.edges``` - object that defines the edges between nodes based on their indices.  Each edge is defined by a from-node-index and a to-node-index.  In the example above, the first edge begins at node ```0``` and ends at node ```1```.  For non directed graphs, or bi-directional graphs, ```from``` and ```to``` are interchangeable. 
 
-* ```width``` - number that defines the width of the El Grapho viewport in pixels.  The default is 500;
+* ```width``` - number that defines the width of the El Grapho viewport in pixels.  The default is ```500```.
 
-* ```height``` - number defines the height of the El Grapho viewport in pixels.  The default is 500;
+* ```height``` - number defines the height of the El Grapho viewport in pixels.  The default is ```500```.
 
-* ```nodeSize``` - number between 0 and 1 which defines the node size.  The default is 1.
+* ```nodeSize``` - number between 0 and 1 which defines the node size.  The default is ```1```.
 
-* ```edgeSize``` - number between 0 and 1 which defines the edge size.  Edge sizes are relative to the connecting node size.  The default is 0.25. 
+* ```nodeOutline``` - boolean that enables or disables node outlines.  The default is ```true```.
 
-* ```fillContainer``` - boolean that enables or disables auto filling the container.  When true, El Grapho will automatically detect anytime its container has changed shape, and will auto resize itself.  The default is false.
+* ```edgeSize``` - number between 0 and 1 which defines the edge size.  Edge sizes are relative to the connecting node size.  The default is ```0.25```. 
 
-* ```tooltips``` - boolean that enables or disables tooltips.  The default is true.
+* ```darkMode``` - boolean that enables or disables dark mode.  The default is ```false```.
 
-* ```arrows``` - boolean that enables or disables edge arrows. The default is false.  For non directed or bi-directional graphs, you should keep ```arrows``` as ```false```.
+* ```globalAlpha``` - number between 0 and 1 that defines the global alpha of nodes and edges.  Alphas are blended where nodes and edges intersect, resulting in a brightening effect at the intersections.  The default is ```1```. 
 
-* ```animations``` - boolean that defines animation strategy.  When animations is true, zoom and pan transitions will be animated.  Otherwise the transitions will be immediate.  Although animations utilize requestAnimationFrame for dynamic frame rates, in some situations you may prefer to set animations to false to improve transition performance for very high cardinality graphs with millions of nodes and edges.  The default is true.
+* ```fillContainer``` - boolean that enables or disables auto filling the container.  When true, El Grapho will automatically detect anytime its container has changed shape, and will auto resize itself.  The default is ```false```.
 
-* ```debug``` - boolean that can be used to enable debug mode.  Debug mode will show the node and edge count in the bottom right corner of the visualization.  The default is false.
+* ```tooltips``` - boolean that enables or disables tooltips.  The default is ```true```.
+
+* ```arrows``` - boolean that enables or disables edge arrows.  For non directed or bi-directional graphs, you should keep ```arrows``` as ```false```.  The default is ```false```.
+
+* ```animations``` - boolean that defines animation strategy.  When animations is true, zoom and pan transitions will be animated.  Otherwise the transitions will be immediate.  Although animations utilize requestAnimationFrame for dynamic frame rates, in some situations you may prefer to set animations to false to improve transition performance for very high cardinality graphs with millions of nodes and edges.  The default is ```true```.
+
+* ```debug``` - boolean that can be used to enable debug mode.  Debug mode will show the node and edge count in the bottom right corner of the visualization.  The default is ```false```.
 
 
 ### Layouts
@@ -357,6 +363,11 @@ graph.on('node-mouseover', function(evt) {
 * ```graph.deselectGroup()``` - deselect the currently selected group
 
 * ```graph.setSize(width, height)``` - set the graph size in pixels
+
+* ```graph.setDarkMode(mode)``` - set dark mode to true or false
+
+* new selectNode() method
+* new deselectNode() method
 
 ## About the Name and Logo
 
