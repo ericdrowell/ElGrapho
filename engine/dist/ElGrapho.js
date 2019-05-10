@@ -1,7 +1,7 @@
 /*
  * El Grapho v2.3.1
  * A high performance WebGL graph data visualization engine
- * Release Date: 05-07-2019
+ * Release Date: 05-09-2019
  * https://github.com/ericdrowell/elgrapho
  * Licensed under the MIT or GPL Version 2 licenses.
  *
@@ -579,10 +579,10 @@ void main() {
 
   if (!isFocused) {
     if (darkMode) {
-      vVertexColor = vec4(60.0/255.0, 60.0/255.0, 60.0/255.0, globalAlpha);  
+      vVertexColor = vec4(60.0/255.0, 60.0/255.0, 60.0/255.0, globalAlpha) * 0.5;  
     }
     else {
-      vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, globalAlpha);
+      vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, globalAlpha) * 0.5;
     }
   }
   else if (validColor == 0.0) {
@@ -801,10 +801,10 @@ void main() {
 
   if (!isFocused) {
     if (darkMode) {
-      vVertexColor = vec4(60.0/255.0, 60.0/255.0, 60.0/255.0, globalAlpha);  
+      vVertexColor = vec4(60.0/255.0, 60.0/255.0, 60.0/255.0, globalAlpha) * 0.5;  
     }
     else {
-      vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, globalAlpha);
+      vVertexColor = vec4(220.0/255.0, 220.0/255.0, 220.0/255.0, globalAlpha) * 0.5;
     }
   }
   else if (validColor == 0.0) {
@@ -1290,9 +1290,9 @@ ElGrapho.prototype = {
           context.strokeStyle = 'black';
         }
 
-        context.lineWidth = 3;
+        context.lineWidth = 2;
         context.beginPath();
-        context.arc(x, y, 6, 0, 2*Math.PI, false);
+        context.arc(x, y, 5, 0, 2*Math.PI, false);
         context.stroke();
         context.restore();
       }
@@ -1311,9 +1311,9 @@ ElGrapho.prototype = {
           context.strokeStyle = 'black';      
         }
 
-        context.lineWidth = 5;
+        context.lineWidth = 3;
         context.beginPath();
-        context.arc(x, y, 6, 0, 2*Math.PI, false);
+        context.arc(x, y, 5, 0, 2*Math.PI, false);
         context.stroke();
         context.restore();
       }
@@ -1593,7 +1593,7 @@ ElGrapho.prototype = {
         return;
       }
 
-      if (!that.panStart && !that.zoomBoxAnchor) {
+      if (that.interactionMode === Enums.interactionMode.SELECT) {
         let mousePos = that.getMousePosition(evt);
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
@@ -1915,7 +1915,13 @@ let ElGraphoCollection = {
 
       if (graph.dirty) {
         idle = false;
-        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, graph.focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, graph.globalAlpha, graph.nodeOutline);
+        let focusedGroup = graph.focusedGroup;
+        let globalAlpha = graph.globalAlpha;
+
+        // if (focusedGroup > -1) {
+        //   globalAlpha = 1;
+        // }
+        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, globalAlpha, graph.nodeOutline);
 
         graph.labelsLayer.scene.clear();
 

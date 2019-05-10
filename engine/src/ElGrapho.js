@@ -328,9 +328,9 @@ ElGrapho.prototype = {
           context.strokeStyle = 'black';
         }
 
-        context.lineWidth = 3;
+        context.lineWidth = 2;
         context.beginPath();
-        context.arc(x, y, 6, 0, 2*Math.PI, false);
+        context.arc(x, y, 5, 0, 2*Math.PI, false);
         context.stroke();
         context.restore();
       }
@@ -349,9 +349,9 @@ ElGrapho.prototype = {
           context.strokeStyle = 'black';      
         }
 
-        context.lineWidth = 5;
+        context.lineWidth = 3;
         context.beginPath();
-        context.arc(x, y, 6, 0, 2*Math.PI, false);
+        context.arc(x, y, 5, 0, 2*Math.PI, false);
         context.stroke();
         context.restore();
       }
@@ -631,7 +631,7 @@ ElGrapho.prototype = {
         return;
       }
 
-      if (!that.panStart && !that.zoomBoxAnchor) {
+      if (that.interactionMode === Enums.interactionMode.SELECT) {
         let mousePos = that.getMousePosition(evt);
         let dataIndex = viewport.getIntersection(mousePos.x, mousePos.y);
 
