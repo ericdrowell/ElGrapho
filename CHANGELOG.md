@@ -3,7 +3,7 @@
 ## v2.4.0
 * node hover and selected visual treatments
 * new darkMode property
-* new globalAlpha property
+* new glowBlend property
 * new setDarkMode() method
 * new nodeOutline property
 * new selectNode() method

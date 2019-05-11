@@ -83,7 +83,7 @@ let graph = new ElGrapho({
 
 * ```darkMode``` - boolean that enables or disables dark mode.  The default is ```false```.
 
-* ```globalAlpha``` - number between 0 and 1 that defines the global alpha of nodes and edges.  Alphas are blended where nodes and edges intersect, resulting in a brightening effect at the intersections.  The default is ```1```. 
+* ```glowBlend``` - number between 0 and 1 that defines the glow blending of nodes and edges.  A value of 0 has no glow blending, and a value of 1 has full glow blending.  Glow blending can be used as a visual treatment to emphasize node clustering or edge bundling.  It is most effective when used in conjunction with dark mode.  The default is ```0```. 
 
 * ```fillContainer``` - boolean that enables or disables auto filling the container.  When true, El Grapho will automatically detect anytime its container has changed shape, and will auto resize itself.  The default is ```false```.
 

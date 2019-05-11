@@ -70,7 +70,7 @@ ElGrapho.prototype = {
     this.focusedGroup = -1;
     this.tooltips = config.tooltips === undefined ? true : config.tooltips;
     this.fillContainer = config.fillContainer === undefined ? false : config.fillContainer;
-    this.globalAlpha = config.globalAlpha === undefined ? 1 : config.globalAlpha;
+    this.glowBlend = config.glowBlend === undefined ? 0 : config.glowBlend;
     this.nodeOutline = config.nodeOutline === undefined ? true : config.nodeOutline;
     this.animations = [];
     this.wrapper = document.createElement('div');

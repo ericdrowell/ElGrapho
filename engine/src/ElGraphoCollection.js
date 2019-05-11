@@ -90,12 +90,9 @@ let ElGraphoCollection = {
       if (graph.dirty) {
         idle = false;
         let focusedGroup = graph.focusedGroup;
-        let globalAlpha = graph.globalAlpha;
+        let glowBlend = graph.glowBlend;
 
-        // if (focusedGroup > -1) {
-        //   globalAlpha = 1;
-        // }
-        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, globalAlpha, graph.nodeOutline);
+        graph.webgl.drawScene(graph.width, graph.height, graph.panX, graph.panY, graph.zoomX, graph.zoomY, magicZoom, nodeSize, focusedGroup, graph.hoveredDataIndex, graph.edgeSize, graph.darkMode, glowBlend, graph.nodeOutline);
 
         graph.labelsLayer.scene.clear();
 
